@@ -1,16 +1,5 @@
-﻿// Copyright (c) 2017, 2019, 2021 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-// http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -91,6 +80,12 @@ namespace CLR_SharpmakeTest
     }
 
     [Sharpmake.Generate]
+    public class CSharpProjBuildOrderDependency : CommonCSharpProject
+    {
+        public CSharpProjBuildOrderDependency() { }
+    }
+
+    [Sharpmake.Generate]
     public class CLR_CPP_Proj : CommonProject
     {
         public CLR_CPP_Proj()
@@ -108,11 +103,17 @@ namespace CLR_SharpmakeTest
                 "System.Xml"
             );
 
-            conf.AddPrivateDependency<OtherCSharpProj>(target, DependencySetting.OnlyBuildOrder);
+            conf.AddPrivateDependency<OtherCSharpProj>(target);
+            conf.AddPrivateDependency<CSharpProjBuildOrderDependency>(target, DependencySetting.OnlyBuildOrder);
             conf.AddPrivateDependency<TheEmptyCPPProject>(target);
 
             // Force full pdb otherwise we get this message: /DEBUG:FASTLINK is not supported when managed code is present; restarting link with /DEBUG:FULL
             conf.Options.Add(Options.Vc.Linker.GenerateFullProgramDatabaseFile.Enable);
+
+            // Force RTTI to be enabled
+            conf.Options.Add(Sharpmake.Options.Vc.Compiler.RTTI.Enable);
+
+            conf.Options.Add(Sharpmake.Options.Vc.General.CommonLanguageRuntimeSupport.ClrSupport);
         }
     }
 

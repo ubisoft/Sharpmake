@@ -1,16 +1,5 @@
-﻿// Copyright (c) 2020-2021 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-// http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System.IO;
 using System.Linq;
@@ -37,6 +26,8 @@ namespace HelloXCode
             IsFileNameToLower = false;
             IsTargetFileNameToLower = false;
 
+            SourceFilesExtensions.Add(".sc");
+
             SourceRootPath = @"[project.RootPath]\[project.Name]";
             AdditionalSourceRootPaths.Add(Globals.ExternalDirectory);
         }
@@ -48,7 +39,7 @@ namespace HelloXCode
             conf.IncludePaths.Add(Globals.ExternalDirectory);
 
             conf.ProjectFileName = "[project.Name]_[target.Platform]";
-            if (target.DevEnv != DevEnv.xcode4ios)
+            if (target.DevEnv != DevEnv.xcode)
                 conf.ProjectFileName += "_[target.DevEnv]";
             conf.ProjectPath = Path.Combine(Globals.TmpDirectory, @"projects\[project.Name]");
             conf.IsFastBuild = target.BuildSystem == BuildSystem.FastBuild;
@@ -67,6 +58,17 @@ namespace HelloXCode
             //conf.TargetFileName += "x";
 
             conf.Output = Configuration.OutputType.Lib; // defaults to creating static libs
+            conf.Options.Add(Options.XCode.Editor.Indent.Spaces);
+
+            if (target.Optimization == Optimization.Release)
+            {
+                conf.Options.Add(Sharpmake.Options.XCode.Compiler.DebugInformationFormat.DwarfWithDSym);
+                conf.Options.Add(Sharpmake.Options.XCode.Linker.StripLinkedProduct.Enable);
+                conf.Options.Add(Sharpmake.Options.XCode.Linker.StripStyle.DebuggingSymbolsOnly);
+                conf.Options.Add(Sharpmake.Options.XCode.Linker.StripSwiftSymbols.Enable);
+            }
+            else
+                conf.Options.Add(Sharpmake.Options.XCode.Compiler.DebugInformationFormat.Dwarf);
         }
 
         ////////////////////////////////////////////////////////////////////////

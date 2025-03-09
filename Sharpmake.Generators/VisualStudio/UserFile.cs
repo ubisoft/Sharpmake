@@ -1,16 +1,6 @@
-﻿// Copyright (c) 2017-2018, 2020 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System.Collections.Generic;
 using System.IO;
 
@@ -58,7 +48,7 @@ namespace Sharpmake.Generators.VisualStudio
                     }
                     overwriteFile &= overwriteFileConfig;
 
-                    using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
+                    using (fileGenerator.Declare("platformName", Util.GetToolchainPlatformString(conf.Platform, conf.Project, conf.Target)))
                     using (fileGenerator.Declare("conf", conf))
                     using (fileGenerator.Declare("project", project))
                     {
@@ -75,16 +65,19 @@ namespace Sharpmake.Generators.VisualStudio
 
                 // remove all line that contain RemoveLineTag
                 fileGenerator.RemoveTaggedLines();
-                using (MemoryStream cleanMemoryStream = fileGenerator.ToMemoryStream())
+                FileInfo userFileInfo = new FileInfo(_userFilePath);
+                //Skip overwriting user file if it exists already so he can keep his setup
+                // unless the UserProjSettings specifies to overwrite
+                bool shouldWrite = !userFileInfo.Exists || overwriteFile;
+                if (shouldWrite && builder.Context.WriteGeneratedFile(project.GetType(), userFileInfo, fileGenerator))
                 {
-                    FileInfo userFileInfo = new FileInfo(_userFilePath);
-                    //Skip overwriting user file if it exists already so he can keep his setup
-                    // unless the UserProjSettings specifies to overwrite
-                    bool shouldWrite = !userFileInfo.Exists || overwriteFile;
-                    if (shouldWrite && builder.Context.WriteGeneratedFile(project.GetType(), userFileInfo, cleanMemoryStream))
-                        generatedFiles.Add(userFileInfo.FullName);
-                    else
-                        skipFiles.Add(userFileInfo.FullName);
+                    generatedFiles.Add(userFileInfo.FullName);
+                }
+                else
+                {
+                    // prevent deletion of skipped files.
+                    Util.RecordInAutoCleanupDatabase(userFileInfo.FullName);
+                    skipFiles.Add(userFileInfo.FullName);
                 }
             }
         }

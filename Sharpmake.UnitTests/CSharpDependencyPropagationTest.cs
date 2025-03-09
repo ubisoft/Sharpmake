@@ -1,16 +1,6 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System.IO;
 using NUnit.Framework;
 
@@ -268,6 +258,29 @@ namespace Sharpmake.UnitTests
                 }
             }
         }
+
+        [Test]
+        public void CSharpDependenciesSwappedWithDLL()
+        {
+            var project = GetProject<CSharpTestProjects.CSharpProjectDependencySwappedToDLL>();
+            foreach (var conf in project.Configurations)
+            {
+                // Dep 1 (swapped):     CSharpInheritOnePublicDependencyProject -> CSharpOnePublicDependencyProject -> CSharpNoDependencyProject1
+                // Dep 2 (not swapped): CSharpProjectB
+                Assert.That(conf.DotNetPublicDependencies.Count, Is.EqualTo(4));
+                Assert.That(conf.DotNetPrivateDependencies.Count, Is.EqualTo(0));
+                
+                foreach (var dependency in conf.DotNetPublicDependencies)
+                {
+                    // All of them should be Swapped except CsharpProjectB (because it's transitive)
+                    if (dependency.Configuration.Project.FullClassName == typeof(CSharpTestProjects.CSharpProjectB).FullName)
+                        Assert.False(dependency.ReferenceSwappedWithOutputAssembly);
+                    else
+                        Assert.True(dependency.ReferenceSwappedWithOutputAssembly);
+                }
+            }
+
+        }
     }
 
 
@@ -514,6 +527,19 @@ namespace Sharpmake.UnitTests
             {
                 conf.AddPublicDependency<CSharpInheritOnePublicDependencyProject>(target);
                 conf.AddPublicDependency<CSharpOnlyBuildOrderDependency>(target);
+            }
+        }
+        
+        [Sharpmake.Generate]
+        public class CSharpProjectDependencySwappedToDLL : CSharpUnitTestCommonProject
+        {
+            public CSharpProjectDependencySwappedToDLL() { }
+
+            [Configure()]
+            public void ConfigureAll(Configuration conf, Target target)
+            {
+                conf.AddPublicDependency<CSharpInheritOnePublicDependencyProject>(target, DependencySetting.DependOnAssemblyOutput);
+                conf.AddPublicDependency<CSharpProjectB>(target);
             }
         }
     }

@@ -1,16 +1,6 @@
-﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -50,8 +40,14 @@ namespace Sharpmake
         vs2022 = 1 << 6,
 
         /// <summary>
-        /// iOS project with Xcode.
+        /// Xcode projects
         /// </summary>
+        xcode = 1 << 7,
+
+        /// <summary>
+        /// iOS project with Xcode [deprecated]
+        /// </summary>
+        [Obsolete("xcode4ios has been deprecated, please use 'xcode'", error: true)]
         xcode4ios = 1 << 7,
 
         /// <summary>
@@ -78,35 +74,99 @@ namespace Sharpmake
         vs2013 = -1,
     }
 
-    // Mandatory
+    /// <summary>
+    /// The platforms supported by Sharpmake generators.
+    /// Always use 'Util.GetSimplePlatformString' to get the correct name of these platforms.
+    /// </summary>
+    /// <remarks>
+    /// This fragment is mandatory in every target.
+    /// </remarks>
     [Fragment, Flags]
     public enum Platform
     {
+        /// <summary>
+        /// Windows 32-bit
+        /// </summary>
         win32 = 1 << 0,
+
+        /// <summary>
+        /// Windows 64-bit
+        /// </summary>
         win64 = 1 << 1,
+
+        /// <summary>
+        /// .NET CLR
+        /// </summary>
         anycpu = 1 << 2,
+
+        /// <summary>
+        /// Xbox One
+        /// </summary>
         durango = 1 << 3,
+
+        /// <summary>
+        /// Playstation 4
+        /// </summary>
         orbis = 1 << 4,
+
+        /// <summary>
+        /// Nintendo Switch
+        /// </summary>
         nx = 1 << 5,
-        ctr = 1 << 6,
+
+        _inactive1 = 1 << 6, // This used to be "ctr"
+
+        /// <summary>
+        /// Apple iPhone and iPad
+        /// </summary>
         ios = 1 << 7,
+
+        /// <summary>
+        /// Android
+        /// </summary>
         android = 1 << 8,
+
+        /// <summary>
+        /// Linux
+        /// </summary>
         linux = 1 << 9,
+
+        /// <summary>
+        /// macOS
+        /// </summary>
         mac = 1 << 10,
+
         /// <summary>
         /// Android Game Development Extension
         /// </summary>
         agde = 1 << 11,
 
-        _reserved9 = 1 << 22,
-        _reserved8 = 1 << 23,
-        _reserved7 = 1 << 24,
-        _reserved6 = 1 << 25,
-        _reserved5 = 1 << 26,
-        _reserved4 = 1 << 27,
-        _reserved3 = 1 << 28,
-        _reserved2 = 1 << 29,
-        _reserved1 = 1 << 30,
+        /// <summary>
+        /// Apple TV
+        /// </summary>
+        tvos = 1 << 12,
+
+        /// <summary>
+        /// Apple Watch
+        /// </summary>
+        watchos = 1 << 13,
+
+        /// <summary>
+        /// Mac Catalyst (see https://developer.apple.com/mac-catalyst/)
+        /// </summary>
+        maccatalyst = 1 << 14,
+
+        // This is a reverse-growing section for undisclosed platforms
+        _reserved10 = 1 << 21, // ACTIVE
+        _reserved9  = 1 << 22, // ACTIVE
+        _reserved8  = 1 << 23, // ACTIVE
+        _reserved7  = 1 << 24, // ACTIVE
+        _reserved6  = 1 << 25, // Inactive
+        _reserved5  = 1 << 26, // Inactive
+        _reserved4  = 1 << 27, // Inactive
+        _reserved3  = 1 << 28, // Inactive
+        _reserved2  = 1 << 29, // Inactive
+        _reserved1  = 1 << 30, // Inactive
 
         [Obsolete]
         x360 = -1,
@@ -120,6 +180,8 @@ namespace Sharpmake
         wiiu = -1,
         [Obsolete]
         nvshield = -1,
+        [Obsolete]
+        ctr = -1,
     }
 
     [Fragment, Flags]
@@ -168,21 +230,25 @@ namespace Sharpmake
 
         net5_0 = 1 << 17,
         net6_0 = 1 << 18,
+        net7_0 = 1 << 19,
+        net8_0 = 1 << 20,
 
-        netstandard1_0 = 1 << 19,
-        netstandard1_1 = 1 << 20,
-        netstandard1_2 = 1 << 21,
-        netstandard1_3 = 1 << 22,
-        netstandard1_4 = 1 << 23,
-        netstandard1_5 = 1 << 24,
-        netstandard1_6 = 1 << 25,
-        netstandard2_0 = 1 << 26,
-        netstandard2_1 = 1 << 27,
+        netstandard1_0 = 1 << 21,
+        netstandard1_1 = 1 << 22,
+        netstandard1_2 = 1 << 23,
+        netstandard1_3 = 1 << 24,
+        netstandard1_4 = 1 << 25,
+        netstandard1_5 = 1 << 26,
+        netstandard1_6 = 1 << 27,
+        netstandard2_0 = 1 << 28,
+        netstandard2_1 = 1 << 29,
+
+        net9_0 = 1 << 30,
 
         [CompositeFragment]
         all_netframework = v3_5 | v3_5clientprofile | v4_5_2 | v4_6 | v4_6_1 | v4_6_2 | v4_7 | v4_7_1 | v4_7_2 | v4_8,
         [CompositeFragment]
-        all_netcore = netcore1_0 | netcore1_1 | netcore2_0 | netcore2_1 | netcore3_0 | netcore3_1 | net5_0 | net6_0,
+        all_netcore = netcore1_0 | netcore1_1 | netcore2_0 | netcore2_1 | netcore3_0 | netcore3_1 | net5_0 | net6_0 | net7_0 | net8_0 | net9_0,
         [CompositeFragment]
         all_netstandard = netstandard1_0 | netstandard1_1 | netstandard1_2 | netstandard1_3 | netstandard1_4 | netstandard1_5 | netstandard1_6 | netstandard2_0 | netstandard2_1,
 
@@ -240,6 +306,7 @@ namespace Sharpmake
     {
         public Optimization Optimization;
         public Platform Platform;
+        public string ToolchainPlatform { get { return Util.GetToolchainPlatformString(Platform, this); } }
         public BuildSystem BuildSystem;
         public DevEnv DevEnv;
         public OutputType OutputType;
@@ -285,6 +352,9 @@ namespace Sharpmake
 
         public string GetTargetString()
         {
+            if (_valueCache != null)
+                return _valueCache;
+
             FieldInfo[] fieldInfos = GetFragmentFieldInfo();
 
             var fieldInfoValues = fieldInfos.Select(f => f.GetValue(this));
@@ -293,15 +363,14 @@ namespace Sharpmake
                 "_",
                 nonZeroValues.Select(f => s_cachedFieldValueToString.GetOrAdd(f, value =>
                 {
-                    if (value is Platform)
+                    if (value is Platform platformValue)
                     {
-                        var platform = (Platform)value;
-                        if (platform >= Platform._reserved9)
-                            return Util.GetPlatformString(platform, null, this).ToLower();
+                        return Util.GetSimplePlatformString(platformValue);
                     }
                     return value.ToString();
                 }))
             );
+            _valueCache = result;
             return result;
         }
 
@@ -381,7 +450,9 @@ namespace Sharpmake
             if (other._valueCache == null)
                 other._valueCache = other.GetTargetString();
 
-            return _valueCache == other._valueCache;
+            if (_valueCache == other._valueCache)
+                return true;
+            return string.Compare(_valueCache, other._valueCache, StringComparison.Ordinal) == 0;
         }
 
         //possible to override this to make the associations with custom platforms and Sharpmake's
@@ -451,6 +522,13 @@ namespace Sharpmake
         {
             FieldInfo[] fragments = GetType().GetFields();
             var tType = typeof(T);
+            return fragments.Any(fragment => fragment.FieldType == tType);
+        }
+
+        public bool HaveFragmentOfSameType(object asFragment)
+        {
+            FieldInfo[] fragments = GetType().GetFields();
+            var tType = asFragment.GetType();
             return fragments.Any(fragment => fragment.FieldType == tType);
         }
 
@@ -613,8 +691,16 @@ namespace Sharpmake
             return false;
         }
 
+        private static ConcurrentDictionary<Type, bool> _verifiedTargetTypes = new ConcurrentDictionary<Type, bool>();
+
         internal void Initialize(Type targetType)
         {
+            if (_verifiedTargetTypes.ContainsKey(targetType))
+            {
+                TargetType = targetType;
+                return; // Type already validated.
+            }
+
             if (targetType == null)
                 throw new InternalError();
 
@@ -653,6 +739,10 @@ namespace Sharpmake
                     if (enumFields[i].GetCustomAttribute<CompositeFragmentAttribute>() != null)
                         continue;
 
+                    // skip duplicate fragment values that have been explicitely marked as ignored
+                    if (enumFields[i].GetCustomAttribute<IgnoreDuplicateFragmentValueAttribute>() != null)
+                        continue;
+
                     int enumFieldValue = (int)enumFields[i].GetRawConstantValue();
 
                     if (enumFieldValue == 0)
@@ -672,6 +762,10 @@ namespace Sharpmake
                                 continue;
 
                             if (enumFields[j].GetCustomAttribute<ObsoleteAttribute>() != null)
+                                continue;
+
+                            // skip duplicate fragment values that have been explicitely marked as ignored
+                            if (enumFields[j].GetCustomAttribute<IgnoreDuplicateFragmentValueAttribute>() != null)
                                 continue;
 
                             if (i != j)
@@ -701,6 +795,9 @@ namespace Sharpmake
                 throw new Error("Mandatory fragment type \"{0}\" not found in target type \"{1}\" (fields also must be public)", typeof(DevEnv).ToString(), targetType);
             if (!fragmentsType.Contains(typeof(Platform)))
                 throw new Error("Mandatory fragment type \"{0}\" not found in target type \"{1}\" (fields also must be public)", typeof(Platform).ToString(), targetType);
+
+            // Mark this type as validated successfully.
+            _verifiedTargetTypes.TryAdd(targetType, true);
         }
 
         internal void AddTargets(string callerInfo, params ITarget[] targetsMask)

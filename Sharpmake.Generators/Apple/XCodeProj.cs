@@ -1,16 +1,6 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -19,6 +9,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Xml.Linq;
+using Sharpmake.Generators.FastBuild;
 using Sharpmake.Generators.VisualStudio;
 
 namespace Sharpmake.Generators.Apple
@@ -28,6 +20,7 @@ namespace Sharpmake.Generators.Apple
         public const string ProjectExtension = ".xcodeproj";
         private const string ProjectFileName = "project.pbxproj";
         private const string ProjectSchemeExtension = ".xcscheme";
+        private const string XCTestBundleExtension = ".xctest";
 
         private const int ProjectArchiveVersion = 1;
         private const int ProjectObjectVersion = 46;
@@ -73,16 +66,21 @@ namespace Sharpmake.Generators.Apple
             }
         }
 
-        private readonly HashSet<ProjectItem> _projectItems = new HashSet<ProjectItem>();
+        internal readonly HashSet<ProjectItem> _projectItems = new HashSet<ProjectItem>();
 
         private ProjectFolder _mainGroup = null;
         private ProjectFolder _productsGroup = null;
         private ProjectFolder _frameworksFolder = null;
+        private ProjectFolder _embedFrameworksFolder = null;
 
         private Dictionary<string, ProjectTarget> _nativeOrLegacyTargets = null;
         private Dictionary<string, ProjectResourcesBuildPhase> _resourcesBuildPhases = null;
-        private Dictionary<string, ProjectSourcesBuildPhase> _sourcesBuildPhases = null;
+        internal Dictionary<string, ProjectSourcesBuildPhase> _sourcesBuildPhases = null;
         private Dictionary<string, ProjectFrameworksBuildPhase> _frameworksBuildPhases = null;
+        private Dictionary<string, UniqueList<ProjectHeadersBuildPhase>> _headersBuildPhases = null;
+        private Dictionary<string, UniqueList<ProjectCopyFilesBuildPhase>> _copyFilesPreBuildPhases = null;
+        private Dictionary<string, UniqueList<ProjectCopyFilesBuildPhase>> _copyFilesBuildPhases = null;
+        private Dictionary<string, UniqueList<ProjectCopyFilesBuildPhase>> _copyFilesPostBuildPhases = null;
         private Dictionary<string, UniqueList<ProjectShellScriptBuildPhase>> _shellScriptPreBuildPhases = null;
         private Dictionary<string, UniqueList<ProjectShellScriptBuildPhase>> _shellScriptPostBuildPhases = null;
         private Dictionary<string, List<ProjectTargetDependency>> _targetDependencies = null;
@@ -92,12 +90,34 @@ namespace Sharpmake.Generators.Apple
 
         private Dictionary<Project.Configuration, Options.ExplicitOptions> _optionMapping = null;
 
+        private string _projectSourceRootPath = null;
+
         // Unit Test Variables
         private string _unitTestFramework = "XCTest";
 
         static XCodeProj()
         {
-            FolderSeparator = Util.UnixSeparator;
+            FolderSeparator = Path.DirectorySeparatorChar;
+        }
+
+        private void PrepareUnitTestSources(
+            Project project,
+            List<Project.Configuration> configurations
+            )
+        {
+            if (!string.IsNullOrEmpty(project.XcodeUnitTestSourceRootPath))
+            {
+                var files = Util.DirectoryGetFiles(Util.SimplifyPath(project.XcodeUnitTestSourceRootPath));
+                project.XcodeUnitTestSourceFiles.AddRange(files);
+            }
+
+            if (project.XcodeUnitTestSourceFilesBuildExclude.Count > 0)
+            {
+                foreach (Project.Configuration conf in configurations)
+                {
+                    conf.XcodeResolvedUnitTestSourceFilesBuildExclude.AddRange(project.XcodeUnitTestSourceFilesBuildExclude);
+                }
+            }
         }
 
         public void Generate(
@@ -109,9 +129,13 @@ namespace Sharpmake.Generators.Apple
             List<string> skipFiles
         )
         {
+            _projectSourceRootPath = project.SourceRootPath;
+
             FileInfo fileInfo = new FileInfo(projectFile);
             string projectPath = fileInfo.Directory.FullName;
             string projectFileName = fileInfo.Name;
+
+            PrepareUnitTestSources(project, configurations);
 
             var context = new XCodeGenerationContext(builder, projectPath, project);
             PrepareSections(context, configurations);
@@ -144,13 +168,41 @@ namespace Sharpmake.Generators.Apple
             string projectFilePath = Path.Combine(projectFolder, ProjectFileName);
             FileInfo projectFileInfo = new FileInfo(projectFilePath);
 
-            var fileGenerator = InitProjectGenerator(configurations);
+            var fileGenerator = InitProjectGenerator(context, configurations);
 
             // Write the project file
-            updated = context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectFileInfo, fileGenerator.ToMemoryStream());
+            updated = context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectFileInfo, fileGenerator);
+
+            OutputCustomProperties(context, projectFolder);
 
             string projectFileResult = projectFileInfo.FullName;
             return projectFileResult;
+        }
+
+        // export customproperties for xcode project
+        private void OutputCustomProperties(XCodeGenerationContext context, string projectFolder)
+        {
+            var project = context.Project;
+            if (project.CustomProperties.Any())
+            {
+                XNamespace xmlns = "http://schemas.microsoft.com/developer/msbuild/2003";
+                XElement customPropertiesProject = new XElement(xmlns + "Project");
+                XElement propertyGroup = new XElement(xmlns + "PropertyGroup");
+
+                customPropertiesProject.Add(propertyGroup);
+                foreach (var property in project.CustomProperties)
+                {
+                    propertyGroup.Add(new XElement(xmlns + property.Key, property.Value));
+                }
+
+                string xmlContent = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n" + customPropertiesProject.ToString();
+                FileGenerator fileGenerator = new FileGenerator();
+                fileGenerator.WriteVerbatim(xmlContent);
+
+                string customPropertiesFile = Path.Combine(projectFolder, XCodeUtil.CustompropertiesFilename);
+                FileInfo customPropertiesFileInfo = new FileInfo(customPropertiesFile);
+                context.Builder.Context.WriteGeneratedFile(typeof(XDocument), customPropertiesFileInfo, fileGenerator);
+            }
         }
 
         private string GenerateProjectScheme(
@@ -170,13 +222,13 @@ namespace Sharpmake.Generators.Apple
             var fileGenerator = InitProjectSchemeGenerator(configurations, projectFile);
 
             // Write the scheme file
-            updated = context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectSchemeFileInfo, fileGenerator.ToMemoryStream());
+            updated = context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectSchemeFileInfo, fileGenerator);
             string projectFileResult = projectSchemeFileInfo.FullName;
 
             return projectFileResult;
         }
 
-        private FileGenerator InitProjectGenerator(IList<Project.Configuration> configurations)
+        private FileGenerator InitProjectGenerator(XCodeGenerationContext context, IList<Project.Configuration> configurations)
         {
             // Header.
             var fileGenerator = new FileGenerator();
@@ -186,22 +238,33 @@ namespace Sharpmake.Generators.Apple
                 fileGenerator.Write(Template.GlobalHeader);
             }
 
-            WriteSection<ProjectBuildFile>(configurations[0], fileGenerator);
-            WriteSection<ProjectContainerProxy>(configurations[0], fileGenerator);
-            WriteSection<ProjectFile>(configurations[0], fileGenerator);
-            WriteSection<ProjectFrameworksBuildPhase>(configurations[0], fileGenerator);
-            WriteSection<ProjectFolder>(configurations[0], fileGenerator);
-            WriteSection<ProjectLegacyTarget>(configurations[0], fileGenerator);
-            WriteSection<ProjectNativeTarget>(configurations[0], fileGenerator);
-            WriteSection<ProjectMain>(configurations[0], fileGenerator);
-            WriteSection<ProjectReferenceProxy>(configurations[0], fileGenerator);
-            WriteSection<ProjectResourcesBuildPhase>(configurations[0], fileGenerator);
-            WriteSection<ProjectSourcesBuildPhase>(configurations[0], fileGenerator);
-            WriteSection<ProjectVariantGroup>(configurations[0], fileGenerator);
-            WriteSection<ProjectTargetDependency>(configurations[0], fileGenerator);
-            WriteSection<ProjectBuildConfiguration>(configurations[0], fileGenerator);
-            WriteSection<ProjectConfigurationList>(configurations[0], fileGenerator);
-            WriteSection<ProjectShellScriptBuildPhase>(configurations[0], fileGenerator);
+            var editorOptions = new Options.ExplicitOptions();
+            context.SelectOption(
+                Options.Option(Options.XCode.Editor.Indent.Tabs, () => { editorOptions["IndentUseTabs"] = "1"; }),
+                Options.Option(Options.XCode.Editor.Indent.Spaces, () => { editorOptions["IndentUseTabs"] = "0"; })
+            );
+
+            using (fileGenerator.Declare("editorOptions", editorOptions))
+            {
+                WriteSection<ProjectBuildFile>(configurations[0], fileGenerator);
+                WriteSection<ProjectContainerProxy>(configurations[0], fileGenerator);
+                WriteSection<ProjectFile>(configurations[0], fileGenerator);
+                WriteSection<ProjectFrameworksBuildPhase>(configurations[0], fileGenerator);
+                WriteSection<ProjectHeadersBuildPhase>(configurations[0], fileGenerator);
+                WriteSection<ProjectCopyFilesBuildPhase>(configurations[0], fileGenerator);
+                WriteSection<ProjectFolder>(configurations[0], fileGenerator);
+                WriteSection<ProjectLegacyTarget>(configurations[0], fileGenerator);
+                WriteSection<ProjectNativeTarget>(configurations[0], fileGenerator);
+                WriteSection<ProjectMain>(configurations[0], fileGenerator);
+                WriteSection<ProjectReferenceProxy>(configurations[0], fileGenerator);
+                WriteSection<ProjectResourcesBuildPhase>(configurations[0], fileGenerator);
+                WriteSection<ProjectSourcesBuildPhase>(configurations[0], fileGenerator);
+                WriteSection<ProjectVariantGroup>(configurations[0], fileGenerator);
+                WriteSection<ProjectTargetDependency>(configurations[0], fileGenerator);
+                WriteSection<ProjectBuildConfiguration>(configurations[0], fileGenerator);
+                WriteSection<ProjectConfigurationList>(configurations[0], fileGenerator);
+                WriteSection<ProjectShellScriptBuildPhase>(configurations[0], fileGenerator);
+            }
 
             // Footer.
             using (fileGenerator.Declare("RootObject", _projectMain))
@@ -223,6 +286,9 @@ namespace Sharpmake.Generators.Apple
             // Setup resolvers
             var fileGenerator = new FileGenerator();
 
+            var defaultConfiguration = configurations.Where(conf => conf.UseAsDefaultForXCode == true).FirstOrDefault();
+            Project.Configuration activeConfiguration = defaultConfiguration != null ? defaultConfiguration : configurations[0];
+
             // Build testable elements
             var testableTargets = _nativeOrLegacyTargets.Values.Where(target => target.OutputFile.OutputType == Project.Configuration.OutputType.IosTestBundle);
             var testableElements = new StringBuilder();
@@ -235,23 +301,98 @@ namespace Sharpmake.Generators.Apple
                 }
             }
 
+            // Build commandLineArguments
+            var debugArguments = Options.GetObject<Options.XCode.Scheme.DebugArguments>(activeConfiguration);
+            var commandLineArguments = new StringBuilder();
+            if (debugArguments != null)
+            {
+                commandLineArguments.Append(Template.CommandLineArgumentsBegin);
+                foreach(var argument in debugArguments)
+                {
+                    using (fileGenerator.Declare("argument", argument))
+                    commandLineArguments.Append(fileGenerator.Resolver.Resolve(Template.CommandLineArgument));
+                }
+                commandLineArguments.Append(Template.CommandLineArgumentsEnd);
+            }
+            else
+            {
+                commandLineArguments.Append(RemoveLineTag);
+            }
+
             // Write the scheme file
             var defaultTarget = _nativeOrLegacyTargets.Values.Where(target => target.OutputFile.OutputType != Project.Configuration.OutputType.IosTestBundle).FirstOrDefault();
 
             var options = new Options.ExplicitOptions();
-            Options.SelectOption(configurations[0],
+            Options.SelectOption(activeConfiguration,
                 Options.Option(Options.XCode.Compiler.EnableGpuFrameCaptureMode.AutomaticallyEnable, () => options["EnableGpuFrameCaptureMode"] = RemoveLineTag),
                 Options.Option(Options.XCode.Compiler.EnableGpuFrameCaptureMode.MetalOnly, () => options["EnableGpuFrameCaptureMode"] = "1"),
                 Options.Option(Options.XCode.Compiler.EnableGpuFrameCaptureMode.OpenGLOnly, () => options["EnableGpuFrameCaptureMode"] = "2"),
                 Options.Option(Options.XCode.Compiler.EnableGpuFrameCaptureMode.Disable, () => options["EnableGpuFrameCaptureMode"] = "3")
             );
+            // An empty line means ON, "1" means OFF
+            // https://gitlab.kitware.com/cmake/cmake/-/issues/23857
+            Options.SelectOption(activeConfiguration,
+                Options.Option(Options.XCode.Scheme.MetalAPIValidation.Enable, () => options["MetalAPIValidation"] = RemoveLineTag),
+                Options.Option(Options.XCode.Scheme.MetalAPIValidation.Disable, () => options["MetalAPIValidation"] = "1")
+            );
+
+            options["CustomDirectory"] = Options.PathOption.Get<Options.XCode.Scheme.CustomWorkingDirectory>(activeConfiguration);
+            var useCustomDirectory = options["CustomDirectory"] != RemoveLineTag ? "YES" : "NO";
+
+            string targetName = $"&quot;{activeConfiguration.Target.Name}&quot;";
+            string buildImplicitDependencies = activeConfiguration.IsFastBuild ? "NO" : "YES";
+            bool useBuildableProductRunnableSection = true;
+            string runnableFilePath = string.Empty;
+            if (activeConfiguration.IsFastBuild && activeConfiguration.Output == Project.Configuration.OutputType.AppleApp && !activeConfiguration.XcodeUseNativeProjectForFastBuildApp)
+            {
+                useBuildableProductRunnableSection = false;
+                var customRunnablePath = Options.GetObject<Options.XCode.Scheme.CustomRunnablePath>(activeConfiguration);
+                if (customRunnablePath != null)
+                    runnableFilePath = customRunnablePath.Path;
+                else
+                    runnableFilePath = Path.Combine(activeConfiguration.TargetPath, activeConfiguration.TargetFileFullNameWithExtension);
+            }
+
+            var environmentVariables = Options.GetObject<Options.XCode.Scheme.EnvironmentVariables>(activeConfiguration);
+            var environmentVariablesBuilder = new StringBuilder();
+            if (environmentVariables != null)
+            {
+                environmentVariablesBuilder.Append(Template.EnvironmentVariablesBegin);
+                foreach (var variable in environmentVariables.Variables)
+                {
+                    using (fileGenerator.Declare("name", variable.Key))
+                    using (fileGenerator.Declare("value", variable.Value))
+                    {
+                        environmentVariablesBuilder.Append(fileGenerator.Resolver.Resolve(Template.EnvironmentVariable));
+                    }
+                }
+                environmentVariablesBuilder.Append(Template.EnvironmentVariablesEnd);
+            }
+            else
+            {
+                environmentVariablesBuilder.Append(RemoveLineTag);
+            }
+
             using (fileGenerator.Declare("projectFile", projectFile))
             using (fileGenerator.Declare("item", defaultTarget))
             using (fileGenerator.Declare("options", options))
             using (fileGenerator.Declare("testableElements", testableElements))
-            using (fileGenerator.Declare("optimization", configurations[0].Target.Name))
+            using (fileGenerator.Declare("DefaultTarget", targetName))
+            using (fileGenerator.Declare("UseCustomDir", useCustomDirectory))
+            using (fileGenerator.Declare("commandLineArguments", commandLineArguments))
+            using (fileGenerator.Declare("environmentVariables", environmentVariablesBuilder))
+            using (fileGenerator.Declare("buildImplicitDependencies", buildImplicitDependencies))
+            using (fileGenerator.Declare("runnableFilePath", runnableFilePath))
+            using (fileGenerator.Declare("project", activeConfiguration.Project))
+            using (fileGenerator.Declare("target", activeConfiguration.Target))
+            using (fileGenerator.Declare("conf", activeConfiguration))
             {
-                fileGenerator.Write(Template.SchemeFileTemplate);
+                fileGenerator.Write(Template.SchemeFileTemplatePart1);
+                if (useBuildableProductRunnableSection)
+                    fileGenerator.Write(Template.SchemeRunnableNativeProject);
+                else
+                    fileGenerator.Write(Template.SchemeRunnableMakeFileProject);
+                fileGenerator.Write(Template.SchemeFileTemplatePart2);
             }
 
             // Remove all line that contain RemoveLineTag
@@ -260,9 +401,93 @@ namespace Sharpmake.Generators.Apple
             return fileGenerator;
         }
 
+        /// <summary>
+        /// Get the possible next folder against the longest common path.
+        /// - the string.Empty will be returned if no common path found;
+        /// - the 'inFolder' will be returned if 'refFolder' start of it;
+        /// example,
+        /// 'inFolder=sourceRoot', 'refFolder=differentSourceRoot', return should be string.Empty
+        /// 'inFolder=sourceRoot/source', 'refFolder=sourceRoot', return should be 'sourceRoot/source'
+        /// 'inFolder=sourceRoot', 'refFolder=sourceRoot/source', return should be 'sourceRoot'
+        /// </summary>
+        /// <param name="inFolder"></param>
+        /// <param name="refFolder"></param>
+        /// <returns></returns>
+        internal static string GetLongestCommonPath(string inFolder, string refFolder)
+        {
+            string[] folders = inFolder.Split(FolderSeparator);
+            string[] refFolders = refFolder.Split(FolderSeparator);
+
+            int nbrCommonFolders = 0;
+            int maxNbrFolders = Math.Min(folders.Length, refFolders.Length);
+            for (int i = 0; i < maxNbrFolders; ++i)
+            {
+                if (folders[i].Equals(refFolders[i]))
+                {
+                    ++nbrCommonFolders;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            if (nbrCommonFolders > 0)
+                return string.Join(FolderSeparator, folders, 0, Math.Min(nbrCommonFolders + 1, folders.Length));
+            return string.Empty;
+        }
+
+        private void PrepareSourceRootFolders(Project project, Project.Configuration configuration)
+        {
+            List<string> folders = new List<string>();
+
+            // Add subfolders instead of SourceRootPath to make the project's hierarchy looks like VS
+            foreach (var folder in Directory.GetDirectories(project.SourceRootPath))
+                folders.Add(folder);
+
+            foreach (var folder in project.AdditionalSourceRootPaths)
+            {
+                // suppose 'workspaceFolder/projectA/tmp/autogen' in AdditionalSourceRootPaths
+                // SourceRootPath=workspaceFolder/projectA/src
+                // then 'workspaceFolder/projectA/tmp' is expected to be added into 'folders'.
+                // 'workspaceFolder/projectA/tmp/autogen' will be added later as child of ProjectFolder(workspaceFolder/projectA/tmp) in AddInFileSystem() if there's any file under 'workspaceFolder/projectA/tmp/autogen'
+                string candidateFolder = GetLongestCommonPath(folder, project.SourceRootPath);
+                if (candidateFolder.Equals(string.Empty))
+                {
+                    candidateFolder = folder;
+                }
+                if (folders.Contains(candidateFolder))
+                    continue;
+                folders.Add(candidateFolder);
+            }
+
+            // blob path
+            foreach (var conf in project.Configurations)
+            {
+                if (!conf.IsBlobbed)
+                    continue;
+                string folder = GetLongestCommonPath(conf.BlobPath, project.SourceRootPath);
+                if (folder.Equals(string.Empty))
+                {
+                    folder = conf.BlobPath;
+                }
+                if (folders.Contains(folder))
+                    continue;
+                folders.Add(folder);
+            }
+
+            string projectPath = Directory.GetParent(configuration.ProjectFullFileNameWithExtension).FullName;
+            // add source root folders
+            foreach (string folder in folders)
+            {
+                AddOrGetFolderInFileSystem(folder, projectPath);
+            }
+        }
+
         private void PrepareSections(XCodeGenerationContext context, List<Project.Configuration> configurations)
         {
             Project project = context.Project;
+
+            Project.Configuration defaultConfiguration = configurations.Where(conf => conf.UseAsDefaultForXCode == true).FirstOrDefault() ?? configurations[0];
 
             //TODO: add support for multiple targets with the same outputtype. Would need a mechanism to define a default configuration per target and associate it with non-default conf with different optimization.
             //At the moment it only supports target with different output type (e.g:lib, app, test bundle)
@@ -295,95 +520,223 @@ namespace Sharpmake.Generators.Apple
             _sourcesBuildPhases = new Dictionary<string, ProjectSourcesBuildPhase>();
             _resourcesBuildPhases = new Dictionary<string, ProjectResourcesBuildPhase>();
             _frameworksBuildPhases = new Dictionary<string, ProjectFrameworksBuildPhase>();
+            _headersBuildPhases = new Dictionary<string, UniqueList<ProjectHeadersBuildPhase>>();
+            _copyFilesPreBuildPhases = new Dictionary<string, UniqueList<ProjectCopyFilesBuildPhase>>();
+            _copyFilesBuildPhases = new Dictionary<string, UniqueList<ProjectCopyFilesBuildPhase>>();
+            _copyFilesPostBuildPhases = new Dictionary<string, UniqueList<ProjectCopyFilesBuildPhase>>();
             _shellScriptPreBuildPhases = new Dictionary<string, UniqueList<ProjectShellScriptBuildPhase>>();
             _shellScriptPostBuildPhases = new Dictionary<string, UniqueList<ProjectShellScriptBuildPhase>>();
+
+            bool createUnitTestTarget = project.XcodeUnitTestSourceFiles.Count > 0 && configurations.All(conf => conf.Output == Project.Configuration.OutputType.AppleApp);
 
             //Loop on each targets
             foreach (var projectTarget in projectTargetsList)
             {
                 string xCodeTargetName = projectTarget.Key;
                 var targetConfigurations = projectTarget.Value;
+                string xCodeUnitTestTargetName = project.XcodeUnitTestTargetName;
 
                 var configurationsForTarget = new HashSet<ProjectBuildConfiguration>();
                 var configurationListForNativeTarget = new ProjectConfigurationList(configurationsForTarget, xCodeTargetName);
                 _projectItems.Add(configurationListForNativeTarget);
 
-                var firstConf = targetConfigurations.First();
+                HashSet<ProjectBuildConfiguration> configurationsForUnitTestTarget = null;
+                ProjectConfigurationList configurationListForUnitTestNativeTarget = null;
+                if (createUnitTestTarget)
+                {
+                    configurationsForUnitTestTarget = new HashSet<ProjectBuildConfiguration>();
+                    configurationListForUnitTestNativeTarget = new ProjectConfigurationList(configurationsForUnitTestTarget, xCodeUnitTestTargetName);
+                    _projectItems.Add(configurationListForUnitTestNativeTarget);
+                }
 
-                if (!firstConf.IsFastBuild) // since we grouped all FastBuild conf together, we only need to test the first conf
+                var firstConf = targetConfigurations.First();
+                // Adjust fastbuild target
+                if (firstConf.IsFastBuild)
+                {
+                    // Handle cases where a configuration is using fastbuild but not all configurations are using it(and the first one is not using it)
+                    firstConf = targetConfigurations.FirstOrDefault(conf => conf.FastBuildMasterBffList.Any(), targetConfigurations[0]);
+                }
+
+                bool canIncludeSourceFiles = !firstConf.IsFastBuild || firstConf.Output != Project.Configuration.OutputType.AppleApp || !firstConf.XcodeUseNativeProjectForFastBuildApp;
+                if (canIncludeSourceFiles)
                 {
                     var projectSourcesBuildPhase = new ProjectSourcesBuildPhase(xCodeTargetName, 2147483647);
                     _projectItems.Add(projectSourcesBuildPhase);
                     _sourcesBuildPhases.Add(xCodeTargetName, projectSourcesBuildPhase);
                 }
 
+                if (createUnitTestTarget)
+                {
+                    // currently, unit Test target won't use fastbuild
+                    var projectUnitTestSourcesBuildPhase = new ProjectSourcesBuildPhase(xCodeUnitTestTargetName, 2147483647);
+                    _projectItems.Add(projectUnitTestSourcesBuildPhase);
+                    _sourcesBuildPhases.Add(xCodeUnitTestTargetName, projectUnitTestSourcesBuildPhase);
+                }
+
                 var resourceBuildPhase = new ProjectResourcesBuildPhase(xCodeTargetName, 2147483647);
                 _projectItems.Add(resourceBuildPhase);
                 _resourcesBuildPhases.Add(xCodeTargetName, resourceBuildPhase);
+                if (createUnitTestTarget)
+                {
+                    var unitTestResourceBuildPhase = new ProjectResourcesBuildPhase(xCodeUnitTestTargetName, 2147483647);
+                    _projectItems.Add(unitTestResourceBuildPhase);
+                    _resourcesBuildPhases.Add(xCodeUnitTestTargetName, unitTestResourceBuildPhase);
+                }
 
                 var frameworkBuildPhase = new ProjectFrameworksBuildPhase(xCodeTargetName, 2147483647);
                 _projectItems.Add(frameworkBuildPhase);
                 _frameworksBuildPhases.Add(xCodeTargetName, frameworkBuildPhase);
+                if (createUnitTestTarget)
+                {
+                    var unitTestFrameworkBuildPhase = new ProjectFrameworksBuildPhase(xCodeUnitTestTargetName, 2147483647);
+                    _projectItems.Add(unitTestFrameworkBuildPhase);
+                    _frameworksBuildPhases.Add(xCodeUnitTestTargetName, unitTestFrameworkBuildPhase);
+                }
+
+                var headersBuildPhases = new UniqueList<ProjectHeadersBuildPhase>();
+                _headersBuildPhases.Add(xCodeTargetName, headersBuildPhases);
+
+                var copyFilesPreBuildPhases = new UniqueList<ProjectCopyFilesBuildPhase>();
+                _copyFilesPreBuildPhases.Add(xCodeTargetName, copyFilesPreBuildPhases);
+                var copyFilesBuildPhases = new UniqueList<ProjectCopyFilesBuildPhase>();
+                _copyFilesBuildPhases.Add(xCodeTargetName, copyFilesBuildPhases);
+                var copyFilesPostBuildPhases = new UniqueList<ProjectCopyFilesBuildPhase>();
+                _copyFilesPostBuildPhases.Add(xCodeTargetName, copyFilesPostBuildPhases);
 
                 var targetDependencies = new List<ProjectTargetDependency>();
                 _targetDependencies.Add(xCodeTargetName, targetDependencies);
+                if (createUnitTestTarget)
+                {
+                    var unitTestTargetDependencies = new List<ProjectTargetDependency>();
+                    _targetDependencies.Add(xCodeUnitTestTargetName, unitTestTargetDependencies);
+                }
 
                 string masterBffFilePath = null;
 
+                if (canIncludeSourceFiles)
+                    PrepareSourceFiles(xCodeTargetName, sourceFiles.SortedValues, project, defaultConfiguration, forUnitTest: false, workspacePath);
+
+                if (createUnitTestTarget)
+                {
+                    PrepareSourceFiles(xCodeUnitTestTargetName, project.XcodeUnitTestSourceFiles, project, defaultConfiguration, forUnitTest: true, workspacePath);
+                }
+                PrepareResourceFiles(xCodeTargetName, resourceFiles.SortedValues, project, defaultConfiguration);
+
                 foreach (var conf in targetConfigurations)
                 {
-                    if (!conf.IsFastBuild)
-                        PrepareSourceFiles(xCodeTargetName, sourceFiles.SortedValues, project, conf, workspacePath);
-                    PrepareResourceFiles(xCodeTargetName, resourceFiles.SortedValues, project, conf);
                     PrepareExternalResourceFiles(xCodeTargetName, project, conf);
 
+                    // AppleApp project for fastbuild, append fastbuild script into conf.EventPreBuild, so xcode will start fastbuild after all PreBuild phase and before build phase(resources, plist build etc.).
+                    if (conf.IsFastBuild && conf.Output == Project.Configuration.OutputType.AppleApp)
+                    {
+                        var masterBff = conf.FastBuildMasterBffList.FirstOrDefault();
+                        if (masterBff != null)
+                        {
+                            string fastBuildCommandLine = ProjectLegacyTarget.BuildArgumentsStringByCommandLineOptions(conf, true);
+                            var fastbuildMakeArguments = FastBuildSettings.MakeCommandGenerator.GetArguments(FastBuildMakeCommandGenerator.BuildType.Build, conf, fastBuildCommandLine);
+                            var fastbuildMakeExe = FastBuildSettings.MakeCommandGenerator.GetExecutablePath(conf);
+                            var buildWorkingDirectory = Path.GetDirectoryName(masterBff);
+                            var fastbuildCmd = @$"pushd {buildWorkingDirectory}
+{fastbuildMakeExe} {fastbuildMakeArguments}
+exit_code=$?
+if (( $exit_code != 0 )); then
+    exit $exit_code
+fi
+popd";
+                            conf.EventPreBuild.Add(fastbuildCmd);
+                        }
+                    }
                     RegisterScriptBuildPhase(xCodeTargetName, _shellScriptPreBuildPhases, conf.EventPreBuild.GetEnumerator());
                     RegisterScriptBuildPhase(xCodeTargetName, _shellScriptPostBuildPhases, conf.EventPostBuild.GetEnumerator());
 
-                    Strings systemFrameworks = Options.GetStrings<Options.XCode.Compiler.SystemFrameworks>(conf);
-                    foreach (string systemFramework in systemFrameworks)
+                    if (conf.Output == Project.Configuration.OutputType.AppleFramework)
+                        RegisterHeadersBuildPhase(xCodeTargetName, _headersBuildPhases);
+
+                    var folderSpec = conf.Output == Project.Configuration.OutputType.Exe ? FolderSpec.AbsolutePath : FolderSpec.Resources;
+                    RegisterCopyFilesBuildPhases(xCodeTargetName, _copyFilesBuildPhases, conf.ResolvedTargetCopyFiles.GetEnumerator(), conf.TargetCopyFilesPath, folderSpec);
+                    RegisterCopyFilesBuildPhases(xCodeTargetName, _copyFilesBuildPhases, conf.ResolvedTargetCopyFilesToSubDirectory.GetEnumerator());
+                    RegisterCopyFilesBuildPhases(xCodeTargetName, _copyFilesPostBuildPhases, conf.EventPostBuildCopies.GetEnumerator());
+                    RegisterCopyFilesBuildPhases(xCodeTargetName, _copyFilesPreBuildPhases, conf.ResolvedEventPreBuildExe.GetEnumerator());
+                    RegisterCopyFilesBuildPhases(xCodeTargetName, _copyFilesPreBuildPhases, conf.ResolvedEventCustomPreBuildExe.GetEnumerator());
+                    RegisterCopyFilesBuildPhases(xCodeTargetName, _copyFilesPostBuildPhases, conf.ResolvedEventPostBuildExe.GetEnumerator());
+                    RegisterCopyFilesBuildPhases(xCodeTargetName, _copyFilesPostBuildPhases, conf.ResolvedEventCustomPostBuildExe.GetEnumerator());
+
+                    switch (conf.Output)
                     {
-                        var systemFrameworkItem = new ProjectSystemFrameworkFile(systemFramework);
-                        var buildFileItem = new ProjectBuildFile(systemFrameworkItem);
-                        if (!_frameworksFolder.Children.Exists(item => item.FullPath == systemFrameworkItem.FullPath))
-                        {
-                            _frameworksFolder.Children.Add(systemFrameworkItem);
-                            _projectItems.Add(systemFrameworkItem);
-                        }
-                        _projectItems.Add(buildFileItem);
-                        _frameworksBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
+                        case Project.Configuration.OutputType.AppleApp:
+                        case Project.Configuration.OutputType.AppleFramework:
+                        case Project.Configuration.OutputType.AppleBundle:
+                        case Project.Configuration.OutputType.IosTestBundle:
+                        case Project.Configuration.OutputType.Exe:
+                        case Project.Configuration.OutputType.Dll:
+
+                            OrderableStrings systemFrameworks = new OrderableStrings(conf.XcodeSystemFrameworks);
+                            systemFrameworks.AddRange(conf.XcodeDependenciesSystemFrameworks);
+                            RegisterFrameworkBuildPhases<ProjectSystemFrameworkFile>(xCodeTargetName, _frameworksBuildPhases,
+                                _frameworksFolder,
+                                systemFrameworks,
+                                (string systemFramework) => new ProjectSystemFrameworkFile(systemFramework),
+                                createUnitTestTarget,
+                                xCodeUnitTestTargetName
+                            );
+
+                            OrderableStrings developerFrameworks = new OrderableStrings(conf.XcodeDeveloperFrameworks);
+                            developerFrameworks.AddRange(conf.XcodeDependenciesDeveloperFrameworks);
+                            RegisterFrameworkBuildPhases<ProjectDeveloperFrameworkFile>(xCodeTargetName, _frameworksBuildPhases,
+                                _frameworksFolder,
+                                developerFrameworks,
+                                (string developerFramework) => new ProjectDeveloperFrameworkFile(developerFramework),
+                                createUnitTestTarget,
+                                xCodeUnitTestTargetName
+                            );
+
+                            OrderableStrings userFrameworks = new OrderableStrings(conf.XcodeUserFrameworks);
+                            userFrameworks.AddRange(conf.XcodeDependenciesUserFrameworks);
+                            RegisterFrameworkBuildPhases<ProjectUserFrameworkFile>(xCodeTargetName, _frameworksBuildPhases,
+                                _frameworksFolder,
+                                userFrameworks,
+                                (string userFramework) => new ProjectUserFrameworkFile(XCodeUtil.ResolveProjectPaths(project, userFramework), workspacePath),
+                                createUnitTestTarget,
+                                xCodeUnitTestTargetName
+                            );
+
+                            OrderableStrings embeddedFrameworks = new OrderableStrings(conf.XcodeEmbeddedFrameworks);
+                            embeddedFrameworks.AddRange(conf.XcodeDependenciesEmbeddedFrameworks);
+                            var embeddedFrameworkItems = RegisterFrameworkBuildPhases<ProjectEmbeddedFrameworkFile>(xCodeTargetName, _frameworksBuildPhases,
+                                _embedFrameworksFolder,
+                                embeddedFrameworks,
+                                (string embeddedFramework) => new ProjectEmbeddedFrameworkFile(XCodeUtil.ResolveProjectPaths(project, embeddedFramework), workspacePath),
+                                createUnitTestTarget,
+                                xCodeUnitTestTargetName
+                            );
+                            RegisterFrameworkCopyFilesPhases(xCodeTargetName, _copyFilesPostBuildPhases,
+                                _embedFrameworksFolder,
+                                embeddedFrameworkItems,
+                                (string embeddedFramework) => new ProjectEmbeddedFrameworkFile(XCodeUtil.ResolveProjectPaths(project, embeddedFramework), workspacePath)
+                            );
+
+                            break;
                     }
 
-                    // master bff path
                     if (conf.IsFastBuild)
                     {
+                        // master bff path
                         // we only support projects in one or no master bff, but in that last case just output a warning
-                        var masterBffList = conf.FastBuildMasterBffList.Distinct().ToArray();
-                        if (masterBffList.Length == 0)
+                        foreach (string confMasterBff in conf.FastBuildMasterBffList)
                         {
-                            Builder.Instance.LogWarningLine("Bff {0} doesn't appear in any master bff, it won't be buildable.", conf.BffFullFileName + FastBuildSettings.FastBuildConfigFileExtension);
-                        }
-                        else if (masterBffList.Length > 1)
-                        {
-                            throw new Error("Bff {0} appears in {1} master bff, sharpmake only supports 1.", conf.BffFullFileName + FastBuildSettings.FastBuildConfigFileExtension, masterBffList.Length);
-                        }
-                        else
-                        {
-                            if (masterBffFilePath != null && masterBffFilePath != masterBffList[0])
+                            if (masterBffFilePath == null)
+                            {
+                                masterBffFilePath = confMasterBff;
+                            }
+                            else if (masterBffFilePath != confMasterBff)
+                            {
                                 throw new Error("Project {0} has a fastbuild target that has distinct master bff, sharpmake only supports 1.", conf);
-                            masterBffFilePath = masterBffList[0];
+                            }
                         }
-                    }
 
-                    Strings userFrameworks = Options.GetStrings<Options.XCode.Compiler.UserFrameworks>(conf);
-                    foreach (string userFramework in userFrameworks)
-                    {
-                        var userFrameworkItem = new ProjectUserFrameworkFile(XCodeUtil.ResolveProjectPaths(project, userFramework), workspacePath);
-                        var buildFileItem = new ProjectBuildFile(userFrameworkItem);
-                        _frameworksFolder.Children.Add(userFrameworkItem);
-                        _projectItems.Add(userFrameworkItem);
-                        _projectItems.Add(buildFileItem);
-                        _frameworksBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
+                        // Make the commandline written in the bff available, except the master bff -config
+                        string commandLine = conf.GetFastBuildCommandLineArguments();
+                        Bff.SetCommandLineArguments(conf, commandLine);
                     }
 
                     if (conf.Output == Project.Configuration.OutputType.IosTestBundle)
@@ -391,35 +744,82 @@ namespace Sharpmake.Generators.Apple
                         var testFrameworkItem = new ProjectDeveloperFrameworkFile(_unitTestFramework);
                         var buildFileItem = new ProjectBuildFile(testFrameworkItem);
                         if (_frameworksFolder != null)
-                            _frameworksFolder.Children.Add(testFrameworkItem);
+                            _frameworksFolder.AddChildren(testFrameworkItem);
                         _projectItems.Add(testFrameworkItem);
                         _projectItems.Add(buildFileItem);
                         _frameworksBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
                     }
                 }
 
+                if (createUnitTestTarget)
+                {
+                    var testFrameworkItem = new ProjectDeveloperFrameworkFile(_unitTestFramework);
+                    var buildFileItem = new ProjectBuildFile(testFrameworkItem);
+                    if (_frameworksFolder != null)
+                        _frameworksFolder.AddChildren(testFrameworkItem);
+                    _projectItems.Add(testFrameworkItem);
+                    _projectItems.Add(buildFileItem);
+                    _frameworksBuildPhases[xCodeUnitTestTargetName].Files.Add(buildFileItem);
+                }
+
                 // use the first conf as file, but the target name
                 var targetOutputFile = new ProjectOutputFile(firstConf, xCodeTargetName);
-                _productsGroup.Children.Add(targetOutputFile);
+                _productsGroup.AddChildren(targetOutputFile);
 
                 _projectItems.Add(targetOutputFile);
 
+                ProjectOutputFile targetUnitTestOutputFile = null;
+                if (createUnitTestTarget)
+                {
+                    targetUnitTestOutputFile = new ProjectOutputFile(firstConf, xCodeUnitTestTargetName, forTestBundle : true);
+                    _productsGroup.AddChildren(targetUnitTestOutputFile);
+
+                    _projectItems.Add(targetUnitTestOutputFile);
+                }
+
                 ProjectTarget target;
-                if (!firstConf.IsFastBuild)
+                ProjectTarget targetUnitTest = null;
+                if (!firstConf.IsFastBuild || (firstConf.Output == Project.Configuration.OutputType.AppleApp && firstConf.XcodeUseNativeProjectForFastBuildApp))
                 {
                     target = new ProjectNativeTarget(xCodeTargetName, targetOutputFile, configurationListForNativeTarget, _targetDependencies[xCodeTargetName]);
+                    if (createUnitTestTarget)
+                    {
+                        targetUnitTest = new ProjectNativeTarget(xCodeUnitTestTargetName, targetUnitTestOutputFile, configurationListForUnitTestNativeTarget, _targetDependencies[xCodeUnitTestTargetName]);
+                    }
                 }
                 else
                 {
-                    target = new ProjectLegacyTarget(xCodeTargetName, targetOutputFile, configurationListForNativeTarget, masterBffFilePath);
+                    target = new ProjectLegacyTarget(xCodeTargetName, targetOutputFile, configurationListForNativeTarget, firstConf);
                 }
                 target.ResourcesBuildPhase = _resourcesBuildPhases[xCodeTargetName];
+                if (targetUnitTest != null)
+                {
+                    targetUnitTest.ResourcesBuildPhase = _resourcesBuildPhases[xCodeUnitTestTargetName];
+                }
+
                 if (_sourcesBuildPhases.ContainsKey(xCodeTargetName))
                     target.SourcesBuildPhase = _sourcesBuildPhases[xCodeTargetName];
+                if (targetUnitTest != null && _sourcesBuildPhases.ContainsKey(xCodeUnitTestTargetName))
+                    targetUnitTest.SourcesBuildPhase = _sourcesBuildPhases[xCodeUnitTestTargetName];
 
-                target.FrameworksBuildPhase = _frameworksBuildPhases[xCodeTargetName];
+                if (_frameworksBuildPhases.ContainsKey(xCodeTargetName))
+                    target.FrameworksBuildPhase = _frameworksBuildPhases[xCodeTargetName];
+                if (targetUnitTest != null)
+                {
+                    targetUnitTest.FrameworksBuildPhase = _frameworksBuildPhases[xCodeUnitTestTargetName];
+                }
                 if (_shellScriptPreBuildPhases.ContainsKey(xCodeTargetName))
                     target.ShellScriptPreBuildPhases = _shellScriptPreBuildPhases[xCodeTargetName];
+
+                if (_headersBuildPhases.ContainsKey(xCodeTargetName))
+                    target.HeadersBuildPhases = _headersBuildPhases[xCodeTargetName];
+
+                if (_copyFilesPreBuildPhases.ContainsKey(xCodeTargetName))
+                    target.CopyFilesPreBuildPhases = _copyFilesPreBuildPhases[xCodeTargetName];
+                if (_copyFilesBuildPhases.ContainsKey(xCodeTargetName))
+                    target.CopyFilesBuildPhases = _copyFilesBuildPhases[xCodeTargetName];
+                if (_copyFilesPostBuildPhases.ContainsKey(xCodeTargetName))
+                    target.CopyFilesPostBuildPhases = _copyFilesPostBuildPhases[xCodeTargetName];
 
                 if (_shellScriptPostBuildPhases.ContainsKey(xCodeTargetName))
                     target.ShellScriptPostBuildPhases = _shellScriptPostBuildPhases[xCodeTargetName];
@@ -427,6 +827,12 @@ namespace Sharpmake.Generators.Apple
                 configurationListForNativeTarget.RelatedItem = target;
                 _projectItems.Add(target);
                 _nativeOrLegacyTargets.Add(xCodeTargetName, target);
+                if (targetUnitTest != null)
+                {
+                    configurationListForUnitTestNativeTarget.RelatedItem = targetUnitTest;
+                    _projectItems.Add(targetUnitTest);
+                    _nativeOrLegacyTargets.Add(xCodeUnitTestTargetName, targetUnitTest);
+                }
 
                 //Generate BuildConfigurations
                 foreach (Project.Configuration targetConf in targetConfigurations)
@@ -435,13 +841,20 @@ namespace Sharpmake.Generators.Apple
                     ProjectBuildConfigurationForTarget configurationForTarget = null;
                     if (targetConf.Output == Project.Configuration.OutputType.IosTestBundle)
                         configurationForTarget = new ProjectBuildConfigurationForUnitTestTarget(targetConf, target, options);
-                    else if (!targetConf.IsFastBuild)
+                    else if (!targetConf.IsFastBuild || (targetConf.Output == Project.Configuration.OutputType.AppleApp && targetConf.XcodeUseNativeProjectForFastBuildApp))
                         configurationForTarget = new ProjectBuildConfigurationForNativeTarget(targetConf, (ProjectNativeTarget)target, options);
                     else
                         configurationForTarget = new ProjectBuildConfigurationForLegacyTarget(targetConf, (ProjectLegacyTarget)target, options);
 
                     configurationsForTarget.Add(configurationForTarget);
                     _projectItems.Add(configurationForTarget);
+                    
+                    if (targetUnitTest != null)
+                    {
+                        configurationForTarget = new ProjectBuildConfigurationForUnitTestTarget(targetConf, targetUnitTest, options);
+                        configurationsForUnitTestTarget.Add(configurationForTarget);
+                        _projectItems.Add(configurationForTarget);
+                    }
                 }
             }
 
@@ -474,6 +887,11 @@ namespace Sharpmake.Generators.Apple
                     ((ProjectNativeTarget)_nativeOrLegacyTargets[GetTargetKey(unitTestConfig)]).Dependencies.Add(targetDependency);
                 }
             }
+            
+            if (createUnitTestTarget)
+            {
+                GenerateDependenciesForUnitTestTargets(project, configurations);
+            }
 
             HashSet<ProjectBuildConfiguration> configurationsForProject = new HashSet<ProjectBuildConfiguration>();
             ProjectConfigurationList configurationListForProject = new ProjectConfigurationList(configurationsForProject, "configurationListForProject");
@@ -505,11 +923,44 @@ namespace Sharpmake.Generators.Apple
             _projectItems.Add(_projectMain);
         }
 
+        private void GenerateDependenciesForUnitTestTargets(Project project, List<Project.Configuration> configurations)
+        {
+            // Generate dependencies for unit test targets refer to AppleApp.
+            var bundleLoadingAppConfigs = new List<Project.Configuration>(configurations).FindAll(conf => conf.Output == Project.Configuration.OutputType.AppleApp);
+            if (bundleLoadingAppConfigs != null && bundleLoadingAppConfigs.Count != 0)
+            {
+                string unitTestTargetKey = project.XcodeUnitTestTargetName;
+                foreach (Project.Configuration bundleLoadingAppConfig in bundleLoadingAppConfigs)
+                {
+                    string key = GetTargetKey(bundleLoadingAppConfig);
+                    ProjectTarget target;
+                    if (_nativeOrLegacyTargets.ContainsKey(key))
+                    {
+                        target = _nativeOrLegacyTargets[key];
+                        if (!(target is ProjectNativeTarget))
+                            continue;
+                        if (((ProjectNativeTarget)_nativeOrLegacyTargets[unitTestTargetKey]).Dependencies.Find(dep => (dep.Identifier == key)) != null)
+                            continue;
+
+                        ProjectNativeTarget bundleLoadingAppTarget = (ProjectNativeTarget)target;
+
+                        ProjectReference projectReference = new ProjectReference(ItemSection.PBXProject, bundleLoadingAppTarget.Identifier);
+                        ProjectContainerProxy projectProxy = new ProjectContainerProxy(projectReference, bundleLoadingAppTarget, ProjectContainerProxy.Type.Target);
+
+                        ProjectTargetDependency targetDependency = new ProjectTargetDependency(projectReference, projectProxy, bundleLoadingAppTarget);
+                        _projectItems.Add(targetDependency);
+
+                        ((ProjectNativeTarget)_nativeOrLegacyTargets[unitTestTargetKey]).Dependencies.Add(targetDependency);
+                    }
+                }
+            }
+        }
+
         //Find Project.Configuration of the bundle loading app that matches the unit test target, if it exists.
-        //Should have OutputType IosApp assuming targets with different output type.
+        //Should have OutputType App assuming targets with different output type.
         private Project.Configuration FindBundleLoadingApp(List<Project.Configuration> configurations)
         {
-            return configurations.Find(element => (element.Output == Project.Configuration.OutputType.IosApp));
+            return configurations.Find(element => (element.Output == Project.Configuration.OutputType.AppleApp));
         }
 
         private static string GetTargetKey(Project.Configuration conf)
@@ -547,6 +998,135 @@ namespace Sharpmake.Generators.Apple
                 }
             }
         }
+
+        private void RegisterHeadersBuildPhase(string xCodeTargetName, Dictionary<string, UniqueList<ProjectHeadersBuildPhase>> headersBuildPhases)
+        {
+            var headerFiles = _projectItems
+                    .Where(p => p is ProjectBuildFile)
+                    .Select(p => p as ProjectBuildFile)
+                    .Where(p => p.File.IsHeader)
+                    .ToList(); //< make a copy since we want to add to _projectItems
+
+            foreach (var pitem in headerFiles)
+            {
+                var headerPhase = headersBuildPhases[xCodeTargetName].Count > 0 ?
+                    headersBuildPhases[xCodeTargetName].First() :
+                    new ProjectHeadersBuildPhase(2147483647);
+
+                headerPhase.Files.Add(pitem);
+                _projectItems.Add(headerPhase);
+                headersBuildPhases[xCodeTargetName].Add(headerPhase);
+            }
+        }
+
+        private void RegisterCopyFilesBuildPhases(string xCodeTargetName, Dictionary<string, UniqueList<ProjectCopyFilesBuildPhase>> copyFilesPhases, string file, string targetPath, FolderSpec folderSpec = FolderSpec.Resources)
+        {
+            PrepareCopyFiles(xCodeTargetName, file);
+
+            var copyFileItem = new ProjectCopyFile(file);
+            _projectItems.Add(copyFileItem);
+            var copyBuildPhase = copyFilesPhases[xCodeTargetName].Where(p => p.TargetPath == targetPath).Any() ?
+                copyFilesPhases[xCodeTargetName].Where(p => p.TargetPath == targetPath).First() :
+                new ProjectCopyFilesBuildPhase(2147483647, targetPath, folderSpec);
+            copyBuildPhase.Files.Add(copyFileItem);
+            _projectItems.Add(copyBuildPhase);
+            copyFilesPhases[xCodeTargetName].Add(copyBuildPhase);
+        }
+
+        private void RegisterCopyFilesBuildPhases(string xCodeTargetName, Dictionary<string, UniqueList<ProjectCopyFilesBuildPhase>> copyFilesPhases, IEnumerator<string> files, string targetPath, FolderSpec folderSpec)
+        {
+            while (files.MoveNext())
+            {
+                RegisterCopyFilesBuildPhases(xCodeTargetName, copyFilesPhases, files.Current, targetPath, folderSpec);
+            }
+        }
+
+        private void RegisterCopyFilesBuildPhases(string xCodeTargetName, Dictionary<string, UniqueList<ProjectCopyFilesBuildPhase>> copyFilesPhases, IEnumerator<KeyValuePair<string, string>> filesAndTargets)
+        {
+            while (filesAndTargets.MoveNext())
+            {
+                var fileAndTarget = filesAndTargets.Current;
+                RegisterCopyFilesBuildPhases(xCodeTargetName, copyFilesPhases, fileAndTarget.Key, fileAndTarget.Value);
+            }
+        }
+
+        private void RegisterCopyFilesBuildPhases(string xCodeTargetName, Dictionary<string, UniqueList<ProjectCopyFilesBuildPhase>> copyFilesPhases, IEnumerator<Project.Configuration.BuildStepBase> buildSteps)
+        {
+            while (buildSteps.MoveNext())
+            {
+                var buildStep = buildSteps.Current;
+                if (buildStep is Project.Configuration.BuildStepCopy)
+                {
+                    Project.Configuration.BuildStepCopy copyStep = buildStep as Project.Configuration.BuildStepCopy;
+                    RegisterCopyFilesBuildPhases(xCodeTargetName, copyFilesPhases, copyStep.SourcePath, copyStep.DestinationPath);
+                }
+            }
+        }
+
+        private List<ProjectSystemFileType> RegisterFrameworkBuildPhases<ProjectSystemFileType>(
+            string xCodeTargetName,
+            Dictionary<string, ProjectFrameworksBuildPhase> frameworksBuildPhases,
+            ProjectFolder frameworksFolder,
+            OrderableStrings frameworks,
+            Func<string, ProjectSystemFileType> createProjectSystemFileType,
+            bool createUnitTestTargetWithApp,
+            string xCodeUnitTestTargetName)
+            where ProjectSystemFileType : ProjectFrameworkFile
+        {
+            List<ProjectSystemFileType> buildFiles = new List<ProjectSystemFileType>();
+            foreach (string framework in frameworks)
+            {
+                var frameworkItem = createProjectSystemFileType(framework);
+                var buildFileItem = new ProjectBuildFile(frameworkItem as ProjectFileBase);
+                if (frameworksFolder.AddChildren(frameworkItem))
+                {
+                    _projectItems.Add(frameworkItem);
+                    buildFiles.Add(frameworkItem);
+                }
+
+                if (!_projectItems.Contains(buildFileItem))
+                {
+                    _projectItems.Add(buildFileItem);
+                    frameworksBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
+                }
+
+                if (createUnitTestTargetWithApp)
+                {
+                    _frameworksBuildPhases[xCodeUnitTestTargetName].Files.Add(buildFileItem);
+                }
+            }
+            return buildFiles;
+        }
+
+        private void RegisterFrameworkCopyFilesPhases(
+            string xCodeTargetName,
+            Dictionary<string, UniqueList<ProjectCopyFilesBuildPhase>> copyFilesPhases,
+            ProjectFolder frameworksFolder,
+            List<ProjectEmbeddedFrameworkFile> frameworkItems,
+            Func<string, ProjectEmbeddedFrameworkFile> createProjectSystemFileType)
+        {
+            foreach (var frameworkItem in frameworkItems)
+            {
+                // add second entry for copy (Xcode does this as well)
+                var buildFileItem2 = new ProjectBuildFile(frameworkItem, settings: @"{ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }");
+                frameworksFolder.AddChildren(frameworkItem);
+
+                if (!_projectItems.Contains(buildFileItem2))
+                {
+                    _projectItems.Add(buildFileItem2);
+
+                    // add to post-build phase
+                    var locator = (ProjectCopyFilesBuildPhase p) => p.FolderSpec == (int)FolderSpec.Frameworks;
+                    var copyBuildPhase = _copyFilesPostBuildPhases[xCodeTargetName].Where(locator).Any() ?
+                        _copyFilesPostBuildPhases[xCodeTargetName].Where(locator).First() :
+                        new ProjectCopyFilesBuildPhase("Embed Frameworks", 2147483647, string.Empty, FolderSpec.Frameworks);
+                    copyBuildPhase.Files.Add(buildFileItem2);
+                    _projectItems.Add(copyBuildPhase);
+                    copyFilesPhases[xCodeTargetName].Add(copyBuildPhase);
+                }
+            }
+        }
+
 
         private static void FillIncludeDirectoriesOptions(IGenerationContext context, IPlatformVcxproj platformVcxproj)
         {
@@ -588,35 +1168,28 @@ namespace Sharpmake.Generators.Apple
             return true;
         }
 
-        private void PrepareSourceFiles(string xCodeTargetName, IEnumerable<string> sourceFiles, Project project, Project.Configuration configuration, string workspacePath = null)
+        internal void PrepareSourceFiles(string xCodeTargetName, IEnumerable<string> sourceFiles, Project project, Project.Configuration configuration, bool forUnitTest, string workspacePath = null)
         {
             foreach (string file in sourceFiles)
             {
+                string extension = Path.GetExtension(file);
+                bool build = ((forUnitTest && !configuration.XcodeResolvedUnitTestSourceFilesBuildExclude.Contains(file)) || !configuration.ResolvedSourceFilesBuildExclude.Contains(file)) && project.SourceFilesCompileExtensions.Contains(extension);
+
                 bool alreadyPresent;
                 ProjectFileSystemItem item = AddInFileSystem(file, out alreadyPresent, workspacePath, true);
                 if (alreadyPresent)
                     continue;
-
-                item.Build = !configuration.ResolvedSourceFilesBuildExclude.Contains(item.FullPath);
-                item.Source = project.SourceFilesCompileExtensions.Contains(item.Extension) || (string.Compare(item.Extension, ".mm", StringComparison.OrdinalIgnoreCase) == 0) || (string.Compare(item.Extension, ".m", StringComparison.OrdinalIgnoreCase) == 0);
-
-                if (item.Source)
+                item.Source = true;
+                item.Build = build;
+                if (build)
                 {
-                    if (item.Build)
-                    {
-                        var fileItem = (ProjectFile)item;
-                        var buildFileItem = new ProjectBuildFile(fileItem);
-                        _projectItems.Add(buildFileItem);
-                        _sourcesBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
-                    }
+                    var buildFileItem = new ProjectBuildFile((ProjectFile)item, item.IsHeader ? @"{ATTRIBUTES = (Public, ); }" : RemoveLineTag);
+                    _projectItems.Add(buildFileItem);
+                    _sourcesBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
                 }
                 else
                 {
-                    if (!item.Build)
-                    {
-                        // Headers not matching file restrictions : remove them from the solution.
-                        RemoveFromFileSystem(item);
-                    }
+                    _projectItems.Add(item);
                 }
             }
         }
@@ -637,6 +1210,29 @@ namespace Sharpmake.Generators.Apple
                 var buildFileItem = new ProjectBuildFile(fileItem);
                 _projectItems.Add(buildFileItem);
                 _resourcesBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
+            }
+        }
+
+        private void PrepareCopyFiles(string xCodeTargetName, string file, string workspacePath = null)
+        {
+            bool alreadyPresent;
+            ProjectFileSystemItem item = AddInFileSystem(file, out alreadyPresent, workspacePath);
+            if (alreadyPresent)
+                return;
+
+            item.Build = true;
+            item.Source = true;
+
+            var fileItem = (ProjectFile)item;
+            var buildFileItem = new ProjectBuildFile(fileItem);
+            _projectItems.Add(buildFileItem);
+        }
+
+        private void PrepareCopyFiles(string xCodeTargetName, IEnumerator<string> resourceFiles, string workspacePath = null)
+        {
+            while (resourceFiles.MoveNext())
+            {
+                PrepareCopyFiles(xCodeTargetName, resourceFiles.Current, workspacePath);
             }
         }
 
@@ -679,28 +1275,42 @@ namespace Sharpmake.Generators.Apple
             }
         }
 
-        private void SetRootGroup(Project project, Project.Configuration configuration)
+        internal void SetRootGroup(Project project, Project.Configuration configuration)
         {
             _mainGroup = new ProjectFolder(project.GetType().Name, true);
 
-            if (Options.GetObjects<Options.XCode.Compiler.SystemFrameworks>(configuration).Any() || Options.GetObjects<Options.XCode.Compiler.UserFrameworks>(configuration).Any())
+            if (configuration.XcodeSystemFrameworks.Any() ||
+                configuration.XcodeDependenciesSystemFrameworks.Any() ||
+                configuration.XcodeDeveloperFrameworks.Any() ||
+                configuration.XcodeDependenciesDeveloperFrameworks.Any() ||
+                configuration.XcodeUserFrameworks.Any() ||
+                configuration.XcodeDependenciesUserFrameworks.Any() ||
+                configuration.XcodeEmbeddedFrameworks.Any() ||
+                configuration.XcodeDependenciesEmbeddedFrameworks.Any()
+            )
             {
                 _frameworksFolder = new ProjectFolder("Frameworks", true);
                 _projectItems.Add(_frameworksFolder);
-                _mainGroup.Children.Add(_frameworksFolder);
+                _mainGroup.AddChildren(_frameworksFolder);
+            }
+
+            if (configuration.XcodeEmbeddedFrameworks.Any() ||
+                configuration.XcodeDependenciesEmbeddedFrameworks.Any()
+            )
+            {
+                _embedFrameworksFolder = new ProjectFolder("Embed Frameworks", true);
+                _projectItems.Add(_embedFrameworksFolder);
+                _mainGroup.AddChildren(_embedFrameworksFolder);
             }
 
             _projectItems.Add(_mainGroup);
 
-            string workspacePath = Directory.GetParent(configuration.ProjectFullFileNameWithExtension).FullName;
-            string sourceRootPath = project.SourceRootPath;
-            ProjectFolder rootGroup = new ProjectFolder(sourceRootPath, Util.PathGetRelative(workspacePath, sourceRootPath));
-            _projectItems.Add(rootGroup);
-
             _productsGroup = new ProjectFolder("Products", true);
-            _mainGroup.Children.Add(rootGroup);
-            _mainGroup.Children.Add(_productsGroup);
+            _mainGroup.AddChildren(_productsGroup);
             _projectItems.Add(_productsGroup);
+
+            // add source root folders to make sure the folder hierarchy created correctly.
+            PrepareSourceRootFolders(project, configuration);
         }
 
         private void Write(string value, TextWriter writer, Resolver resolver)
@@ -712,12 +1322,45 @@ namespace Sharpmake.Generators.Apple
             writer.Flush();
         }
 
+        private void GetEmptyProjectFolders(IEnumerable<ProjectItem> projectItems, List<ProjectFileSystemItem> emptyProjectFolders)
+        {
+            foreach (var item in projectItems)
+            {
+                if (item is ProjectFolder)
+                {
+                    ProjectFolder folderItem = (ProjectFolder)item;
+
+                    if (folderItem.Children.Count == 0)
+                    {
+                        emptyProjectFolders.Add(folderItem);
+                        continue;
+                    }
+
+                    GetEmptyProjectFolders(folderItem.Children.Values, emptyProjectFolders);
+                }
+            }
+        }
+
         private void WriteSection<ProjectItemType>(Project.Configuration configuration, IFileGenerator fileGenerator)
             where ProjectItemType : ProjectItem
         {
-            IEnumerable<ProjectItem> projectItems = _projectItems.Where(item => item is ProjectItemType).OrderBy(item => item.Uid, StringComparer.Ordinal);
+            IEnumerable<ProjectItem> projectItems = _projectItems.Where(item => item is ProjectItemType);
             if (projectItems.Any())
             {
+                if (projectItems.Any(p => p is ProjectFolder))
+                {
+                    // TODO those transformations should probably be made during PrepareSections()
+                    List<ProjectFileSystemItem> emptyProjectFolders = new List<ProjectFileSystemItem>();
+                    GetEmptyProjectFolders(projectItems, emptyProjectFolders);
+                    // clean empty node
+                    foreach (var c in emptyProjectFolders)
+                    {
+                        RemoveFromFileSystem(c);
+                    }
+                }
+
+                projectItems = projectItems.OrderBy(item => item.Uid, StringComparer.Ordinal);
+
                 ProjectItem firstItem = projectItems.First();
                 using (fileGenerator.Declare("item", firstItem))
                 {
@@ -746,45 +1389,37 @@ namespace Sharpmake.Generators.Apple
             }
         }
 
-        private ProjectFileSystemItem AddInFileSystem(string fullPath, out bool alreadyPresent, string workspacePath = null, bool applyWorkspaceOnlyToRoot = false)
+        private ProjectFolder AddOrGetFolderInFileSystem(string folder, string workspacePath = null)
         {
             // Search in existing roots.
-            var fileSystemItems = _projectItems.Where(item => item is ProjectFileSystemItem);
-            foreach (ProjectFileSystemItem item in fileSystemItems)
+            foreach (ProjectFolder item in _projectItems.Where(item => item is ProjectFolder))
             {
-                if (fullPath.StartsWith(item.FullPath, StringComparison.OrdinalIgnoreCase))
+                if (folder.Equals(item.FullPath, StringComparison.OrdinalIgnoreCase))
+                    return item;
+                if (folder.StartsWith(item.FullPath + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (fullPath.Length > item.FullPath.Length)
-                        return AddInFileSystem(item, out alreadyPresent, fullPath.Substring(item.FullPath.Length + 1), applyWorkspaceOnlyToRoot ? null : workspacePath);
+                    if (folder.Length > item.FullPath.Length)
+                    {
+                        return AddFolderInFileSystem(item, folder.Substring(item.FullPath.Length + 1), workspacePath);
+                    }
                 }
             }
 
             // Not found in existing root, create a new root for this item.
-            alreadyPresent = false;
-            string parentDirectoryPath = Directory.GetParent(fullPath).FullName;
-            //string fileName = fullPath.Substring(parentDirectoryPath.Length + 1);
-
-            ProjectFolder folder = workspacePath != null ? new ProjectExternalFolder(parentDirectoryPath, workspacePath) : new ProjectFolder(parentDirectoryPath);
-            _projectItems.Add(folder);
-            _mainGroup.Children.Insert(0, folder);
-
-            ProjectFile file = workspacePath != null ? new ProjectExternalFile(fullPath, workspacePath) : new ProjectFile(fullPath);
-            _projectItems.Add(file);
-            folder.Children.Add(file);
-
-            return file;
+            ProjectFolder projectFolder = workspacePath != null ? new ProjectExternalFolder(folder, workspacePath) : new ProjectFolder(folder);
+            _projectItems.Add(projectFolder);
+            _mainGroup.AddChildren(projectFolder);
+            return projectFolder;
         }
 
-        private ProjectFileSystemItem AddInFileSystem(ProjectFileSystemItem parent, out bool alreadyPresent, string remainingPath, string workspacePath)
+        private ProjectFolder AddFolderInFileSystem(ProjectFolder parent, string remainingPath, string workspacePath = null)
         {
-            alreadyPresent = false;
-
             string[] remainingPathParts = remainingPath.Split(FolderSeparator);
             for (int i = 0; i < remainingPathParts.Length; i++)
             {
                 bool found = false;
                 string remainingPathPart = remainingPathParts[i];
-                foreach (ProjectFileSystemItem item in parent.Children)
+                foreach (ProjectFolder item in parent.Children.Values.Where(item => item is ProjectFolder))
                 {
                     if (remainingPathPart == item.Name)
                     {
@@ -796,42 +1431,74 @@ namespace Sharpmake.Generators.Apple
 
                 if (!found)
                 {
-                    if (i == remainingPathParts.Length - 1)
-                    {
-                        string fullPath = parent.FullPath + FolderSeparator + remainingPathPart;
-                        ProjectFile file = workspacePath != null ? new ProjectExternalFile(fullPath, workspacePath) : new ProjectFile(fullPath);
-                        _projectItems.Add(file);
-                        parent.Children.Add(file);
-                        return file;
-                    }
-                    else
-                    {
-                        string fullPath = parent.FullPath + FolderSeparator + remainingPathPart;
-                        ProjectFolder folder = workspacePath != null ? new ProjectExternalFolder(fullPath, workspacePath) : new ProjectFolder(fullPath);
-                        _projectItems.Add(folder);
-                        parent.Children.Add(folder);
-                        parent = folder;
-                    }
-                }
-                else if (i == remainingPathParts.Length - 1)
-                {
-                    alreadyPresent = true;
+                    string fullPath = parent.FullPath + FolderSeparator + remainingPathPart;
+                    ProjectFolder folder = workspacePath != null ? new ProjectExternalFolder(fullPath, workspacePath) : new ProjectFolder(fullPath);
+                    _projectItems.Add(folder);
+                    parent.AddChildren(folder);
+                    parent = folder;
                 }
             }
-            parent.Children.Sort((f1, f2) => string.Compare(f1.Name, f2.Name, StringComparison.OrdinalIgnoreCase));
+
             return parent;
+        }
+
+        private ProjectFile FindFileInFileSystem(ProjectFileSystemItem file)
+        {
+            ProjectItem itemFound;
+            return _projectItems.TryGetValue(file, out itemFound) ? itemFound as ProjectFile : null;
+        }
+
+        private ProjectFileSystemItem AddInFileSystem(string fullPath, out bool alreadyPresent, string workspacePath = null, bool applyWorkspaceOnlyToRoot = false)
+        {
+            // if file is under SourceRootPath, add it onto _mainGroup directly to make the project's hierarchy similar to VS 
+            if (Path.GetDirectoryName(fullPath).Equals(_projectSourceRootPath, StringComparison.OrdinalIgnoreCase))
+            {
+                ProjectFileSystemItem candidateFile = workspacePath != null ? new ProjectExternalFile(fullPath, workspacePath) : new ProjectFile(fullPath);
+                ProjectFile file = FindFileInFileSystem(candidateFile);
+                alreadyPresent = file != null;
+                if (alreadyPresent)
+                {
+                    return file;
+                }
+
+                _projectItems.Add(candidateFile);
+                _mainGroup.AddChildren(candidateFile);
+                return candidateFile;
+            }
+
+            ProjectFolder folder = AddOrGetFolderInFileSystem(Directory.GetParent(fullPath).FullName, workspacePath);
+            // add the file
+            return AddInFileSystem(folder, out alreadyPresent, Path.GetFileName(fullPath), applyWorkspaceOnlyToRoot ? null : workspacePath);
+        }
+
+        private ProjectFileSystemItem AddInFileSystem(ProjectFolder parent, out bool alreadyPresent, string fileName, string workspacePath)
+        {
+            parent.Children.TryGetValue(fileName, out var file);
+            alreadyPresent = file != null;
+            if (alreadyPresent)
+            {
+                return file;
+            }
+
+            string fullPath = parent.FullPath + FolderSeparator + fileName;
+            file = workspacePath != null ? new ProjectExternalFile(fullPath, workspacePath) : new ProjectFile(fullPath);
+            _projectItems.Add(file);
+            parent.AddChildren(file);
+            return file;
         }
 
         private void RemoveFromFileSystem(ProjectFileSystemItem fileSystemItem)
         {
+            if (!_projectItems.Contains(fileSystemItem))
+                return;
             ProjectFileSystemItem itemToSearch = fileSystemItem;
             while (itemToSearch != null)
             {
-                ProjectFileSystemItem parentItemToSearch = _projectItems.Where(item => item is ProjectFileSystemItem).Cast<ProjectFileSystemItem>().FirstOrDefault(item => item.Children.Contains(itemToSearch));
+                ProjectFileSystemItem parentItemToSearch = _projectItems.Where(item => item is ProjectFileSystemItem).Cast<ProjectFileSystemItem>().FirstOrDefault(item => item.Children.ContainsKey(itemToSearch.FullPath));
                 if (parentItemToSearch == null)
                     break;
 
-                parentItemToSearch.Children.Remove(itemToSearch);
+                parentItemToSearch.RemoveChildren(itemToSearch);
                 if (parentItemToSearch.Children.Count != 0)
                     break;
 
@@ -859,7 +1526,9 @@ namespace Sharpmake.Generators.Apple
             var project = context.Project;
             var conf = context.Configuration;
             var options = new Options.ExplicitOptions();
+            var cmdLineOptions = new ProjectOptionsGenerator.VcxprojCmdLineOptions();
             context.Options = options;
+            context.CommandLineOptions = cmdLineOptions;
 
             options["TargetName"] = XCodeUtil.XCodeFormatSingleItem(conf.Target.Name);
 
@@ -868,7 +1537,6 @@ namespace Sharpmake.Generators.Apple
 
             FillIncludeDirectoriesOptions(context, platformVcxproj);
             FillCompilerOptions(context, platformVcxproj);
-            SelectAdditionalLibraryDirectoriesOption(context, platformVcxproj);
 
             context.Options["GenerateMapFile"] = RemoveLineTag;
             platformVcxproj.SelectLinkerOptions(context);
@@ -878,15 +1546,46 @@ namespace Sharpmake.Generators.Apple
             libFiles.AddRange(conf.DependenciesOtherLibraryFiles);
             libFiles.Sort();
 
+            conf.AdditionalLinkerOptions.Sort();
             var linkerOptions = new Strings(conf.AdditionalLinkerOptions);
 
-            // TODO: make this an option
-            linkerOptions.Add("-ObjC");
+            var linkObjC = Options.GetObject<Options.XCode.Linker.LinkObjC>(conf);
+            if (linkObjC == Options.XCode.Linker.LinkObjC.Enable)
+                linkerOptions.Add("-ObjC");
 
-            // TODO: fix this to use proper lib prefixing
-            linkerOptions.AddRange(libFiles.Select(library => "-l" + library));
+            // linker(ld) of Xcode: only accept libfilename without prefix and suffix.
+            linkerOptions.AddRange(libFiles.Select(library =>
+            {
+                bool hasLibraryExtension = Path.HasExtension(library) &&
+                    ((Path.GetExtension(library).EndsWith(".a", StringComparison.OrdinalIgnoreCase) ||
+                      Path.GetExtension(library).EndsWith(".dylib", StringComparison.OrdinalIgnoreCase)
+                    ));
 
-            // TODO: when the above is fixed, we won't need this anymore
+                // deal with full library path: add libdir and libname
+                if (Path.IsPathFullyQualified(library))
+                {
+                    // Special case with full path: pass them as is.
+                    // This is to leave the possibility to force the extension,
+                    // preventing conflict if the folder contains both .a and .dylib version.
+                    if (hasLibraryExtension)
+                        return library;
+
+                    conf.LibraryPaths.Add(Path.GetDirectoryName(library));
+                    library = Path.GetFileName(library);
+                }
+
+                if (hasLibraryExtension)
+                {
+                    library = Path.GetFileNameWithoutExtension(library);
+                    if (library.StartsWith("lib"))
+                        library = library.Remove(0, 3);
+                }
+                return $"-l{library}";
+            }));
+
+            SelectAdditionalLibraryDirectoriesOption(context, platformVcxproj);
+
+            // this is needed to make sure the output dynamic library with proper prefix
             if (conf.Output == Project.Configuration.OutputType.Dll)
                 options["ExecutablePrefix"] = "lib";
             else
@@ -898,7 +1597,9 @@ namespace Sharpmake.Generators.Apple
                 conf.Defines.Add("NDEBUG");
 
             options["PreprocessorDefinitions"] = XCodeUtil.XCodeFormatList(conf.Defines, 4, forceQuotes: true);
-            options["CompilerOptions"] = XCodeUtil.XCodeFormatList(conf.AdditionalCompilerOptions, 4, forceQuotes: true);
+            conf.AdditionalCompilerOptions.Sort();
+            conf.AdditionalCompilerOptimizeOptions.Sort();
+            options["CompilerOptions"] = XCodeUtil.XCodeFormatList(Enumerable.Concat(conf.AdditionalCompilerOptions, conf.AdditionalCompilerOptimizeOptions), 4, forceQuotes: true);
             if (conf.AdditionalLibrarianOptions.Any())
                 throw new NotImplementedException(nameof(conf.AdditionalLibrarianOptions) + " not supported with XCode generator");
             options["LinkerOptions"] = XCodeUtil.XCodeFormatList(linkerOptions, 4, forceQuotes: true);
@@ -952,6 +1653,8 @@ namespace Sharpmake.Generators.Apple
             PBXReferenceProxy,
             PBXResourcesBuildPhase,
             PBXSourcesBuildPhase,
+            PBXHeadersBuildPhase,
+            PBXCopyFilesBuildPhase,
             PBXVariantGroup,
             PBXTargetDependency,
             XCBuildConfiguration_NativeTarget,
@@ -969,20 +1672,23 @@ namespace Sharpmake.Generators.Apple
             private string _internalIdentifier;
             private int _hashCode;
             private string _uid;
+            private string _settings;
 
-            public ProjectItem(ItemSection section, string identifier)
+            public ProjectItem(ItemSection section, string identifier, string settings = RemoveLineTag)
             {
                 _section = section;
                 _identifier = identifier;
-                _internalIdentifier = section.ToString() + "/" + Identifier;
+                _internalIdentifier = section.ToString() + "/" + Identifier + settings;
+                _settings = settings;
                 _hashCode = _internalIdentifier.GetHashCode();
                 _uid = XCodeProjIdGenerator.GetXCodeId(this);
             }
 
-            public ItemSection Section { get { return _section; } }
-            public string SectionString { get { return _section.ToString(); } }
-            public string Identifier { get { return _identifier; } }
-            public string Uid { get { return _uid; } }
+            public ItemSection Section { get => _section; }
+            public string SectionString { get => _section.ToString(); }
+            public string Identifier { get => _identifier; }
+            public string Uid { get => _uid; }
+            public string Settings { get => string.IsNullOrEmpty(_settings) ? RemoveLineTag : _settings; }
 
             public virtual void GetAdditionalResolverParameters(ProjectItem item, Resolver resolver, ref Dictionary<string, string> resolverParameters)
             {
@@ -1007,7 +1713,7 @@ namespace Sharpmake.Generators.Apple
 
             public bool Equals(ProjectItem other)
             {
-                return _hashCode == other._hashCode;
+                return _internalIdentifier == other._internalIdentifier;
             }
 
             public int CompareTo(ProjectItem other)
@@ -1059,7 +1765,7 @@ namespace Sharpmake.Generators.Apple
             }
         }
 
-        private abstract class ProjectFileSystemItem : ProjectItem
+        internal abstract class ProjectFileSystemItem : ProjectItem
         {
             public enum SourceTreeSetting
             {
@@ -1074,29 +1780,49 @@ namespace Sharpmake.Generators.Apple
             protected ProjectFileSystemItem(ItemSection section, string fullPath)
                 : base(section, fullPath)
             {
-                Children = new List<ProjectFileSystemItem>();
                 FullPath = fullPath;
-                Name = fullPath.Substring(fullPath.LastIndexOf(FolderSeparator) + 1);
+                Name = System.IO.Path.GetFileName(fullPath);
             }
 
-            public List<ProjectFileSystemItem> Children { get; protected set; }
+            private Dictionary<string, ProjectFileSystemItem> _children = new Dictionary<string, ProjectFileSystemItem>();
+
+            public IReadOnlyDictionary<string, ProjectFileSystemItem> Children { get { return _children; } }
+
+            public bool AddChildren(ProjectFileSystemItem item)
+            {
+                return _children.TryAdd(item.FullPath, item);
+            }
+            public void RemoveChildren(ProjectFileSystemItem item)
+            {
+                _children.Remove(item.FullPath);
+            }
+            
             public abstract bool Build { get; set; }
             public abstract bool Source { get; set; }
+
+            /// <summary>
+            /// returns true if the file is a C|C++|ObjC header file
+            /// Header files require special classification inside Xcode projects,
+            /// e.g. for Framework projects, to embed the headers in the resulting bundle.
+            /// </summary>
+            public bool IsHeader { get => Extension == ".h" || Extension == ".hpp" || Extension == ".hxx" || Extension == ".inl"; }
             public string FullPath { get; protected set; }
-            public string FileName => System.IO.Path.GetFileName(FullPath);
             public virtual string Name { get; protected set; }
             public virtual string Path
             {
                 get { return Name; }
                 protected set { Name = value; }
             }
-            public string Type => Source ? "Sources" : "Frameworks";
+            public string Type =>
+                IsHeader ? @"Headers" :
+                Source ? @"Sources" :
+                @"Frameworks";
             public abstract string Extension { get; }
             public string SourceTree => EnumExtensions.EnumToString(SourceTreeValue);
             public abstract SourceTreeSetting SourceTreeValue { get; }
         }
 
-        private abstract class ProjectFileBase : ProjectFileSystemItem
+        internal abstract class ProjectFileBase : ProjectFileSystemItem
         {
             private bool _build = false;
             private bool _source = false;
@@ -1132,9 +1858,15 @@ namespace Sharpmake.Generators.Apple
                         return "sourcecode.c.c";
                     case ".cpp":
                         return "sourcecode.cpp.cpp";
+                    case ".cxx":
+                        return "sourcecode.cpp.cpp";
                     case ".h":
                         return "sourcecode.c.h";
                     case ".hpp":
+                        return "sourcecode.c.h";
+                    case ".hxx":
+                        return "sourcecode.c.h";
+                    case ".inl":
                         return "sourcecode.c.h";
                     case ".s":
                         return "sourcecode.asm";
@@ -1144,6 +1876,10 @@ namespace Sharpmake.Generators.Apple
                         return "sourcecode.c.objc";
                     case ".mm":
                         return "sourcecode.cpp.objcpp";
+                    case ".swift":
+                        return "sourcecode.swift";
+                    case ".metal":
+                        return "sourcecode.metal";
 
                     case ".xcodeproj":
                         return "\"wrapper.pb-project\"";
@@ -1193,6 +1929,11 @@ namespace Sharpmake.Generators.Apple
                         return "file.gf";
                     case ".xib":
                         return "file.xib";
+                    case ".storyboard":
+                        return "file.storyboard";
+
+                    case ".xcassets":
+                        return "folder.assetcatalog";
                 }
 
                 return "\"?\"";
@@ -1206,7 +1947,7 @@ namespace Sharpmake.Generators.Apple
             public string IncludeInIndex { get { return _includeInIndex; } }
         }
 
-        private class ProjectFile : ProjectFileBase
+        internal class ProjectFile : ProjectFileBase
         {
             public ProjectFile(ItemSection section, string fullPath)
                 : base(section, fullPath)
@@ -1281,43 +2022,65 @@ namespace Sharpmake.Generators.Apple
 
         private class ProjectOutputFile : ProjectFile
         {
-            private Project.Configuration _conf;
+            private Project.Configuration.OutputType _outputType;
 
             public ProjectOutputFile(string fullPath)
                 : base(fullPath)
             {
             }
 
-            public ProjectOutputFile(Project.Configuration conf, string name = null)
-                : this(((conf.Output == Project.Configuration.OutputType.Lib) ? conf.TargetLibraryPath : conf.TargetPath) + FolderSeparator + conf.TargetFileFullNameWithExtension)
+            public static string GetFullPathFromConfiguration(Project.Configuration conf, bool forTestBundle, string name)
+            {
+                var targetPath = conf.Output == Project.Configuration.OutputType.Lib ?
+                    conf.TargetLibraryPath :
+                    conf.TargetPath;
+                var appleAppRootFolder = conf.TargetFileFullNameWithExtension + FolderSeparator + ProjectOptionsGenerator.AppleAppBinaryRootFolder(conf.Platform) + (forTestBundle ? "PLugIns" + FolderSeparator + name + XCTestBundleExtension : conf.TargetFileName);
+                var targetFilePath = conf.Output == Project.Configuration.OutputType.AppleApp ? appleAppRootFolder : conf.TargetFileFullNameWithExtension;
+
+                return targetPath + FolderSeparator + targetFilePath;
+            } 
+
+            public ProjectOutputFile(Project.Configuration conf, string name = null, bool forTestBundle = false)
+                : this(GetFullPathFromConfiguration(conf, forTestBundle, name))
             {
                 Name = name ?? conf.Project.Name + " " + conf.Name;
                 BuildableName = System.IO.Path.GetFileName(FullPath);
-                _conf = conf;
+                _outputType = forTestBundle ?  Project.Configuration.OutputType.IosTestBundle : conf.Output;
             }
 
             public override SourceTreeSetting SourceTreeValue { get { return SourceTreeSetting.BUILT_PRODUCTS_DIR; } }
 
-            public Project.Configuration.OutputType OutputType { get { return _conf.Output; } }
+            public Project.Configuration.OutputType OutputType { get { return _outputType; } }
 
             public string BuildableName { get; }
         }
 
+        private class ProjectCopyFile : ProjectBuildFile
+        {
+            public ProjectCopyFile(string fullPath)
+                : base(new ProjectFile(ItemSection.PBXFileReference, fullPath))
+            {
+            }
+        }
+
         private abstract class ProjectFrameworkFile : ProjectFile
         {
+            protected const string FrameworkExtension = ".framework";
+
             public ProjectFrameworkFile(string fullPath)
-                : base(fullPath)
+                : base(System.IO.Path.GetExtension(fullPath) == FrameworkExtension ?
+                    fullPath :
+                    System.IO.Path.ChangeExtension(fullPath, FrameworkExtension))
             {
             }
         }
 
         private class ProjectSystemFrameworkFile : ProjectFrameworkFile
         {
-            private static readonly string s_frameworkPath = "System" + FolderSeparator + "Library" + FolderSeparator + "Frameworks" + FolderSeparator;
-            private const string FrameworkExtension = ".framework";
+            private static readonly string s_frameworkPath = System.IO.Path.Combine("/System", "Library", "Frameworks");
 
             public ProjectSystemFrameworkFile(string frameworkFileName)
-                : base(s_frameworkPath + frameworkFileName + FrameworkExtension)
+                : base(System.IO.Path.Combine(s_frameworkPath, frameworkFileName))
             {
             }
 
@@ -1327,13 +2090,10 @@ namespace Sharpmake.Generators.Apple
 
         private class ProjectDeveloperFrameworkFile : ProjectFrameworkFile
         {
-            private static readonly string s_frameworkPath = ".." + FolderSeparator + ".." + FolderSeparator
-                + "Library" + FolderSeparator
-                + "Frameworks" + FolderSeparator;
-            private const string FrameworkExtension = ".framework";
+            private static readonly string s_frameworkPath = System.IO.Path.Combine("..", "..", "Library", "Frameworks");
 
             public ProjectDeveloperFrameworkFile(string frameworkFileName)
-                : base(s_frameworkPath + frameworkFileName + FrameworkExtension)
+                : base(System.IO.Path.Combine(s_frameworkPath, frameworkFileName))
             {
             }
 
@@ -1343,7 +2103,7 @@ namespace Sharpmake.Generators.Apple
 
         private class ProjectUserFrameworkFile : ProjectFrameworkFile
         {
-            private string _relativePath;
+            protected string _relativePath;
 
             public ProjectUserFrameworkFile(string frameworkFullPath, string workspacePath)
                 : base(frameworkFullPath)
@@ -1353,6 +2113,14 @@ namespace Sharpmake.Generators.Apple
 
             public override SourceTreeSetting SourceTreeValue { get { return SourceTreeSetting.SOURCE_ROOT; } }
             public override string Path { get { return _relativePath; } }
+        }
+
+        private class ProjectEmbeddedFrameworkFile : ProjectUserFrameworkFile
+        {
+            public ProjectEmbeddedFrameworkFile(string frameworkFullPath, string workspacePath)
+                : base(frameworkFullPath, workspacePath)
+            {
+            }
         }
 
         private class ProjectFolder : ProjectFileSystemItem
@@ -1378,16 +2146,17 @@ namespace Sharpmake.Generators.Apple
             public override void GetAdditionalResolverParameters(ProjectItem item, Resolver resolver, ref Dictionary<string, string> resolverParameters)
             {
                 ProjectFolder folderItem = (ProjectFolder)item;
-                string childrenList = "";
-                foreach (ProjectFileSystemItem childItem in folderItem.Children)
+                var children = folderItem.Children.Values.OrderByDescending(c => c.Section).ThenBy(c => c.Name).ThenBy(c=>c.FullPath);
+                StringBuilder childrenList = new StringBuilder();
+                foreach (ProjectFileSystemItem childItem in children)
                 {
                     using (resolver.NewScopedParameter("item", childItem))
                     {
-                        childrenList += resolver.Resolve(Template.SectionSubItem);
+                        childrenList.Append(resolver.Resolve(Template.SectionSubItem));
                     }
                 }
 
-                resolverParameters.Add("itemChildren", childrenList);
+                resolverParameters.Add("itemChildren", childrenList.ToString());
             }
         }
 
@@ -1413,10 +2182,10 @@ namespace Sharpmake.Generators.Apple
             public override string Path { get { return RemoveLineTag; } }
         }
 
-        private class ProjectBuildFile : ProjectItem
+        internal class ProjectBuildFile : ProjectItem
         {
-            public ProjectBuildFile(ProjectFileBase file)
-                : base(ItemSection.PBXBuildFile, file.Name)
+            public ProjectBuildFile(ProjectFileBase file, string settings = @"")
+                : base(ItemSection.PBXBuildFile, file.FullPath, settings)
             {
                 File = file;
             }
@@ -1424,7 +2193,7 @@ namespace Sharpmake.Generators.Apple
             public ProjectFileBase File { get; }
         }
 
-        private abstract class ProjectBuildPhase : ProjectItem
+        internal abstract class ProjectBuildPhase : ProjectItem
         {
             public ProjectBuildPhase(ItemSection section, string phaseName, uint buildActionMask)
                 : base(section, phaseName)
@@ -1437,16 +2206,16 @@ namespace Sharpmake.Generators.Apple
             public override void GetAdditionalResolverParameters(ProjectItem item, Resolver resolver, ref Dictionary<string, string> resolverParameters)
             {
                 ProjectBuildPhase folderItem = (ProjectBuildPhase)item;
-                string childrenList = "";
+                StringBuilder childrenList = new StringBuilder();
                 foreach (ProjectBuildFile childItem in folderItem.Files.SortedValues)
                 {
                     using (resolver.NewScopedParameter("item", childItem))
                     {
-                        childrenList += resolver.Resolve(Template.SectionSubItem);
+                        childrenList.Append(resolver.Resolve(Template.SectionSubItem));
                     }
                 }
 
-                resolverParameters.Add("itemChildren", childrenList);
+                resolverParameters.Add("itemChildren", childrenList.ToString());
             }
 
             public UniqueList<ProjectBuildFile> Files { get; }
@@ -1467,7 +2236,7 @@ namespace Sharpmake.Generators.Apple
             }
         }
 
-        private class ProjectSourcesBuildPhase : ProjectBuildPhase
+        internal class ProjectSourcesBuildPhase : ProjectBuildPhase
         {
             public ProjectSourcesBuildPhase(uint buildActionMask)
                 : base(ItemSection.PBXSourcesBuildPhase, "Sources", buildActionMask)
@@ -1493,6 +2262,43 @@ namespace Sharpmake.Generators.Apple
             }
         }
 
+        private enum FolderSpec
+        {
+            AbsolutePath = 0,
+            Wrapper = 1,
+            Executables = 6,
+            Resources = 7,
+            Frameworks = 10,
+            ProductsDirectory = 16,
+        }
+
+        private class ProjectHeadersBuildPhase : ProjectBuildPhase
+        {
+            public ProjectHeadersBuildPhase(uint buildActionMask)
+                : base(ItemSection.PBXHeadersBuildPhase, "Headers", buildActionMask)
+            {
+            }
+        }
+
+        private class ProjectCopyFilesBuildPhase : ProjectBuildPhase
+        {
+            public string TargetPath;
+            public int FolderSpec = 0;
+            public ProjectCopyFilesBuildPhase(uint buildActionMask, string targetPath, FolderSpec folderSpec = XCodeProj.FolderSpec.AbsolutePath)
+                : base(ItemSection.PBXCopyFilesBuildPhase, $"Copy Files to {targetPath}", buildActionMask)
+            {
+                TargetPath = targetPath;
+                FolderSpec = (int)folderSpec;
+            }
+
+            public ProjectCopyFilesBuildPhase(string name, uint buildActionMask, string targetPath, FolderSpec folderSpec = XCodeProj.FolderSpec.AbsolutePath)
+                : base(ItemSection.PBXCopyFilesBuildPhase, name, buildActionMask)
+            {
+                TargetPath = targetPath;
+                FolderSpec = (int)folderSpec;
+            }
+        }
+
         private class ProjectShellScriptBuildPhase : ProjectBuildPhase
         {
             public class EqualityComparer : IEqualityComparer<ProjectShellScriptBuildPhase>
@@ -1511,7 +2317,7 @@ namespace Sharpmake.Generators.Apple
             public string script;
 
             public ProjectShellScriptBuildPhase(uint buildActionMask)
-                : base(ItemSection.PBXShellScriptBuildPhase, "ShellScrips", buildActionMask)
+                : base(ItemSection.PBXShellScriptBuildPhase, "ShellScripts", buildActionMask)
             {
             }
 
@@ -1623,9 +2429,17 @@ namespace Sharpmake.Generators.Apple
                         ProductType = "com.apple.product-type.bundle.unit-test";
                         ProductInstallPath = "$(HOME)/Applications";
                         break;
-                    case Project.Configuration.OutputType.IosApp:
+                    case Project.Configuration.OutputType.AppleApp:
                         ProductType = "com.apple.product-type.application";
-                        ProductInstallPath = "$(HOME)/Applications";
+                        ProductInstallPath = "$(USER_APPS_DIR)";
+                        break;
+                    case Project.Configuration.OutputType.AppleFramework:
+                        ProductType = "com.apple.product-type.framework";
+                        ProductInstallPath = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+                        break;
+                    case Project.Configuration.OutputType.AppleBundle:
+                        ProductType = "com.apple.product-type.bundle";
+                        ProductInstallPath = "$(LOCAL_LIBRARY_DIR)/Bundles";
                         break;
                     case Project.Configuration.OutputType.Exe:
                     case Project.Configuration.OutputType.None:
@@ -1642,8 +2456,55 @@ namespace Sharpmake.Generators.Apple
             public ProjectSourcesBuildPhase SourcesBuildPhase { get; set; }
             public string SourceBuildPhaseUID { get { return SourcesBuildPhase?.Uid ?? RemoveLineTag; } }
             public ProjectFrameworksBuildPhase FrameworksBuildPhase { get; set; }
+            public UniqueList<ProjectHeadersBuildPhase> HeadersBuildPhases { get; set; }
+            public UniqueList<ProjectCopyFilesBuildPhase> CopyFilesPreBuildPhases { get; set; }
+            public UniqueList<ProjectCopyFilesBuildPhase> CopyFilesBuildPhases { get; set; }
+            public UniqueList<ProjectCopyFilesBuildPhase> CopyFilesPostBuildPhases { get; set; }
             public UniqueList<ProjectShellScriptBuildPhase> ShellScriptPreBuildPhases { get; set; }
             public UniqueList<ProjectShellScriptBuildPhase> ShellScriptPostBuildPhases { get; set; }
+
+            public string HeadersBuildPhasesUIDs
+            {
+                get
+                {
+                    if (HeadersBuildPhases != null && HeadersBuildPhases.Any())
+                        return string.Join(",", HeadersBuildPhases.Select(buildEvent => buildEvent.Uid));
+
+                    return RemoveLineTag;
+                }
+            }
+
+            public string CopyFileBuildPhasesUIDs
+            {
+                get
+                {
+                    if (CopyFilesBuildPhases != null && CopyFilesBuildPhases.Any())
+                        return string.Join(",", CopyFilesBuildPhases.Select(buildEvent => buildEvent.Uid));
+
+                    return RemoveLineTag;
+                }
+            }
+            public string CopyFilePreBuildPhasesUIDs
+            {
+                get
+                {
+                    if (CopyFilesPreBuildPhases != null && CopyFilesPreBuildPhases.Any())
+                        return string.Join(",", CopyFilesPreBuildPhases.Select(buildEvent => buildEvent.Uid));
+
+                    return RemoveLineTag;
+                }
+            }
+            public string CopyFilePostBuildPhasesUIDs
+            {
+                get
+                {
+                    if (CopyFilesPostBuildPhases != null && CopyFilesPostBuildPhases.Any())
+                        return string.Join(",", CopyFilesPostBuildPhases.Select(buildEvent => buildEvent.Uid));
+
+                    return RemoveLineTag;
+                }
+            }
+
             public string ShellScriptPreBuildPhaseUIDs
             {
                 get
@@ -1667,7 +2528,7 @@ namespace Sharpmake.Generators.Apple
             public ProjectOutputFile OutputFile { get; }
             public string ProductType { get; }
             public ProjectConfigurationList ConfigurationList { get; }
-            public string ProductInstallPath { get; }
+            public string ProductInstallPath { get; set; }
         }
 
         private class ProjectNativeTarget : ProjectTarget
@@ -1692,16 +2553,16 @@ namespace Sharpmake.Generators.Apple
                     throw new Error("Trying to compute dependencies on incomplete native target. ");
 
                 ProjectNativeTarget folderItem = (ProjectNativeTarget)item;
-                string childrenList = "";
+                StringBuilder childrenList = new StringBuilder();
                 foreach (ProjectTargetDependency childItem in folderItem.Dependencies)
                 {
                     using (resolver.NewScopedParameter("item", childItem))
                     {
-                        childrenList += resolver.Resolve(Template.SectionSubItem);
+                        childrenList.Append(resolver.Resolve(Template.SectionSubItem));
                     }
                 }
 
-                resolverParameters.Add("itemChildren", childrenList);
+                resolverParameters.Add("itemChildren", childrenList.ToString());
             }
 
             public List<ProjectTargetDependency> Dependencies { get; }
@@ -1709,55 +2570,31 @@ namespace Sharpmake.Generators.Apple
 
         private class ProjectLegacyTarget : ProjectTarget
         {
-            private string _masterBffFilePath;
+            private Project.Configuration _conf;
 
-            public ProjectLegacyTarget(string identifier, ProjectOutputFile outputFile, ProjectConfigurationList configurationList, string masterBffFilePath)
+            public ProjectLegacyTarget(string identifier, ProjectOutputFile outputFile, ProjectConfigurationList configurationList, Project.Configuration conf)
                 : base(ItemSection.PBXLegacyTarget, identifier, outputFile, configurationList)
             {
-                _masterBffFilePath = masterBffFilePath;
+                _conf = conf;
+            }
+
+            internal static string BuildArgumentsStringByCommandLineOptions(Project.Configuration conf, bool forShellCmd)
+            {
+                var fastBuildCommandLineOptions = new List<string>();
+
+                fastBuildCommandLineOptions.Add(FastBuild.UtilityMethods.GetFastBuildCommandLineArguments(conf));
+                fastBuildCommandLineOptions.Add("-config " + conf.FastBuildMasterBffList.First());
+                fastBuildCommandLineOptions.Add(forShellCmd ? "$FASTBUILD_TARGET" : "$(FASTBUILD_TARGET)"); // special envvar hardcoded in the template
+
+                return string.Join(" ", fastBuildCommandLineOptions);
             }
 
             public string BuildArgumentsString
             {
                 get
                 {
-                    var fastBuildCommandLineOptions = new List<string>();
-
-                    fastBuildCommandLineOptions.Add("$(FASTBUILD_TARGET)"); // special envvar hardcoded in the template
-
-                    if (FastBuildSettings.FastBuildUseIDE)
-                        fastBuildCommandLineOptions.Add("-ide");
-
-                    if (FastBuildSettings.FastBuildReport)
-                        fastBuildCommandLineOptions.Add("-report");
-
-                    if (FastBuildSettings.FastBuildNoSummaryOnError)
-                        fastBuildCommandLineOptions.Add("-nosummaryonerror");
-
-                    if (FastBuildSettings.FastBuildSummary)
-                        fastBuildCommandLineOptions.Add("-summary");
-
-                    if (FastBuildSettings.FastBuildVerbose)
-                        fastBuildCommandLineOptions.Add("-verbose");
-
-                    if (FastBuildSettings.FastBuildMonitor)
-                        fastBuildCommandLineOptions.Add("-monitor");
-
-                    if (FastBuildSettings.FastBuildWait)
-                        fastBuildCommandLineOptions.Add("-wait");
-
-                    if (FastBuildSettings.FastBuildNoStopOnError)
-                        fastBuildCommandLineOptions.Add("-nostoponerror");
-
-                    if (FastBuildSettings.FastBuildFastCancel)
-                        fastBuildCommandLineOptions.Add("-fastcancel");
-
-                    if (FastBuildSettings.FastBuildNoUnity)
-                        fastBuildCommandLineOptions.Add("-nounity");
-
-                    fastBuildCommandLineOptions.Add("-config " + Path.GetFileName(_masterBffFilePath));
-
-                    return string.Join(" ", fastBuildCommandLineOptions);
+                    string fastbuildArgs = BuildArgumentsStringByCommandLineOptions(_conf, false);
+                    return FastBuildSettings.MakeCommandGenerator.GetArguments(FastBuildMakeCommandGenerator.BuildType.Build, _conf, fastbuildArgs);
                 }
             }
 
@@ -1765,7 +2602,7 @@ namespace Sharpmake.Generators.Apple
             {
                 get
                 {
-                    return XCodeUtil.XCodeFormatSingleItem(Util.SimplifyPath(FastBuildSettings.FastBuildMakeCommand));
+                    return FastBuildSettings.MakeCommandGenerator.GetExecutablePath(_conf);
                 }
             }
 
@@ -1773,7 +2610,7 @@ namespace Sharpmake.Generators.Apple
             {
                 get
                 {
-                    return XCodeUtil.XCodeFormatSingleItem(Path.GetDirectoryName(_masterBffFilePath));
+                    return XCodeUtil.XCodeFormatSingleItem(Path.GetDirectoryName(_conf.FastBuildMasterBffList.First()));
                 }
             }
         }
@@ -1819,35 +2656,48 @@ namespace Sharpmake.Generators.Apple
 
         private class ProjectBuildConfigurationForUnitTestTarget : ProjectBuildConfigurationForTarget
         {
+            private string _UnitTestFilesExclude;
+            private string _SymRoot; // Identifies the root of the directory hierarchy that contains product files and intermediate build files. Product and build files are placed in subdirectories of this directory.
+            // Note: CONFIGURATION_BUILD_DIR has to be set to the AppleApp output directory instead of the folder of .xctest file otherwise Xcode complaint,
+            // error: could not compute relative build path for TEST_HOST: PlugIns folder relative to $(TEST_HOST) is not a descendant of $(TARGET_BUILD_DIR)
+
             public ProjectBuildConfigurationForUnitTestTarget(Project.Configuration configuration, ProjectTarget target, Options.ExplicitOptions options)
                 : base(ItemSection.XCBuildConfiguration_UnitTestTarget, configuration, target, options)
-            { }
+            {
+                _UnitTestFilesExclude = XCodeUtil.XCodeFormatList(configuration.XcodeResolvedUnitTestSourceFilesBuildExclude, 4);
+                _SymRoot = Path.GetDirectoryName(ProjectOutputFile.GetFullPathFromConfiguration(configuration, forTestBundle: true, configuration.Project.XcodeUnitTestTargetName));
+            }
 
             public override void GetAdditionalResolverParameters(ProjectItem item, Resolver resolver, ref Dictionary<string, string> resolverParameters)
             {
                 string testHostParam = RemoveLineTag;
 
                 var nativeTarget = Target as ProjectNativeTarget;
-                if (nativeTarget == null)
-                    return;
-
-                // Lookup for the app in the unit test dependencies.
-                ProjectTargetDependency testHostTargetDependency =
-                    nativeTarget.Dependencies.Find(dependency => dependency.NativeTarget != null && dependency.NativeTarget.OutputFile.OutputType == Project.Configuration.OutputType.IosApp);
-
-                if (testHostTargetDependency != null)
+                if (nativeTarget != null)
                 {
-                    ProjectNativeTarget testHostTarget = testHostTargetDependency.NativeTarget;
+                    // Lookup for the app in the unit test dependencies.
+                    ProjectTargetDependency testHostTargetDependency =
+                        nativeTarget.Dependencies.Find(dependency => dependency.NativeTarget != null &&
+                        dependency.NativeTarget.OutputFile.OutputType == Project.Configuration.OutputType.AppleApp &&
+                        dependency.NativeTarget.ConfigurationList.Configurations.First(conf => (conf.Configuration.Name == this.Configuration.Name)).Configuration != null);
 
-                    // Each ProjectNativeTarget have a list of ProjectBuildConfiguration that wrap a Project.Configuration.
-                    // Here we look for the Project.Configuration in the ProjectBuildConfiguration list of the test host target (app)
-                    // that match the unit tests bundle ProjectBuildConfiguration.
-                    Project.Configuration testConfig = testHostTarget.ConfigurationList.Configurations.First(config => config.Configuration.Name == this.Configuration.Name).Configuration;
+                    if (testHostTargetDependency != null)
+                    {
+                        ProjectNativeTarget testHostTarget = testHostTargetDependency.NativeTarget;
 
-                    testHostParam = string.Format("$(BUILT_PRODUCTS_DIR)/{0}{1}{2}/{0}{1}", testHostTarget.Identifier, testConfig.TargetFileSuffix, testConfig.Output);
+                        // Each ProjectNativeTarget have a list of ProjectBuildConfiguration that wrap a Project.Configuration.
+                        // Here we look for the Project.Configuration in the ProjectBuildConfiguration list of the test host target (app)
+                        // that match the unit tests bundle ProjectBuildConfiguration.
+                        Project.Configuration testConfig = testHostTarget.ConfigurationList.Configurations.First(config => config.Configuration.Name == this.Configuration.Name).Configuration;
+
+                        testHostParam = String.Format("$(BUILT_PRODUCTS_DIR)/{0}{1}/$(BUNDLE_EXECUTABLE_FOLDER_PATH){0}", testConfig.TargetFileName, testConfig.TargetFileFullExtension);
+                    }
                 }
 
                 resolverParameters.Add("testHost", testHostParam);
+
+                resolverParameters.Add("ExcludedSourceFileNames", _UnitTestFilesExclude);
+                resolverParameters.Add("SymRoot", _SymRoot);
             }
         }
 
@@ -1872,16 +2722,16 @@ namespace Sharpmake.Generators.Apple
             public override void GetAdditionalResolverParameters(ProjectItem item, Resolver resolver, ref Dictionary<string, string> resolverParameters)
             {
                 ProjectConfigurationList configurationList = (ProjectConfigurationList)item;
-                string childrenList = "";
+                StringBuilder childrenList = new StringBuilder();
                 foreach (ProjectBuildConfiguration childItem in configurationList.Configurations)
                 {
                     using (resolver.NewScopedParameter("item", childItem))
                     {
-                        childrenList += resolver.Resolve(Template.SectionSubItem);
+                        childrenList.Append(resolver.Resolve(Template.SectionSubItem));
                     }
                 }
 
-                resolverParameters.Add("itemChildren", childrenList);
+                resolverParameters.Add("itemChildren", childrenList.ToString());
             }
 
             public HashSet<ProjectBuildConfiguration> Configurations { get { return _configurations; } }
@@ -1971,38 +2821,37 @@ namespace Sharpmake.Generators.Apple
 
             public override void GetAdditionalResolverParameters(ProjectItem item, Resolver resolver, ref Dictionary<string, string> resolverParameters)
             {
-                //ProjectMain mainItem = (ProjectMain)item;
-                string targetList = "";
+                StringBuilder targetList = new StringBuilder();
                 foreach (ProjectTarget target in _targets)
                 {
                     using (resolver.NewScopedParameter("item", target))
                     {
-                        targetList += resolver.Resolve(Template.SectionSubItem);
+                        targetList.Append(resolver.Resolve(Template.SectionSubItem));
                     }
                 }
-                resolverParameters.Add("itemTargets", targetList);
+                resolverParameters.Add("itemTargets", targetList.ToString());
 
-                string dependenciesList = "";
+                StringBuilder dependenciesList = new StringBuilder();
                 foreach (KeyValuePair<ProjectFolder, ProjectReference> projectReference in _projectReferences)
                 {
                     using (resolver.NewScopedParameter("group", projectReference.Key))
                     using (resolver.NewScopedParameter("project", projectReference.Value))
                     {
-                        dependenciesList += resolver.Resolve(Template.ProjectReferenceSubItem);
+                        dependenciesList.Append(resolver.Resolve(Template.ProjectReferenceSubItem));
                     }
                 }
-                resolverParameters.Add("itemProjectReferences", dependenciesList);
+                resolverParameters.Add("itemProjectReferences", dependenciesList.ToString());
 
-                string targetAttributes = "";
+                StringBuilder targetAttributes = new StringBuilder();
                 foreach (ProjectTarget target in _targets)
                 {
                     using (resolver.NewScopedParameter("item", target))
                     using (resolver.NewScopedParameter("project", this))
                     {
-                        targetAttributes += resolver.Resolve(Template.ProjectTargetAttribute);
+                        targetAttributes.Append(resolver.Resolve(Template.ProjectTargetAttribute));
                     }
                 }
-                resolverParameters.Add("itemTargetAttributes", targetAttributes);
+                resolverParameters.Add("itemTargetAttributes", targetAttributes.ToString());
             }
 
             public ProjectTarget Target { get { return _target; } }

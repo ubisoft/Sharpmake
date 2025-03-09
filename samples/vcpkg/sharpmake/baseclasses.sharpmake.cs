@@ -1,3 +1,6 @@
+// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using Sharpmake;
 
 namespace VCPKGSample
@@ -13,7 +16,7 @@ namespace VCPKGSample
             {
                 return new Target[]{ new Target(
                     Platform.win64,
-                    DevEnv.vs2019,
+                    DevEnv.vs2019  | DevEnv.vs2022,
                     Optimization.Debug | Optimization.Release,
                     buildSystem: BuildSystem.MSBuild | BuildSystem.FastBuild)};
             }
@@ -83,7 +86,6 @@ namespace VCPKGSample
             conf.AdditionalCompilerOptions.Add("/Zo");
             conf.LinkerPdbSuffix = string.Empty;
 
-            conf.TargetFileSuffix = (target.Optimization == Optimization.Debug) ? "_d" : "";
             conf.Options.Add(new Sharpmake.Options.Vc.Librarian.DisableSpecificWarnings(
                 "4221" // This object file does not define any previously undefined public symbols, so it will not be used by any link operation that consumes this library
                 ));

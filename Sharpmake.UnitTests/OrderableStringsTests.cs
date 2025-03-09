@@ -1,16 +1,5 @@
-﻿// Copyright (c) 2020 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-// http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -658,6 +647,35 @@ namespace Sharpmake.UnitTests
 
             Assert.AreEqual("LLA,YA,UTA", strings.ToString());
         }
+
+        /// <summary>
+        ///     Verify if the suffix was added to the string when absent or the original string
+        /// </summary>
+        [Test]
+        public static void TestInsertSuffixAbsentWithAdditionalSuffixes()
+        {
+            OrderableStrings strings = new OrderableStrings { "libatomic.a", "libatomic.so", "libcurl", "libthreads.dll" };
+            Strings expectedStrings = new Strings("libatomic.a", "libatomic.so", "libcurl.a", "libthreads.dll");
+
+            strings.InsertSuffix(".a", true, new[] { ".so", ".dll" });
+
+            Assert.AreEqual(expectedStrings.ToString(), strings.ToString());
+        }
+
+        /// <summary>
+        ///     Verify if the suffix was added to the strings if it's absent or not
+        /// </summary>
+        [Test]
+        public static void TestInsertSuffixOnlyIfAbsentFalseWithAdditionalSuffixes()
+        {
+            OrderableStrings strings = new OrderableStrings { "libatomic.a", "libatomic.so", "libcurl", "libthreads.dll" };
+            Strings expectedStrings = new Strings("libatomic.a.a", "libatomic.so.a", "libcurl.a", "libthreads.dll.a");
+
+            strings.InsertSuffix(".a", false, new[] { ".so", ".dll" });
+
+            Assert.AreEqual(expectedStrings.ToString(), strings.ToString());
+        }
+
 
         /// <summary>
         ///     Verify if the prefix was added

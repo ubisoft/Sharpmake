@@ -1,17 +1,8 @@
-﻿// Copyright (c) 2017, 2019-2020 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -19,11 +10,9 @@ namespace Sharpmake.Generators
 {
     public class FileGenerator : IFileGenerator
     {
-        // TODO: Remove usage of MemoryStream in APIs and refactor this to use StreamBuilder
-        //       instead.
         private MemoryStream _stream;
         private StreamWriter _writer;
-
+        internal Encoding Encoding => _writer.Encoding;
         public Resolver Resolver { get; }
 
         public FileGenerator()
@@ -36,7 +25,7 @@ namespace Sharpmake.Generators
                 throw new ArgumentNullException(nameof(resolver));
 
             _stream = new MemoryStream();
-            _writer = new StreamWriter(_stream);
+            _writer = new StreamWriter(_stream, new UTF8Encoding(false));
             Resolver = resolver;
         }
 
@@ -56,60 +45,38 @@ namespace Sharpmake.Generators
             Resolver = resolver;
         }
 
-        public FileGenerator(MemoryStream stream, Resolver resolver)
+        public void WriteTo(IFileGenerator generator)
         {
-            if (stream == null)
-                throw new ArgumentNullException(nameof(stream));
-            if (resolver == null)
-                throw new ArgumentNullException(nameof(resolver));
+            var fileGenerator = generator as FileGenerator;
+            Debug.Assert(fileGenerator != null);
 
-            _stream = stream;
-            _writer = new StreamWriter(stream);
-            Resolver = resolver;
+            Flush();
+            fileGenerator.Flush();
+            _stream.WriteTo(fileGenerator._stream);
         }
 
         public void Write(string text)
         {
             string resolvedValue = Resolver.Resolve(text);
-
-            // I assume they go to the trouble of doing all that to read a line for a reason. May
-            // help to know what it is though.
-            StringReader reader = new StringReader(resolvedValue);
-            string str = reader.ReadToEnd();
-            _writer.Write(str);
+            _writer.Write(resolvedValue);
         }
 
         public void Write(string text, string fallbackValue)
         {
             string resolvedValue = Resolver.Resolve(text, fallbackValue);
-
-            // I assume they go to the trouble of doing all that to read a line for a reason. May
-            // help to know what it is though.
-            StringReader reader = new StringReader(resolvedValue);
-            string str = reader.ReadToEnd();
-            _writer.Write(str);
+            _writer.Write(resolvedValue);
         }
 
         public void WriteLine(string text)
         {
             string resolvedValue = Resolver.Resolve(text);
-
-            // I assume they go to the trouble of doing all that to read a line for a reason. May
-            // help to know what it is though.
-            StringReader reader = new StringReader(resolvedValue);
-            string str = reader.ReadToEnd();
-            _writer.WriteLine(str);
+            _writer.WriteLine(resolvedValue);
         }
 
         public void WriteLine(string text, string fallbackValue)
         {
             string resolvedValue = Resolver.Resolve(text, fallbackValue);
-
-            // I assume they go to the trouble of doing all that to read a line for a reason. May
-            // help to know what it is though.
-            StringReader reader = new StringReader(resolvedValue);
-            string str = reader.ReadToEnd();
-            _writer.WriteLine(str);
+            _writer.WriteLine(resolvedValue);
         }
 
         public void WriteVerbatim(string text)
@@ -130,6 +97,12 @@ namespace Sharpmake.Generators
             return new Resolver.ScopedParameterGroup(Resolver, variables);
         }
 
+        public void Clear()
+        {
+            Flush(); // Needed otherwise remaining data would be written after reset
+            _stream.SetLength(0);
+        }
+
         public void ResolveEnvironmentVariables(Platform platform, params VariableAssignment[] variables)
         {
             if (variables == null)
@@ -141,17 +114,20 @@ namespace Sharpmake.Generators
             {
                 Flush();
 
-                string content = ToString();
-                string cleanContent = resolver.Resolve(content);
+                string content = GetBufferAsString();
+                string newContent = resolver.Resolve(content, null, out var wasChanged);
+                if (!wasChanged)
+                    return;
 
                 _stream.SetLength(0);
-
-                // Logically the writer should be reusable on a modified stream after flushing it's
-                // buffer but the API does not guarantee that buffered writers after modifying a stream.
-                // So create a new string.
-                _writer = new StreamWriter(_stream);
-                _writer.Write(cleanContent);
+                _writer.Write(newContent);
             }
+        }
+
+        public bool IsEmpty()
+        {
+            _writer.Flush();
+            return _stream.Length == 0;
         }
 
         public void Flush()
@@ -159,59 +135,108 @@ namespace Sharpmake.Generators
             _writer.Flush();
         }
 
-        public override string ToString()
+        private string GetBufferAsString()
         {
             Flush();
-            return ToString(Encoding.Default);
+
+            return _writer.Encoding.GetString(_stream.GetBuffer(), 0, (int)_stream.Length);
         }
 
-        public string ToString(Encoding encoding)
-        {
-            if (encoding == null)
-                throw new ArgumentNullException(nameof(encoding));
-
-            Flush();
-            return encoding.GetString(_stream.ToArray());
-        }
-
-        // TODO: Remove this since callers can call Seek and break the writer. Calling code should
-        //       just use ToString.
+        [Obsolete("Can't use this anymore. Please use IsFileDifferent or FileWriteIfDifferent")]
         public MemoryStream ToMemoryStream()
         {
             Flush();
             return _stream;
+        }
+        public bool IsFileDifferent(FileInfo file)
+        {
+            Flush();
+            return Util.IsFileDifferent(file, _stream);
+        }
+
+        public bool FileWriteIfDifferent(FileInfo file, bool bypassAutoCleanupDatabase = false)
+        {
+            Flush();
+            return Util.FileWriteIfDifferentInternal(file, _stream, bypassAutoCleanupDatabase);
         }
 
         public void RemoveTaggedLines()
         {
             Flush();
 
-            try
+            // Read and process the stream using spans to avoid any extra buffer copy.
+            var removeLineBytes = _writer.Encoding.GetBytes(FileGeneratorUtilities.RemoveLineTag.ToCharArray()).AsSpan();
+            var wholeStreamSpan = _stream.GetBuffer().AsSpan().Slice(0, (int)_stream.Length);
+            if (wholeStreamSpan.IndexOf(removeLineBytes) == -1)
+                return; // Early exit when there is no remove line tag in the file.
+
+            var newLineBytes = _writer.Encoding.GetBytes(Environment.NewLine.ToCharArray()).AsSpan();
+            var newStream = new MemoryStream((int)_stream.Length);
+            int nextSlice = 0;
+            while (true)
             {
-                _stream.Seek(0, SeekOrigin.Begin);
-                using (var reader = new StreamReader(_stream))
+                // Looking for end of line
+                var restOfFileSlice = wholeStreamSpan.Slice(nextSlice);
+                int endLineIndex = -1;
+                int endLineMarkerSize = 0;
+                for (int i = 0; i < restOfFileSlice.Length; i++)
                 {
-                    var cleanStream = new MemoryStream();
-                    var writer = new StreamWriter(cleanStream);
-
-                    do
+                    byte ch = restOfFileSlice[i];
+                    if (ch == '\r' || ch == '\n')
                     {
-                        string readline = reader.ReadLine();
-                        if (readline == null)
-                            break;
-                        if (!readline.Contains(FileGeneratorUtilities.RemoveLineTag))
-                            writer.WriteLine(readline);
-                    } while (true);
+                        endLineIndex = nextSlice + i;
+                        endLineMarkerSize = 1;
 
-                    _stream = cleanStream;
-                    _writer = writer;
+                        if (ch == '\r' && i + 1 < restOfFileSlice.Length && restOfFileSlice[i + 1] == '\n')
+                        {
+                            endLineMarkerSize = 2;
+                        }
+                        break;
+                    }
+                }
+
+                if (endLineIndex != -1)
+                {
+                    // Check if the line contains the remove line tag. Skip the line if found
+                    var lineSlice = wholeStreamSpan.Slice(nextSlice, endLineIndex - nextSlice);
+                    if (lineSlice.IndexOf(removeLineBytes) == -1)
+                    {
+                        newStream.Write(lineSlice);
+                        newStream.Write(newLineBytes);
+                    }
+
+                    // Advance to next line
+                    nextSlice += (lineSlice.Length + endLineMarkerSize);
+                    if (nextSlice >= wholeStreamSpan.Length)
+                    {
+                        Debug.Assert(nextSlice == wholeStreamSpan.Length);
+                        break;
+                    }
+                }
+                else
+                {
+                    // Rest of file.
+                    var lineSlice = wholeStreamSpan.Slice(nextSlice);
+
+                    // Check if the line contains the remove line tag. Skip the line if found
+                    if (lineSlice.IndexOf(removeLineBytes) == -1)
+                    {
+                        newStream.Write(lineSlice);
+                        // Note: Adding a new line to generate the exact same thing than with original implementation
+                        newStream.Write(newLineBytes);
+                    }
+
+                    // End of file
+                    break;
                 }
             }
-            catch (Exception)
-            {
-                _stream.Seek(0, SeekOrigin.End);
-                _writer = new StreamWriter(_stream);
-            }
+
+            Debug.Assert(newStream.Length > 0);
+            var newWriter = new StreamWriter(newStream, _writer.Encoding);
+            _writer.Dispose(); // This will dispose _stream as well.
+
+            _stream = newStream;
+            _writer = newWriter;
         }
     }
 }

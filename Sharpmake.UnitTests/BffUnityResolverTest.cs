@@ -1,24 +1,13 @@
-﻿// Copyright (c) 2022 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
-using NUnit.Framework;
-using Sharpmake.Generators.FastBuild;
-using Sharpmake.UnitTests.BffUnityResolverTestUtils;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using NUnit.Framework;
+using Sharpmake.Generators.FastBuild;
+using Sharpmake.UnitTests.BffUnityResolverTestUtils;
 
 namespace Sharpmake.UnitTests
 {
@@ -68,12 +57,12 @@ namespace Sharpmake.UnitTests
             var unityLogNames = GetProjectUnityLogNames();
 
             var expectedLogNames = new List<string> {
-                    "SimpleProject_vs2017_Debug : SimpleProject_unity_C887618D",   // Debug and Release have the same unity config, so hash is identical.
-                    "SimpleProject_vs2017_Release : SimpleProject_unity_C887618D",
-                    "SimpleProject_vs2017_Retail : SimpleProject_unity_3A2FAD5B",
-                    "SimpleProject_vs2019_Debug : SimpleProject_unity_8C09C56F",   // vs2019 values follow same pattern (debug == release),
-                    "SimpleProject_vs2019_Release : SimpleProject_unity_8C09C56F", // but different hash values because of different conf.FastBuildUnityUseRelativePaths from vs2017.
-                    "SimpleProject_vs2019_Retail : SimpleProject_unity_C29895B3",
+                    "SimpleProject_vs2017_Debug : SimpleProject_unity_C301FCDB",   // Debug and Release have the same unity config, so hash is identical.
+                    "SimpleProject_vs2017_Release : SimpleProject_unity_C301FCDB",
+                    "SimpleProject_vs2017_Retail : SimpleProject_unity_0BAACBF5",
+                    "SimpleProject_vs2019_Debug : SimpleProject_unity_D68FD759",   // vs2019 values follow same pattern (debug == release),
+                    "SimpleProject_vs2019_Release : SimpleProject_unity_D68FD759", // but different hash values because of different conf.FastBuildUnityUseRelativePaths from vs2017.
+                    "SimpleProject_vs2019_Retail : SimpleProject_unity_3DFB929D",
                 };
             CollectionAssert.AreEqual(expectedLogNames, unityLogNames);
         }
@@ -126,16 +115,16 @@ namespace Sharpmake.UnitTests
 
         public class UnityResolverLogger : Bff.IUnityResolver
         {
-            private Bff.IUnityResolver UnityResolver;
+            private Bff.IUnityResolver _unityResolver;
 
             public UnityResolverLogger(Bff.IUnityResolver resolver)
             {
-                UnityResolver = resolver;
+                _unityResolver = resolver;
             }
 
             public void ResolveUnities(Project project, string projectPath, ref Dictionary<Bff.Unity, List<Project.Configuration>> unities)
             {
-                UnityResolver.ResolveUnities(project, projectPath, ref unities);
+                _unityResolver.ResolveUnities(project, projectPath, ref unities);
 
                 foreach (var unitySection in unities)
                 {

@@ -1,16 +1,7 @@
-// Copyright (c) 2022 Ubisoft Entertainment
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
+using System;
 
 namespace Sharpmake
 {
@@ -65,11 +56,52 @@ namespace Sharpmake
                 }
 
                 /// <summary>
+                /// Output Apk name for gradle build which can be set per configuration.
+                /// </summary>
+                public class AndroidGradlePackageOutputName : StringOption
+                {
+                    public AndroidGradlePackageOutputName(string androidGradlePackageOutputName)
+                       : base(androidGradlePackageOutputName) { }
+                }
+
+                /// <summary>
                 /// The apk file used for debugging which can be set per configuration, is usually for FastBuild configuration.
                 /// </summary>
-                public class AndroidApkLocation: PathOption
+                public class AndroidApkLocation : PathOption
                 {
                     public AndroidApkLocation(string androidApkLocation) : base(androidApkLocation) { }
+                }
+
+                /// <summary>
+                /// Commands to be executed after the APK is installed, before the app is started for run/debug
+                /// </summary>
+                public class AndroidPostApkInstallCommands : StringOption
+                {
+                    public AndroidPostApkInstallCommands(string androidPostApkInstallCommands)
+                       : base(androidPostApkInstallCommands) { }
+                }
+
+                /// <summary>
+                /// Commands to be executed after the APK is built, before the app is installed
+                /// </summary>
+                public class AndroidPreApkInstallCommands : StringOption
+                {
+                    public AndroidPreApkInstallCommands(string androidPreApkInstallCommands)
+                       : base(androidPreApkInstallCommands) { }
+                }
+
+
+                /// <summary>
+                /// Android Packaging with Gradle
+                /// </summary>
+                /// <remarks>
+                /// Specifies if you want to create the APK with Gradle
+                /// </remarks>
+                public enum AndroidGradlePackaging
+                {
+                    [Default]
+                    Enable,
+                    Disable
                 }
 
                 /// <summary>
@@ -261,11 +293,26 @@ namespace Sharpmake
                 /// <summary>
                 /// Multi-processor Compilation
                 /// </summary>
+                [Obsolete("Use NativeBuildBackend instead i.e.: Enable = MultiToolTaskMSBuild, Disable = OriginalMSBuild", true)]
                 public enum MultiProcessorCompilation
                 {
                     [Default]
                     Enable,
                     Disable
+                }
+
+                /// <summary>
+                /// NativeBuildBackend
+                /// </summary>
+                /// /// <remarks>
+                /// Determines which backend visual studio uses that are supported by AGDE
+                /// </remarks>
+                public enum NativeBuildBackend
+                {
+                    [Default]
+                    MultiToolTaskMSBuild,
+                    OriginalMSBuild,
+                    Ninja
                 }
 
                 /// <summary>
@@ -390,6 +437,14 @@ namespace Sharpmake
                     Cpp17,
 
                     /// <summary>
+                    /// C++20
+                    /// </summary>
+                    /// <remarks>
+                    /// C++20 Language Standard.
+                    /// </remarks>
+                    Cpp20,
+
+                    /// <summary>
                     /// C++98 (GNU Dialect)
                     /// </summary>
                     /// <remarks>
@@ -435,7 +490,15 @@ namespace Sharpmake
                     /// <remarks>
                     /// C++17 (GNU Dialect) Language Standard.
                     /// </remarks>
-                    Gnupp17
+                    Gnupp17,
+
+                    /// <summary>
+                    /// C++20 (GNU Dialect)
+                    /// </summary>
+                    /// <remarks>
+                    /// C++20 (GNU Dialect) Language Standard.
+                    /// </remarks>
+                    Gnupp20
                 }
 
                 /// <summary>
@@ -730,6 +793,21 @@ namespace Sharpmake
                     [Default]
                     Disable,
                     Enable,
+                }
+
+                /// <summary>
+                /// Tag the shared object with a build id.
+                ///
+                /// This is typically necessary to match debug symbols with a stripped executable.
+                /// </summary>
+                public enum BuildId
+                {
+                    [Default]
+                    None,
+                    Fast,
+                    Md5,
+                    Sha1,
+                    Uuid,
                 }
             }
         }

@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.Build.NoTargets/3.7.0">
+
+  <PropertyGroup>
+    <!-- While Microsoft.Build.NoTargets doesn't build anything, it still requires to have a valid TargetFramework defined -->
+    <TargetFramework>net6.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="**/*" Exclude="Sharpmake.FunctionalTests.csproj;obj/**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sharpmake.Application\Sharpmake.Application.csproj" />
+  </ItemGroup>
+
+</Project>

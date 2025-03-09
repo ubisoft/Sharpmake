@@ -1,0 +1,73 @@
+# Sharpmake GitHub Actions build reusable workflow
+name: build
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        required: true
+        type: string
+      framework:
+        required: true
+        type: string
+      configuration:
+        required: true
+        type: string
+      run_unit_tests:
+        required: false
+        type: boolean
+        default: true
+      run_regression_tests:
+        required: false
+        type: boolean
+        default: true
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+  DOTNET_NOLOGO: true
+
+jobs:
+  build:
+    runs-on: ${{ inputs.os }}
+
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 0
+
+      # Requirement for GitVersion.
+      # This step ensure current commit exists on a branch.
+      # Its not the case when a workflow is triggered by a pull request coming from a fork.
+      # These commits only exists in a ref that isn't associated to any branch.
+      - name: Create branch on pull request from fork
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork
+        run: git checkout -b ${{ github.ref_name }}
+
+      - name: Build Sharpmake ${{ inputs.configuration }} ${{ inputs.os }}
+        shell: pwsh
+        run: |
+          dotnet build "Sharpmake.sln" -c "${{ inputs.configuration }}" -bl:Sharpmake_${{ inputs.configuration }}.binlog
+
+      - name: Store MSBuild binary logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sharpmake-msbuild-logs-${{ inputs.framework }}-${{ runner.os }}-${{ github.sha }}-${{ inputs.configuration }}
+          path: Sharpmake_${{ inputs.configuration }}.binlog
+
+      - name: UnitTest ${{ inputs.framework }} - dotnet test
+        if: inputs.run_unit_tests && runner.os == 'Windows' # TODO: fix the tests on mac and linux and remove the first part of the if
+        run: dotnet test --no-build --no-restore Sharpmake.UnitTests/Sharpmake.UnitTests.csproj --framework ${{ inputs.framework }} --configuration ${{ inputs.configuration }}
+
+      - name: RegressionTest
+        if: inputs.run_regression_tests && runner.os == 'Windows'
+        run: python regression_test.py --sharpmake_exe "Sharpmake.Application\bin\${{ inputs.configuration }}\${{ inputs.framework }}\Sharpmake.Application.exe"
+
+      - name: Upload sharpmake ${{ inputs.framework }} ${{ runner.os }}-release binaries
+        if: inputs.configuration == 'release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'Sharpmake-${{ inputs.framework }}-${{ runner.os }}-${{ github.sha }}'
+          path: Sharpmake.Application/bin/Release/${{ inputs.framework }}

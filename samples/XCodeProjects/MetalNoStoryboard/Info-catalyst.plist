@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleSpokenName</key>
+	<string>Sharpmake Sample Metal Without Storyboard</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.ubisoft.sharpmake.sample.metalnostoryboard.catalyst</string>
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.0.1</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>CC0</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>11</string>
+	<key>LSMultipleInstancesProhibited</key>
+	<false/>
+	<key>LSRequiresNativeExecution</key>
+	<true/>
+	<key>MinimumOSVersion</key>
+	<string>11</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>NSPrefersDisplaySafeAreaCompatibilityMode</key>
+	<true/>
+	<key>NSSupportsAutomaticGraphicsSwitching</key>
+	<true/>
+	<key>UIAppSupportsHDR</key>
+	<true/>
+	<key>UIInterfaceOrientation</key>
+	<string>UIInterfaceOrientationLandscapeLeft</string>
+	<key>UISupportsTrueScreenSizeOnMac</key>
+	<true/>
+</dict>
+</plist>

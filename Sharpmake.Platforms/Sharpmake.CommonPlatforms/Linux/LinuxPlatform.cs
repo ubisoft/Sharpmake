@@ -1,16 +1,5 @@
-﻿// Copyright (c) 2017-2018, 2020-2022 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -34,7 +23,8 @@ namespace Sharpmake
         public sealed partial class LinuxPlatform : BasePlatform, Project.Configuration.IConfigurationTasks, IFastBuildCompilerSettings, IClangPlatformBff
         {
             #region IPlatformDescriptor implementation
-            public override string SimplePlatformString => "x64";
+            public override string SimplePlatformString => "Linux";
+            public override string GetToolchainPlatformString(ITarget target) => "x64";
             public override bool IsMicrosoftPlatform => false; // No way!
             public override bool IsPcPlatform => true;
             public override bool IsUsingClang => true; // Maybe now? Traditionally GCC but only the GNU project is backing it now.
@@ -136,6 +126,7 @@ namespace Sharpmake
                 context.Options["RandomizedBaseAddress"] = "true";
                 context.CommandLineOptions["TargetMachine"] = "/MACHINE:X64";
                 context.CommandLineOptions["RandomizedBaseAddress"] = "/DYNAMICBASE";
+                context.CommandLineOptions["NasmCompilerFormat"] = "-felf64";
             }
 
             public override void SetupSdkOptions(IGenerationContext context)
@@ -198,7 +189,6 @@ namespace Sharpmake
                 string sysRoot = Sharpmake.Options.PathOption.Get<Options.General.SysRoot>(context.Configuration, rootpath: context.ProjectDirectoryCapitalized);
                 string bffSysRoot = Bff.CurrentBffPathKeyCombine(sysRoot);
                 context.CommandLineOptions["BffSysRoot"] = $" --sysroot=\"{bffSysRoot}\"";
-
             }
 
             public override void SelectCompilerOptions(IGenerationContext context)
@@ -378,7 +368,7 @@ namespace Sharpmake
                 string configurationsConditional = string.Join(" or ",
                     linuxConfigurations.Select(c => $"'$(Configuration)'=='{c.Name}'")
                 );
-                using (generator.Declare("platformName", SimplePlatformString))
+                using (generator.Declare("platformName", GetToolchainPlatformString(null)))
                 using (generator.Declare("configurationsConditional", configurationsConditional))
                 using (generator.Declare("applicationType", "Linux"))
                 using (generator.Declare("applicationTypeRevision", "1.0"))
@@ -406,11 +396,12 @@ namespace Sharpmake
                 generator.Write(_projectConfigurationsFastBuildMakefile);
             }
 
-            public override void SetupPlatformLibraryOptions(ref string platformLibExtension, ref string platformOutputLibExtension, ref string platformPrefixExtension)
+            public override void SetupPlatformLibraryOptions(out string platformLibExtension, out string platformOutputLibExtension, out string platformPrefixExtension, out string platformLibPrefix)
             {
                 platformLibExtension = ".a";
-                platformOutputLibExtension = "";
+                platformOutputLibExtension = ".a";
                 platformPrefixExtension = "-l:";
+                platformLibPrefix = "lib";
             }
 
             protected override string GetProjectLinkSharedVcxprojTemplate()
@@ -565,7 +556,7 @@ namespace Sharpmake
                 var devEnv = conf.Target.GetFragment<DevEnv>();
 
                 var platform = conf.Target.GetFragment<Platform>();
-                string compilerName = $"Compiler-{Util.GetSimplePlatformString(platform)}-{devEnv}";
+                string compilerName = $"Compiler-{Util.GetToolchainPlatformString(platform, conf.Target)}-{devEnv}";
                 string CCompilerSettingsName = "C-" + compilerName + "-" + "Linux";
                 string CompilerSettingsName = compilerName + "-" + "Linux";
 

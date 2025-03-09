@@ -1,16 +1,5 @@
-﻿// Copyright (c) 2020-2021 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-// http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -66,8 +55,10 @@ namespace HelloXCode
                 var nameParts = new List<string>();
 
                 nameParts.Add(Optimization.ToString().ToLowerInvariant());
+                if (BuildSystem == BuildSystem.FastBuild)
+                    nameParts.Add(BuildSystem.ToString().ToLowerInvariant());
 
-                return string.Join(" ", nameParts);
+                return string.Join("_", nameParts);
             }
         }
 
@@ -101,7 +92,7 @@ namespace HelloXCode
                 if (BuildSystem == BuildSystem.FastBuild)
                     dirNameParts.Add(BuildSystem.ToString());
 
-                if (DevEnv != DevEnv.xcode4ios)
+                if (DevEnv != DevEnv.xcode)
                     dirNameParts.Add(DevEnv.ToString());
 
                 return string.Join("_", dirNameParts).ToLowerInvariant();
@@ -122,21 +113,108 @@ namespace HelloXCode
 
         public static CommonTarget[] GetMacTargets()
         {
-            var defaultTarget = new CommonTarget(
+            var macosTarget = new CommonTarget(
                 Platform.mac,
-                DevEnv.xcode4ios,
+                DevEnv.xcode,
+                Optimization.Debug | Optimization.Release,
+                Blob.NoBlob,
+                BuildSystem.Default
+            );
+
+            // make a blob version of the target
+            var macosBlobTarget = (CommonTarget)macosTarget.Clone(
+                Blob.Blob
+            );
+
+            // make a fastbuild version of the target
+            var macosFastBuildTarget = (CommonTarget)macosTarget.Clone(
+                Blob.FastBuildUnitys,
+                BuildSystem.FastBuild
+            );
+
+            var iosTarget = new CommonTarget(
+                Platform.ios,
+                DevEnv.xcode,
+                Optimization.Debug | Optimization.Release,
+                Blob.NoBlob,
+                BuildSystem.Default
+            );
+
+            // make a blob version of the target
+            var iosBlobTarget = (CommonTarget)iosTarget.Clone(
+                Blob.Blob
+            );
+
+            // make a fastbuild version of the target
+            var iosFastBuildTarget = (CommonTarget)iosTarget.Clone(
+                Blob.FastBuildUnitys,
+                BuildSystem.FastBuild
+            );
+
+            var tvosTarget = new CommonTarget(
+                Platform.tvos,
+                DevEnv.xcode,
                 Optimization.Debug | Optimization.Release,
                 Blob.NoBlob,
                 BuildSystem.Default
             );
 
             // make a fastbuild version of the target
-            var fastBuildTarget = (CommonTarget)defaultTarget.Clone(
+            var tvosBlobTarget = (CommonTarget)tvosTarget.Clone(
+                Blob.Blob
+            );
+
+            // make a fastbuild version of the target
+            var tvosFastBuildTarget = (CommonTarget)tvosTarget.Clone(
                 Blob.FastBuildUnitys,
                 BuildSystem.FastBuild
             );
 
-            return new[] { defaultTarget, fastBuildTarget };
+            var watchosTarget = new CommonTarget(
+                Platform.watchos,
+                DevEnv.xcode,
+                Optimization.Debug | Optimization.Release,
+                Blob.NoBlob,
+                BuildSystem.Default
+            );
+
+            // make a blob version of the target
+            var watchosBlobTarget = (CommonTarget)watchosTarget.Clone(
+                Blob.Blob
+            );
+
+            // make a fastbuild version of the target
+            var watchosFastBuildTarget = (CommonTarget)watchosTarget.Clone(
+                Blob.FastBuildUnitys,
+                BuildSystem.FastBuild
+            );
+
+            var catalystTarget = new CommonTarget(
+                Platform.maccatalyst,
+                DevEnv.xcode,
+                Optimization.Debug | Optimization.Release,
+                Blob.NoBlob,
+                BuildSystem.Default
+            );
+
+            // make a blob version of the target
+            var catalystBlobTarget = (CommonTarget)catalystTarget.Clone(
+                Blob.Blob
+            );
+
+            // make a FastBuild version of the target
+            var catalystFastBuildTarget = (CommonTarget)catalystTarget.Clone(
+                Blob.FastBuildUnitys,
+                BuildSystem.FastBuild
+            );
+
+            return new[] {
+                macosTarget, macosBlobTarget, macosFastBuildTarget,
+                iosTarget, iosBlobTarget, iosFastBuildTarget,
+                tvosTarget, tvosBlobTarget, tvosFastBuildTarget,
+                watchosTarget, watchosBlobTarget, watchosFastBuildTarget,
+                catalystTarget, catalystBlobTarget, catalystFastBuildTarget,
+            };
         }
     }
 }

@@ -1,16 +1,6 @@
-// Copyright (c) 2017-2022 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 namespace Sharpmake.Generators.VisualStudio
 {
     public partial class CSproj
@@ -121,6 +111,7 @@ namespace Sharpmake.Generators.VisualStudio
     <UseWpf>[options.UseWpf]</UseWpf>
     <UseWindowsForms>[options.UseWindowsForms]</UseWindowsForms>
     <Nullable>[options.Nullable]</Nullable>
+    <PublishAot>[options.PublishAot]</PublishAot>
   </PropertyGroup>
 ";
 
@@ -128,8 +119,7 @@ namespace Sharpmake.Generators.VisualStudio
                 public const string MultiFrameworkProjectConfigurationCondition = "'$(Configuration)|$(Platform)|$(TargetFramework)'=='[conf.Name]|[platformName]|[targetFramework]'";
 
                 public static string ProjectConfigurationsGeneral =
-@"  <PropertyGroup Condition=""[projectConfigurationCondition]"">
-    <PlatformTarget>[platformName]</PlatformTarget>
+@"    <PlatformTarget>[platformName]</PlatformTarget>
     <DebugSymbols>[options.DebugSymbols]</DebugSymbols>
     <DebugType>[options.DebugType]</DebugType>
     <Optimize>[options.Optimize]</Optimize>
@@ -156,7 +146,6 @@ namespace Sharpmake.Generators.VisualStudio
     <CopyVsixExtensionFiles>[options.CopyVsixExtensionFiles]</CopyVsixExtensionFiles>
     <CopyVsixExtensionLocation>[options.CopyVsixExtensionLocation]</CopyVsixExtensionLocation>
     <ProduceReferenceAssembly>[options.ProduceReferenceAssembly]</ProduceReferenceAssembly>
-  </PropertyGroup>
 ";
 
                 public static string ImportProjectItemSimple =
@@ -314,7 +303,9 @@ namespace Sharpmake.Generators.VisualStudio
 @"      <CachedSettingsPropName>[cachedSettingsPropName]</CachedSettingsPropName>
 ";
 
-
+            public static string PropertyGroupWithConditionStart =
+@"  <PropertyGroup Condition=""[projectConfigurationCondition]"">
+";
 
             public static class ItemGroups
             {
@@ -698,17 +689,6 @@ namespace Sharpmake.Generators.VisualStudio
   </ProjectExtensions>
 ";
 
-            public const string CustomPropertiesStart =
-@"  <PropertyGroup>
-";
-
-            public const string CustomProperty =
-            @"    <[custompropertyname]>[custompropertyvalue]</[custompropertyname]>
-";
-
-            public const string CustomPropertiesEnd =
-            @"  </PropertyGroup>
-";
             public static class UserFile
             {
                 public static readonly string StartWithProject =

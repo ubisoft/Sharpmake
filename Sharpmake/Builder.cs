@@ -1,16 +1,6 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -133,7 +123,7 @@ namespace Sharpmake
         private ThreadPool _tasks;
         // Keep all instances of manually built (and loaded) assemblies, as they may be needed by other assemblies on load (command line).
         private readonly ConcurrentDictionary<string, Assembly> _builtAssemblies = new ConcurrentDictionary<string, Assembly>(); // Assembly Full Path -> Assembly
-        private readonly Dictionary<string, string> _references = new Dictionary<string, string>(); // Keep track of assemblies explicitly referenced with [module: Sharpmake.Reference("...")] in compiled files
+        private readonly Dictionary<string, string> _runtimeReferences = new Dictionary<string, string>(); // Keep track of runtime assemblies explicitly referenced from scripts, and needed during execution
 
         private class ProfilingCompleteEvent
         {
@@ -503,7 +493,7 @@ namespace Sharpmake
                     {
                         var candidatePath = Path.Combine(assemblyFolder, dllName);
                         if (File.Exists(candidatePath))
-                            extensionLoader.LoadExtension(candidatePath, false);
+                            extensionLoader.LoadExtension(candidatePath);
                     }
                 }
             }
@@ -543,16 +533,16 @@ namespace Sharpmake
             if (newAssemblyInfo.Assembly == null && context.CompileErrorBehavior == BuilderCompileErrorBehavior.ThrowException)
                 throw new InternalError();
 
-            // Keep track of assemblies explicitly referenced by compiled files
+            // Keep track of runtime assemblies explicitly referenced by compiled files
             foreach (var fullpath in assembler.References.Distinct())
             {
                 var assemblyName = AssemblyName.GetAssemblyName(fullpath).FullName;
                 string assemblyPath;
-                if (_references.TryGetValue(assemblyName, out assemblyPath) && !string.Equals(assemblyPath, fullpath, StringComparison.OrdinalIgnoreCase))
+                if (_runtimeReferences.TryGetValue(assemblyName, out assemblyPath) && !string.Equals(assemblyPath, fullpath, StringComparison.OrdinalIgnoreCase))
                 {
                     throw new Error($"Assembly {assemblyName} present in two different locations: {fullpath} and {assemblyPath}.");
                 }
-                _references[assemblyName] = fullpath;
+                _runtimeReferences[assemblyName] = fullpath;
             }
 
             if (newAssemblyInfo.Assembly != null)
@@ -579,14 +569,14 @@ namespace Sharpmake
             if (builtAssembly != null)
                 return builtAssembly;
 
-            // Check if this is an assembly that if referenced by [module: Sharpmake.Reference("...")], is so, explicitly load it with its fullPath
+            // Check if this is a runtime assembly referenced by a script, if so, explicitly load it with its fullPath
             string explicitReferencesFullPath;
-            if (_references.TryGetValue(args.Name, out explicitReferencesFullPath))
+            if (_runtimeReferences.TryGetValue(args.Name, out explicitReferencesFullPath))
                 return Assembly.LoadFrom(explicitReferencesFullPath);
 
             // Default binding redirect for old versions of an assembly to the implicitly/explicitly referenced one
             var requestedAssemblyName = new AssemblyName(args.Name);
-            var referencedAssemblyHighestVersion = _references.Keys
+            var referencedAssemblyHighestVersion = _runtimeReferences.Keys
                 .Where(assemblyFullName => assemblyFullName.StartsWith(requestedAssemblyName.Name, StringComparison.OrdinalIgnoreCase))
                 .Select(assemblyFullName => new AssemblyName(assemblyFullName))
                 .OrderBy(assemblyName => assemblyName.Version)
@@ -595,7 +585,7 @@ namespace Sharpmake
 
             if (referencedAssemblyHighestVersion != null)
             {
-                return Assembly.LoadFrom(_references[referencedAssemblyHighestVersion]);
+                return Assembly.LoadFrom(_runtimeReferences[referencedAssemblyHighestVersion]);
             }
 
             return null;
@@ -974,10 +964,9 @@ namespace Sharpmake
             private string GetFragmentInfoString(int fragmentValue)
             {
                 var typedFragment = Enum.ToObject(FieldInfo.FieldType, fragmentValue);
-                if (typedFragment is Platform)
+                if (typedFragment is Platform platformFragment)
                 {
-                    Platform platformFragment = (Platform)typedFragment;
-                    return platformFragment >= Platform._reserved9 ? Util.GetSimplePlatformString(platformFragment) : platformFragment.ToString();
+                    return Util.GetSimplePlatformString(platformFragment);
                 }
                 return typedFragment.ToString();
             }
@@ -1164,6 +1153,8 @@ namespace Sharpmake
             using (new Util.StopwatchProfiler(ms => { LogWriteLine("    generation done in {0:0.0} sec", ms / 1000.0f); }))
             using (CreateProfilingScope("Generation"))
             {
+                _getGeneratorsManagerCallBack().BeforeGenerate();
+
                 var projects = new List<Project>(_projects.Values);
                 var solutions = new List<Solution>(_solutions.Values);
 
@@ -1405,7 +1396,7 @@ namespace Sharpmake
                 using (var extensionLoader = new ExtensionLoader())
                 {
                     var parserCount = _builder._attributeParsers.Count;
-                    var assembly = extensionLoader.LoadExtension(file, false);
+                    var assembly = extensionLoader.LoadExtension(file);
                     return new LoadInfo(assembly, _builder._attributeParsers.Skip(parserCount));
                 }
             }

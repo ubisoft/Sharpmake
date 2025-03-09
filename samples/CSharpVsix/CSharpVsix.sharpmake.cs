@@ -1,16 +1,5 @@
-﻿// Copyright (c) 2017-2019, 2021 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-// http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System;
 using Sharpmake;
@@ -24,7 +13,7 @@ namespace CSharpVsix
             return new Target[]{
                 new Target(
                     Platform.anycpu,
-                    DevEnv.vs2017,
+                    DevEnv.vs2022,
                     Optimization.Debug | Optimization.Release,
                     OutputType.Dll,
                     Blob.NoBlob,
@@ -73,14 +62,8 @@ namespace CSharpVsix
         {
             conf.Output = Configuration.OutputType.DotNetClassLibrary;
 
-            // we support vs2017 and up, so the nuget version needs to start with 15
             conf.ReferencesByNuGetPackage.Add(
-                "Microsoft.VisualStudio.SDK", "15.0.1"
-            );
-
-            // When referencing VS SDK NuGet packages using PackageReference, assemblies are referenced instead of linked. This package corrects that.
-            conf.ReferencesByNuGetPackage.Add(
-                "Microsoft.VisualStudio.SDK.EmbedInteropTypes", "15.0.36"
+                "Microsoft.VisualStudio.SDK", "17.5.33428.388"
             );
 
             conf.ReferencesByName.Add(
@@ -98,8 +81,8 @@ namespace CSharpVsix
             conf.Options.Add(Options.CSharp.UseCodeBase.Enabled);
 
             // minimum is vs2017
-            conf.Options.Add(new Options.CSharp.MinimumVisualStudioVersion("15.0"));
-            conf.Options.Add(new Options.CSharp.OldToolsVersion("15.0"));
+            conf.Options.Add(new Options.CSharp.MinimumVisualStudioVersion("17.0"));
+            conf.Options.Add(new Options.CSharp.OldToolsVersion("17.0"));
 
             conf.Options.Add(new Options.CSharp.VsToolsPath(@"$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)"));
 

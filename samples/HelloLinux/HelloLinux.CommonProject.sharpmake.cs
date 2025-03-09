@@ -1,16 +1,5 @@
-﻿// Copyright (c) 2020-2021 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-// http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System.IO;
 using System.Linq;
@@ -46,7 +35,7 @@ namespace HelloLinux
         public virtual void ConfigureAll(Configuration conf, CommonTarget target)
         {
             conf.ProjectFileName = "[project.Name]_[target.Platform]";
-            if (target.DevEnv != DevEnv.xcode4ios)
+            if (target.DevEnv != DevEnv.xcode)
                 conf.ProjectFileName += "_[target.DevEnv]";
             conf.ProjectPath = Path.Combine(Globals.TmpDirectory, @"projects\[project.Name]");
             conf.IsFastBuild = target.BuildSystem == BuildSystem.FastBuild;
@@ -73,11 +62,15 @@ namespace HelloLinux
         {
             if (conf.Output == Configuration.OutputType.Exe || conf.Output == Configuration.OutputType.Dll)
             {
+                // To maintain consistency between Windows and Linux
+                // makefiles and paths, instead of absolute global paths via
+                // Sharpmake, we generate local ones using Make variables
+
                 // Create a separate package directory before building.
-                string packageDir = $@"{Globals.TmpDirectory}/package";
+                string packageDir = "$(TARGETDIR)/../../package";
                 conf.EventPreBuild.Add($"mkdir -p {packageDir}");
                 // Copy the build result to the package directory.
-                conf.EventPostBuild.Add($@"cp [conf.TargetPath]/[conf.TargetFileFullNameWithExtension] {packageDir}");
+                conf.EventPostBuild.Add($@"cp $(TARGET) {packageDir}");
             }
         }
 

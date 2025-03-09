@@ -1,17 +1,8 @@
-// Copyright (c) 2017-2022 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
+using System.Buffers;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -23,12 +14,9 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-#if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
-#endif
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.Setup.Configuration;
 using Microsoft.Win32;
@@ -59,6 +47,27 @@ namespace Sharpmake
                 resultName += ">";
             }
             return resultName;
+        }
+
+        /// <summary>
+        /// Returns a OR regular expression for all the entries in the IEnumerable
+        /// e.g. {"foo", "bar"}.ToOrRegex() yields "(foo|bar)"
+        /// </summary>
+        public static string ToOrRegex(this IEnumerable<string> array)
+        {
+            return $"({string.Join("|", array)})";
+        }
+
+        /// <summary>
+        /// Returns a OR regular expression for all the entries in the IEnumerable, except those passed as `except`
+        /// e.g. {"foo", "bar", "hoge"}.ToOrRegexExcept("bar") yields "(foo|hoge)"
+        /// </summary>
+        public static string ToOrRegexExcept(this IEnumerable<string> array, params string[] except)
+        {
+            if (except.Length == 0)
+                return $"({string.Join("|", array)})";
+
+            return $"({string.Join("|", array.Except(except))})";
         }
 
 
@@ -123,70 +132,78 @@ namespace Sharpmake
             return null;
         }
 
+        /// <summary>
+        /// Size of buffer used for stream comparisons.
+        /// </summary>
+        private const int _FileStreamBufferSize = 4096;
+
+        /// <summary>
+        /// Efficiently compare is two streams have the same content
+        /// </summary>
+        /// <param name="stream1">1st stream</param>
+        /// <param name="stream2">2nd stream</param>
+        /// <returns>true=equal, false=not equal</returns>
         private static bool AreStreamsEqual(Stream stream1, Stream stream2)
         {
-            const int BufferSize = 4096;
-            var buffer1 = new byte[BufferSize];
-            var buffer2 = new byte[BufferSize];
-
-            stream1.Position = 0;
-            stream2.Position = 0;
-
-            while (true)
+            byte[] buffer1=null;
+            byte[] buffer2=null;
+            try
             {
-                int count1 = stream1.Read(buffer1, 0, BufferSize);
-                int count2 = stream2.Read(buffer2, 0, BufferSize);
+                // Request buffers from shared pool to reduce pressure on GC.
+                buffer1 = ArrayPool<byte>.Shared.Rent(_FileStreamBufferSize);
+                buffer2 = ArrayPool<byte>.Shared.Rent(_FileStreamBufferSize);
 
-                if (count1 != count2)
-                    return false;
+                stream1.Position = 0;
+                stream2.Position = 0;
 
-                if (count1 == 0)
-                    return true;
+                while (true)
+                {
+                    // Read from both streams
+                    int count1 = stream1.Read(buffer1, 0, buffer1.Length);
+                    int count2 = stream2.Read(buffer2, 0, buffer2.Length);
 
-                if (!buffer1.SequenceEqual(buffer2))
-                    return false;
+                    if (count1 != count2)
+                        return false;
+
+                    if (count1 == 0)
+                        return true;
+
+                    Span<byte> span1 = new Span<byte>(buffer1, 0, count1);
+                    Span<byte> span2 = new Span<byte>(buffer2, 0, count2);
+
+                    // Compare the streams efficiently without any copy.
+                    if (!span1.SequenceEqual(span2))
+                        return false;
+                }
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(buffer1);
+                ArrayPool<byte>.Shared.Return(buffer2);
             }
         }
 
+        [Obsolete("Call IsFileDifferent() with two parameters. Last parameter has been removed.")]
         public static bool IsFileDifferent(FileInfo file, Stream stream, bool compareEndLineCharacters = false)
+        {
+            return IsFileDifferent(file, stream);
+        }
+
+        /// <summary>
+        /// Check if a file is different than the stream content. Content is compared bit per bit.
+        /// </summary>
+        /// <param name="file">file to compare</param>
+        /// <param name="stream">stream to compare</param>
+        /// <returns>true=different, false=same</returns>
+        public static bool IsFileDifferent(FileInfo file, Stream stream)
         {
             if (!file.Exists)
                 return true;
 
-            using (var fstream = file.OpenRead())
+            // Note: Using same buffer size than AreStreamsEqual for better efficiency
+            using (var fstream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read, _FileStreamBufferSize))
             {
-                if (compareEndLineCharacters)
-                {
-                    return !AreStreamsEqual(stream, fstream);
-                }
-                else
-                {
-                    stream.Position = 0;
-                    fstream.Position = 0;
-
-                    StreamReader streamReader = new StreamReader(stream);
-                    StreamReader fstreamReader = new StreamReader(fstream);
-
-                    int c0 = streamReader.Read();
-                    int c1 = fstreamReader.Read();
-
-                    while (c0 != -1 || c1 != -1)
-                    {
-                        // skip end of line for comparison
-                        while ((char)c0 == '\n' || (char)c0 == '\r')
-                            c0 = streamReader.Read();
-
-                        while ((char)c1 == '\n' || (char)c1 == '\r')
-                            c1 = fstreamReader.Read();
-
-                        if (c0 != c1)
-                            return true;
-
-                        c0 = streamReader.Read();
-                        c1 = fstreamReader.Read();
-                    }
-                    return false;
-                }
+                return !AreStreamsEqual(stream, fstream);
             }
         }
 
@@ -207,9 +224,27 @@ namespace Sharpmake
             return generationOutput;
         }
 
+        public static GenerationOutput FileWriteIfDifferent(string outputFilePath, IFileGenerator generator, GenerationOutput generationOutput = null)
+        {
+            if (generationOutput == null)
+                generationOutput = new GenerationOutput();
+
+            if (FileWriteIfDifferent(new FileInfo(outputFilePath), generator))
+                generationOutput.Generated.Add(outputFilePath);
+            else
+                generationOutput.Skipped.Add(outputFilePath);
+
+            return generationOutput;
+        }
+
         public static bool FileWriteIfDifferent(FileInfo file, MemoryStream stream)
         {
             return Builder.Instance.Context.WriteGeneratedFile(null, file, stream);
+        }
+
+        public static bool FileWriteIfDifferent(FileInfo file, IFileGenerator generator)
+        {
+            return Builder.Instance.Context.WriteGeneratedFile(null, file, generator);
         }
 
         internal static bool RecordInAutoCleanupDatabase(string fullPath)
@@ -224,7 +259,7 @@ namespace Sharpmake
 
             if (file.Exists)
             {
-                if (!IsFileDifferent(file, stream, true))
+                if (!IsFileDifferent(file, stream))
                     return false;
 
                 if (file.IsReadOnly)
@@ -240,7 +275,7 @@ namespace Sharpmake
             // write the file
             using (FileStream outStream = file.Open(FileMode.Create))
             {
-                outStream.Write(stream.ToArray(), 0, (int)stream.Length);
+                stream.WriteTo(outStream);
             }
 
             return true;
@@ -256,16 +291,17 @@ namespace Sharpmake
         }
 
         public static List<string> FilesAlternatesAutoCleanupDBSuffixes = new List<string>(); // The alternates db suffixes using by other context
-        public static string FilesAutoCleanupDBPath = string.Empty;
-        public static string FilesAutoCleanupDBSuffix = string.Empty;   // Current auto-cleanup suffix for the database.
+        private static List<string> _FilesAlternatesAutoCleanupDBFullPaths = new List<string>();
+        public static string FilesAutoCleanupDBPath { get; set; } = string.Empty;
+        public static string FilesAutoCleanupDBSuffix { get; set; } = string.Empty;   // Current auto-cleanup suffix for the database.
         internal static bool s_forceFilesCleanup = false;
         internal static string s_overrideFilesAutoCleanupDBPath;
-        public static bool FilesAutoCleanupActive = false;
-        public static TimeSpan FilesAutoCleanupDelay = TimeSpan.Zero;
+
+        public static bool FilesAutoCleanupActive { get; set; }
+        public static TimeSpan FilesAutoCleanupDelay { get; set; } = TimeSpan.Zero;
         public static HashSet<string> FilesToBeExplicitlyRemovedFromDB = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
         public static HashSet<string> FilesAutoCleanupIgnoredEndings = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
         private const string s_filesAutoCleanupDBPrefix = "sharpmakeautocleanupdb";
-        private enum DBVersion { Version = 3 };
 
         private static JsonSerializerOptions GetCleanupDatabaseJsonSerializerOptions()
         {
@@ -273,64 +309,95 @@ namespace Sharpmake
             {
                 AllowTrailingCommas = true,
                 PropertyNamingPolicy = null,
-                WriteIndented = false,
+                WriteIndented = true,
             };
+        }
+
+        private class CleanupDatabaseContent
+        {
+            public enum DBVersions 
+            {
+                BinaryFormatterVersion = 3, // Json in a binary formatter - Deprecated - Support will be removed in the first version released after dec 31th 2024
+                JsonVersion = 4, // New format - simple json
+                CurrentVersion = JsonVersion
+            };
+
+            public DBVersions DBVersion { get; set; }
+            public object Data { get; set; }
         }
 
         private static Dictionary<string, DateTime> ReadCleanupDatabase(string databaseFilename)
         {
-            Dictionary<string, DateTime> dbFiles = null;
-            if (File.Exists(databaseFilename))
+            // DEPRECATED CODE - TO BE REMOVED AFTER DEC 31TH 2024
+            string oldDatabaseFormatFilename = Path.ChangeExtension(databaseFilename, ".bin");
+            if (File.Exists(oldDatabaseFormatFilename))
             {
                 try
                 {
                     // Read database - This is simply a simple binary file containing the list of file and a version number.
-                    using (Stream readStream = new FileStream(databaseFilename, FileMode.Open, FileAccess.Read, FileShare.None))
+                    using (Stream readStream = new FileStream(oldDatabaseFormatFilename, FileMode.Open, FileAccess.Read, FileShare.None))
                     using (BinaryReader binReader = new BinaryReader(readStream))
                     {
                         // Validate version number
                         int version = binReader.ReadInt32();
-                        if (version == (int)DBVersion.Version)
+                        if (version == (int)CleanupDatabaseContent.DBVersions.BinaryFormatterVersion)
                         {
                             // Read the list of files.
                             IFormatter formatter = new BinaryFormatter();
                             string dbAsJson = binReader.ReadString();
 
                             var tmpDbFiles = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, DateTime>>(dbAsJson, GetCleanupDatabaseJsonSerializerOptions());
-                            dbFiles = tmpDbFiles.ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.InvariantCultureIgnoreCase);
+                            var dbFiles = tmpDbFiles.ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.InvariantCultureIgnoreCase);
+
+                            // Converting to new format.
+                            WriteCleanupDatabase(databaseFilename, dbFiles);
+                            return dbFiles;
                         }
-#if NETFRAMEWORK
-                        else if (version == 2)
-                        {
-                            // Read the list of files.
-                            IFormatter formatter = new BinaryFormatter();
-                            var tmpDbFiles = (Dictionary<string, DateTime>)formatter.Deserialize(readStream);
-                            dbFiles = tmpDbFiles.ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.InvariantCultureIgnoreCase);
-                        }
-                        else if (version == 1)
-                        {
-                            IFormatter formatter = new BinaryFormatter();
-                            ConcurrentDictionary<string, bool> dbFilesV1 = (ConcurrentDictionary<string, bool>)formatter.Deserialize(readStream);
-                            DateTime now = DateTime.Now;
-                            dbFiles = dbFilesV1.ToDictionary(kvp => kvp.Key, kvp => now);
-                        }
-#endif
                         else
                         {
                             LogWrite("Warning: found cleanup database in incompatible format v{0}, skipped.", version);
                         }
-
-                        readStream.Close();
                     }
                 }
                 catch
                 {
-                    // File is likely corrupted.
-                    // This is no big deal except that cleanup won't occur.
-                    dbFiles = null;
+                    // nothing to do.
+                }
+                finally
+                {
+                    TryDeleteFile(oldDatabaseFormatFilename);
                 }
             }
-            return dbFiles;
+            // END DEPRECATED CODE
+
+            if (File.Exists(databaseFilename))
+            {
+                try
+                {
+                    string jsonString = File.ReadAllText(databaseFilename);
+                    var versionedDB = System.Text.Json.JsonSerializer.Deserialize<CleanupDatabaseContent>(jsonString);
+                    if (versionedDB.DBVersion == CleanupDatabaseContent.DBVersions.JsonVersion)
+                    {
+                        // Deserialize the Database to a dictionary
+                        var tmpDbFiles = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, DateTime>>(versionedDB.Data.ToString(), GetCleanupDatabaseJsonSerializerOptions());
+
+                        // Convert the dictionary to a case insensitive dictionary
+                        var dbFiles = tmpDbFiles.ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.InvariantCultureIgnoreCase);
+
+                        return dbFiles;
+                    }
+                    else
+                    {
+                        LogWrite($"Cleanup database version {versionedDB.DBVersion} is not supported. Ignoring database"); 
+                    }
+                }
+                catch
+                {
+                    // DB File is likely corrupted.
+                    // This is no big deal except that cleanup won't occur and this could result in files not written by the current Sharpmake run to not being deleted.
+                }
+            }
+            return null;
         }
 
         private static string GetDatabaseFilename(string dbSuffix)
@@ -338,10 +405,9 @@ namespace Sharpmake
             if (!string.IsNullOrWhiteSpace(s_overrideFilesAutoCleanupDBPath))
                 return s_overrideFilesAutoCleanupDBPath;
 
-            string databaseFilename = Path.Combine(FilesAutoCleanupDBPath, $"{s_filesAutoCleanupDBPrefix}{dbSuffix}.bin");
+            string databaseFilename = Path.Combine(FilesAutoCleanupDBPath, $"{s_filesAutoCleanupDBPrefix}{dbSuffix}.json");
             return databaseFilename;
         }
-
 
         /// <summary>
         /// This method is used to execute files auto-cleanup. Which means deleting files that are no longer saved.
@@ -367,6 +433,19 @@ namespace Sharpmake
         /// </example>
         public static void ExecuteFilesAutoCleanup()
         {
+            ExecuteFilesAutoCleanup(false);
+        }
+
+        /// <summary>
+        /// This method is the same as the other ExecuteFilesAutoCleanup but this one gives control if we need to add the current context db
+        /// to alternateDB files list for proper cleanup execution if execution context changes in a subsequent execution
+        /// For example, _debugsolution context when generating debug solution followed
+        /// by a default execution context when executing normal generation.
+        /// </summary>
+        /// <param name="addDBToAlternateDB"></param>
+        /// <exception cref="Exception"></exception>
+        internal static void ExecuteFilesAutoCleanup(bool addDBToAlternateDB)
+        {
             if (!FilesAutoCleanupActive && !s_forceFilesCleanup)
                 return; // Auto cleanup not active. Nothing to do.
 
@@ -378,9 +457,13 @@ namespace Sharpmake
 
             // Note: We must take into account all databases when doing the cleanup otherwise we might end up deleting files still used in other contexts.
             List<Dictionary<string, DateTime>> alternateDatabases = new List<Dictionary<string, DateTime>>();
-            foreach (string alternateDBSuffix in FilesAlternatesAutoCleanupDBSuffixes)
+
+            // Try to load all alternate db contexts
+            var alternateDBFullPaths = FilesAlternatesAutoCleanupDBSuffixes.Select(alternateDBSuffix => GetDatabaseFilename(alternateDBSuffix))
+                .Concat(_FilesAlternatesAutoCleanupDBFullPaths.AsEnumerable());
+
+            foreach (string alternateDatabaseFilename in alternateDBFullPaths)
             {
-                string alternateDatabaseFilename = GetDatabaseFilename(alternateDBSuffix);
                 Dictionary<string, DateTime> alternateDBFiles = ReadCleanupDatabase(alternateDatabaseFilename);
                 if (alternateDBFiles != null)
                     alternateDatabases.Add(alternateDBFiles);
@@ -453,26 +536,24 @@ namespace Sharpmake
                 }
             }
 
-            // Write database if needed
-            if (newDbFiles.Count > 0)
-            {
-                using (Stream writeStream = new FileStream(databaseFilename, FileMode.Create, FileAccess.Write, FileShare.None))
-                using (BinaryWriter binWriter = new BinaryWriter(writeStream))
-                {
-                    // Write version number
-                    int version = (int)DBVersion.Version;
-                    binWriter.Write(version);
+            WriteCleanupDatabase(databaseFilename, newDbFiles);
+            if (addDBToAlternateDB)
+                _FilesAlternatesAutoCleanupDBFullPaths.Add(databaseFilename);
 
-                    // Write the list of files.
-                    string dbAsJson = System.Text.Json.JsonSerializer.Serialize(newDbFiles, GetCleanupDatabaseJsonSerializerOptions());
-                    binWriter.Write(dbAsJson);
-                    binWriter.Flush();
-                }
-            }
-            else
+            // We are done! Clear the list of files to avoid problems as this context is now considered as complete.
+            // For example if generating debug solution and then executing normal generation
+            s_writtenFiles.Clear();
+        }
+
+        private static void WriteCleanupDatabase(string databaseFilename, Dictionary<string, DateTime> generatedFiles)
+        {
+            CleanupDatabaseContent dbContent = new CleanupDatabaseContent
             {
-                TryDeleteFile(databaseFilename);
-            }
+                DBVersion = CleanupDatabaseContent.DBVersions.CurrentVersion,
+                Data = generatedFiles
+            };
+            string jsonString = System.Text.Json.JsonSerializer.Serialize(dbContent, GetCleanupDatabaseJsonSerializerOptions());
+            File.WriteAllText(databaseFilename, jsonString);
         }
 
         public static string WinFormSubTypesDbPath = string.Empty;
@@ -1107,13 +1188,8 @@ namespace Sharpmake
 
         private static bool IsVisualStudioInstalled(DevEnv devEnv)
         {
-#if NET5_0_OR_GREATER
             if (!OperatingSystem.IsWindows())
                 return false;
-#else
-            if (!GetExecutingPlatform().HasAnyFlag(Platform.win32 | Platform.win64))
-                return false;
-#endif
 
             string registryKeyString = string.Format(
                 @"SOFTWARE{0}\Microsoft\VisualStudio\SxS\VS7",
@@ -1148,14 +1224,25 @@ namespace Sharpmake
 
             string libDir = Path.Combine(llvmInstallDir, "lib", "clang");
 
-            var versionFolder = DirectoryGetDirectories(libDir);
-            if (versionFolder.Length == 0)
+            // We expect folder lib/clang to contain only one subfolder which name is the clang version
+            // However in some cases like MacOS, there can be both "16" and "16.0.0", the latter being a symlink.
+            // In that case return the shorter one, which matches what we find on other platforms.
+            var versionFolder = DirectoryGetDirectories(libDir)
+                                .Select(s => Path.GetFileName(s))
+                                .Where(s => Regex.IsMatch(s, @"^\d+?(\.\d+?\.\d+?)?$", RegexOptions.Singleline | RegexOptions.CultureInvariant))
+                                .OrderBy(s => s.Length)
+                                .ToList();
+
+            if (!versionFolder.Any())
                 throw new Error($"Couldn't find a version number folder for clang in {llvmInstallDir}");
 
-            if (versionFolder.Length != 1)
+            if (versionFolder.Count > 1 && versionFolder[1].StartsWith(versionFolder[0] + "."))
+                versionFolder.RemoveAt(1);
+
+            if (versionFolder.Count != 1)
                 throw new NotImplementedException($"More than one version folder found in {llvmInstallDir}, the code doesn't handle that (yet).");
 
-            return Path.GetFileName(versionFolder[0]);
+            return versionFolder[0];
         }
 
         public class VsInstallation
@@ -1439,7 +1526,7 @@ namespace Sharpmake
                         }
                         break;
 
-                    case DevEnv.xcode4ios:
+                    case DevEnv.xcode:
                         return ".xcodeproj";
 
                     case DevEnv.eclipse:
@@ -1548,7 +1635,13 @@ namespace Sharpmake
             return PlatformRegistry.Query<IPlatformDescriptor>(platform)?.SimplePlatformString ?? platform.ToString();
         }
 
+        [Obsolete("Use GetToolchainPlatformString instead")]
         public static string GetPlatformString(Platform platform, Project project, ITarget target, bool isForSolution = false)
+        {
+            return GetToolchainPlatformString(platform, project, target, isForSolution);
+        }
+
+        public static string GetToolchainPlatformString(Platform platform, Project project, ITarget target, bool isForSolution = false)
         {
             if (project is CSharpProject)
             {
@@ -1569,7 +1662,12 @@ namespace Sharpmake
                 return isForSolution ? "Any CPU" : "AnyCPU";
             }
 
-            return PlatformRegistry.Query<IPlatformDescriptor>(platform)?.GetPlatformString(target) ?? platform.ToString();
+            return GetToolchainPlatformString(platform, target);
+        }
+
+        public static string GetToolchainPlatformString(Platform platform, ITarget target)
+        {
+            return PlatformRegistry.Query<IPlatformDescriptor>(platform)?.GetToolchainPlatformString(target) ?? platform.ToString();
         }
 
         public static string CallerInfoTag = "CALLER_INFO: ";
@@ -1641,17 +1739,13 @@ namespace Sharpmake
             return (x << r) | (x >> (32 - r));
         }
 
-#if NET5_0_OR_GREATER
         [SupportedOSPlatform("windows")]
-#endif
         public static object ReadRegistryValue(string key, string value, object defaultValue = null)
         {
             return Registry.GetValue(key, value, defaultValue);
         }
 
-#if NET5_0_OR_GREATER
         [SupportedOSPlatform("windows")]
-#endif
         public static string[] GetRegistryLocalMachineSubKeyNames(string path)
         {
             RegistryKey key = Registry.LocalMachine.OpenSubKey(path);
@@ -1676,11 +1770,7 @@ namespace Sharpmake
 
             string key = string.Empty;
 
-#if NET5_0_OR_GREATER
             if (OperatingSystem.IsWindows())
-#else
-            if (GetExecutingPlatform().HasAnyFlag(Platform.win32 | Platform.win64))
-#endif
             {
                 try
                 {

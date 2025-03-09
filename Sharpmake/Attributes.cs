@@ -1,16 +1,6 @@
-﻿// Copyright (c) 2017-2020 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Linq;
 
@@ -151,10 +141,10 @@ namespace Sharpmake
     }
 
     /// <summary>
-    /// Marks elements of fragments that should not be considered individual fragments.
+    /// Marks elements of a fragment enum that should not be considered individual fragments.
     /// </summary>
     /// <remarks>
-    /// When an enumeration is marked with <see cref="Fragment"/>, Sharpmake normally ensure that
+    /// When an enumeration is marked with <see cref="Fragment"/>, Sharpmake normally ensures that
     /// each element sets 1 and only 1 bit. However, it is often useful in a bit enum to combine
     /// multiple bits together to create sets that go well together. To prevent Sharpmake from
     /// considering those errors, you must decorate these enum members with
@@ -162,6 +152,21 @@ namespace Sharpmake
     /// </remarks>
     [AttributeUsage(AttributeTargets.Field)]
     public class CompositeFragmentAttribute : Attribute
+    {
+    }
+
+    /// <summary>
+    /// Allows a field with a duplicate value in a fragment enum to be ignored.
+    /// </summary>
+    /// <remarks>
+    /// When an enumeration is marked with <see cref="Fragment"/>, Sharpmake normally ensures that
+    /// each element has a unique value. However, it is often useful in a bit enum to have special
+    /// values that represent sections or limits. To prevent Sharpmake from considering those
+    /// errors, you must decorate these enum members with
+    /// <see cref="IgnoreDuplicateFragmentValueAttribute"/>.
+    /// </remarks>
+    [AttributeUsage(AttributeTargets.Field)]
+    public class IgnoreDuplicateFragmentValueAttribute : Attribute
     {
     }
 

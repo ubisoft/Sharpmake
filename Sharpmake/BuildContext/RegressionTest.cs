@@ -1,16 +1,6 @@
-﻿// Copyright (c) 2017, 2020 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -122,6 +112,21 @@ namespace Sharpmake.BuildContext
             _referenceDifferenceMap[refFileInfo.FullName] = outputInfo;
 
             Util.FileWriteIfDifferentInternal(outFileInfo, generated);
+
+            return isDifferent;
+        }
+
+        public override bool WriteGeneratedFile(Type type, FileInfo path, IFileGenerator generator)
+        {
+            var rootPath = RemapRoot?.FullName ?? Path.GetPathRoot(path.FullName);
+            var outFileInfo = new FileInfo(path.FullName.ReplaceHeadPath(rootPath, Output.FullName));
+            var refFileInfo = new FileInfo(path.FullName.ReplaceHeadPath(rootPath, Reference.FullName));
+
+            bool isDifferent = generator.IsFileDifferent(refFileInfo);
+            var outputInfo = new OutputInfo(refFileInfo.FullName, outFileInfo.FullName, isDifferent ? FileStatus.Different : FileStatus.Similar);
+            _referenceDifferenceMap[refFileInfo.FullName] = outputInfo;
+
+            generator.FileWriteIfDifferent(outFileInfo);
 
             return isDifferent;
         }

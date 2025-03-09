@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <PlatformTarget Condition=" '$(Platform)' == '' ">AnyCPU</PlatformTarget>
+    <ProjectGuid>{3D46B916-6806-3778-DB08-02BDDE768A39}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CSharpWCF</RootNamespace>
+    <AssemblyName>CSharpWCF</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>output\anycpu\debug</OutputPath>
+    <IntermediateOutputPath>obj\anycpu\debug</IntermediateOutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>output\anycpu\release</OutputPath>
+    <IntermediateOutputPath>obj\anycpu\release</IntermediateOutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Core">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Data">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Net.Http">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.ServiceModel">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Xml">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\codebase\CSharpWCF\Class1.cs">
+      <Link>Class1.cs</Link>
+    </Compile>
+    <Compile Include="..\..\codebase\CSharpWCF\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\codebase\CSharpWCF\Service References\ServiceReference\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+      <Link>Service References\ServiceReference\Reference.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\codebase\CSharpWCF\Service References\ServiceReference\CSharpWCF.ServiceReference.CompositeType.datasource">
+      <Link>Resources\CSharpWCF.ServiceReference.CompositeType.datasource</Link>
+    </None>
+    <None Include="..\..\codebase\CSharpWCF\Service References\ServiceReference\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+      <Link>Service References\ServiceReference\Reference.svcmap</Link>
+    </None>
+    <None Include="..\..\codebase\CSharpWCF\Service References\ServiceReference\Service1.disco">
+      <Link>Resources\Service1.disco</Link>
+    </None>
+    <None Include="..\..\codebase\CSharpWCF\Service References\ServiceReference\Service1.wsdl">
+      <Link>Resources\Service1.wsdl</Link>
+    </None>
+    <None Include="..\..\codebase\CSharpWCF\Service References\ServiceReference\Service1.xsd">
+      <Link>Resources\Service1.xsd</Link>
+    </None>
+    <None Include="..\..\codebase\CSharpWCF\Service References\ServiceReference\Service11.xsd">
+      <Link>Resources\Service11.xsd</Link>
+    </None>
+    <None Include="..\..\codebase\CSharpWCF\Service References\ServiceReference\Service12.xsd">
+      <Link>Resources\Service12.xsd</Link>
+    </None>
+    <None Include="..\..\codebase\CSharpWCF\Service References\ServiceReference\configuration.svcinfo">
+      <Link>Resources\configuration.svcinfo</Link>
+    </None>
+    <None Include="..\..\codebase\CSharpWCF\Service References\ServiceReference\configuration91.svcinfo">
+      <Link>Resources\configuration91.svcinfo</Link>
+    </None>
+    <None Include="..\..\codebase\CSharpWCF\app.config">
+      <Link>Resources\app.config</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="..\..\codebase\CSharpWCF\Service References\ServiceReference" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>

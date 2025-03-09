@@ -1,16 +1,6 @@
-// Copyright (c) 2017-2022 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -127,7 +117,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                 PresentPlatforms = ProjectConfigurations.Select(conf => conf.Platform).Distinct().ToDictionary(p => p, p => PlatformRegistry.Get<IPlatformVcxproj>(p));
 
-                FastBuildMakeCommandGenerator = FastBuildSettings.MakeCommandGenerator ?? new Bff.FastBuildDefaultNMakeCommandGenerator();
+                FastBuildMakeCommandGenerator = FastBuildSettings.MakeCommandGenerator;
             }
 
             public void Reset()
@@ -154,7 +144,13 @@ namespace Sharpmake.Generators.VisualStudio
             GenerateImpl(context, generatedFiles, skipFiles);
         }
 
-        public static string FastBuildCustomArguments = "";
+        [Obsolete("Deprecated. Use `FastBuildSettings.FastBuildCustomArguments` instead.", error: false)]
+        public static string FastBuildCustomArguments
+        {
+            get { return FastBuildSettings.FastBuildCustomArguments; }
+            set { FastBuildSettings.FastBuildCustomArguments = value; }
+        }
+
         public const string ProjectExtension = ".vcxproj";
         private const string ProjectFilterExtension = ".filters";
         private const string CopyDependenciesExtension = "_runtimedependencies.txt";
@@ -168,6 +164,7 @@ namespace Sharpmake.Generators.VisualStudio
             public string Description = "";
             public string Outputs = "";
             public string AdditionalInputs = "";
+            public string OutputItemType = "";
         };
 
         public static Dictionary<string, CombinedCustomFileBuildStep> CombineCustomFileBuildSteps(string referencePath, Resolver resolver, IEnumerable<Project.Configuration.CustomFileBuildStep> buildSteps)
@@ -178,10 +175,13 @@ namespace Sharpmake.Generators.VisualStudio
             foreach (var customBuildStep in buildSteps)
             {
                 var relativeBuildStep = customBuildStep.MakePathRelative(resolver, (path, commandRelative) => Util.SimplifyPath(Util.PathGetRelative(referencePath, path)));
-                relativeBuildStep.AdditionalInputs.Add(relativeBuildStep.Executable);
+                if (!customBuildStep.UseExecutableFromSystemPath)
+                {
+                    relativeBuildStep.AdditionalInputs.Add(relativeBuildStep.Executable);
+                }
                 // Build the command.
                 string command = string.Format(
-                    "{0} {1}",
+                    "\"{0}\" {1}",
                     relativeBuildStep.Executable,
                     relativeBuildStep.ExecutableArguments
                 );
@@ -206,6 +206,9 @@ namespace Sharpmake.Generators.VisualStudio
                 combinedCustomBuildStep.Description += relativeBuildStep.Description;
                 combinedCustomBuildStep.Outputs = Util.EscapeXml(relativeBuildStep.Output);
                 combinedCustomBuildStep.AdditionalInputs = Util.EscapeXml(relativeBuildStep.AdditionalInputs.JoinStrings(";"));
+
+                //Vcxproj only allows specifying one output item type per build command
+                combinedCustomBuildStep.OutputItemType = customBuildStep.OutputItemType;
             }
 
             return steps;
@@ -359,7 +362,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             GenerateConfOptions(context);
 
-            var fileGenerator = new XmlFileGenerator();
+            var fileGenerator = new FileGenerator();
 
             // xml begin header
             using (fileGenerator.Declare("toolsVersion", context.DevelopmentEnvironmentsRange.MinDevEnv.GetVisualProjectToolsVersionString()))
@@ -435,6 +438,17 @@ namespace Sharpmake.Generators.VisualStudio
             fileGenerator.Write(Template.Project.PropertyGroupEnd);
             // xml end header
 
+            if (clrSupport && firstConf.FrameworkReferences.Count > 0)
+            {
+                fileGenerator.Write(Template.Project.ItemGroupBegin);
+
+                foreach (var frameworkReference in firstConf.FrameworkReferences)
+                    using (fileGenerator.Declare("include", frameworkReference))
+                        fileGenerator.Write(CSproj.Template.ItemGroups.FrameworkReference);
+
+                fileGenerator.Write(Template.Project.ItemGroupEnd);
+            }
+
             foreach (var platform in context.PresentPlatforms.Values)
                 platform.GeneratePlatformSpecificProjectDescription(context, fileGenerator);
 
@@ -458,20 +472,9 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     context.Configuration = conf;
 
-                    string clrSupportString = FileGeneratorUtilities.RemoveLineTag;
-
-                    if (!conf.IsFastBuild && clrSupport)
-                    {
-                        var dotnetFrameWork = firstConf.Target.GetFragment<DotNetFramework>();
-
-                        // .Net Core requires "NetCore" instead of "true", see: https://docs.microsoft.com/en-us/dotnet/core/porting/cpp-cli
-                        clrSupportString = dotnetFrameWork.IsDotNetCore() ? "NetCore" : clrSupport.ToString().ToLower();
-                    }
-
-                    using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
+                    using (fileGenerator.Declare("platformName", Util.GetToolchainPlatformString(conf.Platform, conf.Project, conf.Target)))
                     using (fileGenerator.Declare("conf", conf))
                     using (fileGenerator.Declare("options", context.ProjectConfigurationOptions[conf]))
-                    using (fileGenerator.Declare("clrSupport", clrSupportString))
                     {
                         var platformVcxproj = context.PresentPlatforms[conf.Platform];
                         platformVcxproj.GenerateProjectConfigurationGeneral(context, fileGenerator);
@@ -482,7 +485,21 @@ namespace Sharpmake.Generators.VisualStudio
             // .props files
             fileGenerator.Write(Template.Project.ProjectAfterConfigurationsGeneral);
             if (context.Project.ContainsASM)
+            {
                 fileGenerator.Write(Template.Project.ProjectImportedMasmProps);
+            }
+
+            if (context.Project.ContainsNASM)
+            {
+                if (context.Project.NasmExePath.Length == 0)
+                {
+                    throw new ArgumentNullException("NasmExePath not set and needed for NASM assembly files.");
+                }
+                using (fileGenerator.Declare("importedNasmPropsFile", context.Project.NasmPropsFile))
+                {
+                    fileGenerator.Write(Template.Project.ProjectImportedNasmProps);
+                }
+            }
 
             VsProjCommon.WriteProjectCustomPropsFiles(context.Project.CustomPropsFiles, context.ProjectDirectoryCapitalized, fileGenerator);
             VsProjCommon.WriteConfigurationsCustomPropsFiles(context.ProjectConfigurations, context.ProjectDirectoryCapitalized, fileGenerator);
@@ -501,7 +518,7 @@ namespace Sharpmake.Generators.VisualStudio
                     context.Configuration = conf;
 
                     using (fileGenerator.Declare("project", context.Project))
-                    using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
+                    using (fileGenerator.Declare("platformName", Util.GetToolchainPlatformString(conf.Platform, conf.Project, conf.Target)))
                     using (fileGenerator.Declare("conf", conf))
                     using (fileGenerator.Declare("options", context.ProjectConfigurationOptions[conf]))
                     using (fileGenerator.Declare("target", conf.Target))
@@ -510,77 +527,18 @@ namespace Sharpmake.Generators.VisualStudio
 
                         if (conf.IsFastBuild)
                         {
-                            var fastBuildCommandLineOptions = new List<string>();
-
-                            if (FastBuildSettings.FastBuildUseIDE)
-                                fastBuildCommandLineOptions.Add("-ide");
-
-                            if (FastBuildSettings.FastBuildReport)
-                                fastBuildCommandLineOptions.Add("-report");
-
-                            if (FastBuildSettings.FastBuildNoSummaryOnError)
-                                fastBuildCommandLineOptions.Add("-nosummaryonerror");
-
-                            if (FastBuildSettings.FastBuildSummary)
-                                fastBuildCommandLineOptions.Add("-summary");
-
-                            if (FastBuildSettings.FastBuildVerbose)
-                                fastBuildCommandLineOptions.Add("-verbose");
-
-                            if (FastBuildSettings.FastBuildMonitor)
-                                fastBuildCommandLineOptions.Add("-monitor");
-
-                            // Configuring cache mode if that configuration is allowed to use caching
-                            if (conf.FastBuildCacheAllowed)
-                            {
-                                // Setting the appropriate cache type commandline for that target.
-                                switch (FastBuildSettings.CacheType)
-                                {
-                                    case FastBuildSettings.CacheTypes.CacheRead:
-                                        fastBuildCommandLineOptions.Add("-cacheread");
-                                        break;
-                                    case FastBuildSettings.CacheTypes.CacheWrite:
-                                        fastBuildCommandLineOptions.Add("-cachewrite");
-                                        break;
-                                    case FastBuildSettings.CacheTypes.CacheReadWrite:
-                                        fastBuildCommandLineOptions.Add("-cache");
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            }
-
-                            if (FastBuildSettings.FastBuildDistribution && conf.FastBuildDistribution)
-                                fastBuildCommandLineOptions.Add("-dist");
-
-                            if (FastBuildSettings.FastBuildWait)
-                                fastBuildCommandLineOptions.Add("-wait");
-
-                            if (FastBuildSettings.FastBuildNoStopOnError)
-                                fastBuildCommandLineOptions.Add("-nostoponerror");
-
-                            if (FastBuildSettings.FastBuildFastCancel)
-                                fastBuildCommandLineOptions.Add("-fastcancel");
-
-                            if (FastBuildSettings.FastBuildNoUnity)
-                                fastBuildCommandLineOptions.Add("-nounity");
-
-                            if (!string.IsNullOrEmpty(conf.FastBuildCustomArgs))
-                                fastBuildCommandLineOptions.Add(conf.FastBuildCustomArgs);
-
-                            if (!string.IsNullOrEmpty(FastBuildCustomArguments))
-                                fastBuildCommandLineOptions.Add(FastBuildCustomArguments);
-
-                            string commandLine = string.Join(" ", fastBuildCommandLineOptions);
+                            string commandLine = conf.GetFastBuildCommandLineArguments();
 
                             // Make the commandline written in the bff available, except the master bff -config
                             Bff.SetCommandLineArguments(conf, commandLine);
 
                             commandLine += " -config $(SolutionName)" + FastBuildSettings.FastBuildConfigFileExtension;
 
+                            string makeExecutable = context.FastBuildMakeCommandGenerator.GetExecutablePath(conf);
                             using (fileGenerator.Declare("relativeMasterBffPath", "$(SolutionDir)"))
-                            using (fileGenerator.Declare("fastBuildMakeCommandBuild", context.FastBuildMakeCommandGenerator.GetCommand(FastBuildMakeCommandGenerator.BuildType.Build, conf, commandLine)))
-                            using (fileGenerator.Declare("fastBuildMakeCommandRebuild", context.FastBuildMakeCommandGenerator.GetCommand(FastBuildMakeCommandGenerator.BuildType.Rebuild, conf, commandLine)))
+                            using (fileGenerator.Declare("fastBuildMakeCommandBuild", $"{makeExecutable} {context.FastBuildMakeCommandGenerator.GetArguments(FastBuildMakeCommandGenerator.BuildType.Build, conf, commandLine)}"))
+                            using (fileGenerator.Declare("fastBuildMakeCommandRebuild", $"{makeExecutable} {context.FastBuildMakeCommandGenerator.GetArguments(FastBuildMakeCommandGenerator.BuildType.Rebuild, conf, commandLine)}"))
+                            using (fileGenerator.Declare("fastBuildMakeCommandCompileFile", $"{makeExecutable} {context.FastBuildMakeCommandGenerator.GetArguments(FastBuildMakeCommandGenerator.BuildType.CompileFile, conf, commandLine)}"))
                             {
                                 platformVcxproj.GenerateProjectConfigurationFastBuildMakeFile(context, fileGenerator);
                             }
@@ -593,6 +551,8 @@ namespace Sharpmake.Generators.VisualStudio
                         {
                             platformVcxproj.GenerateProjectConfigurationGeneral2(context, fileGenerator);
                         }
+
+                        VsProjCommon.WriteConfigurationsCustomProperties(conf, fileGenerator);
                     }
                 }
             }
@@ -619,12 +579,11 @@ namespace Sharpmake.Generators.VisualStudio
                             }
                         }
 
-                        using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
+                        using (fileGenerator.Declare("platformName", Util.GetToolchainPlatformString(conf.Platform, conf.Project, conf.Target)))
                         using (fileGenerator.Declare("conf", conf))
                         using (fileGenerator.Declare("project", conf.Project))
                         using (fileGenerator.Declare("target", conf.Target))
                         using (fileGenerator.Declare("options", context.ProjectConfigurationOptions[conf]))
-                        using (fileGenerator.Declare("clrSupport", !clrSupport ? FileGeneratorUtilities.RemoveLineTag : clrSupport.ToString().ToLower()))
                         using (fileGenerator.Declare("compileAsManaged", compileAsManagedString))
                         {
                             fileGenerator.Write(Template.Project.ProjectConfigurationBeginItemDefinition);
@@ -634,7 +593,13 @@ namespace Sharpmake.Generators.VisualStudio
                             platformVcxproj.GenerateProjectLinkVcxproj(context, fileGenerator);
 
                             if (conf.Project.ContainsASM)
+                            {
                                 platformVcxproj.GenerateProjectMasmVcxproj(context, fileGenerator);
+                            }
+                            if (conf.Project.ContainsNASM)
+                            {
+                                platformVcxproj.GenerateProjectNasmVcxproj(context, fileGenerator);
+                            }
 
                             if (conf.EventPreBuild.Count != 0)
                                 fileGenerator.Write(Template.Project.ProjectConfigurationsPreBuildEvent);
@@ -706,6 +671,18 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 fileGenerator.Write(Template.Project.ProjectMasmTargetsItem);
             }
+            if (context.Project.ContainsNASM)
+            {
+                if (context.Project.NasmExePath.Length == 0)
+                {
+                    throw new ArgumentNullException("NasmExePath not set and needed for NASM assembly files.");
+                }
+                using (fileGenerator.Declare("importedNasmTargetsFile", context.Project.NasmTargetsFile))
+                {
+                    fileGenerator.Write(Template.Project.ProjectNasmTargetsItem);
+                }
+            }
+
             foreach (string targetsFiles in context.Project.CustomTargetsFiles)
             {
                 string capitalizedFile = Project.GetCapitalizedFile(targetsFiles) ?? targetsFiles;
@@ -720,7 +697,7 @@ namespace Sharpmake.Generators.VisualStudio
             // configuration .targets files
             foreach (Project.Configuration conf in context.ProjectConfigurations)
             {
-                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
+                using (fileGenerator.Declare("platformName", Util.GetToolchainPlatformString(conf.Platform, conf.Project, conf.Target)))
                 using (fileGenerator.Declare("conf", conf))
                 {
                     foreach (string targetsFile in conf.CustomTargetsFiles)
@@ -788,12 +765,11 @@ namespace Sharpmake.Generators.VisualStudio
 
             // remove all line that contain RemoveLineTag
             fileGenerator.RemoveTaggedLines();
-            MemoryStream cleanMemoryStream = fileGenerator.ToMemoryStream();
 
             vcTargetsPathScopeVar.Dispose();
 
             FileInfo projectFileInfo = new FileInfo(context.ProjectPath + ProjectExtension);
-            if (context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectFileInfo, cleanMemoryStream))
+            if (context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectFileInfo, fileGenerator))
                 generatedFiles.Add(projectFileInfo.FullName);
             else
                 skipFiles.Add(projectFileInfo.FullName);
@@ -814,6 +790,10 @@ namespace Sharpmake.Generators.VisualStudio
             var resourceIncludePaths = platformVcxproj.GetResourceIncludePaths(context);
             context.Options["AdditionalResourceIncludeDirectories"] = resourceIncludePaths.Any() ? Util.PathGetRelative(context.ProjectDirectory, resourceIncludePaths).JoinStrings(";") : FileGeneratorUtilities.RemoveLineTag;
 
+            // Fill Assembly include dirs
+            var assemblyIncludePaths = platformVcxproj.GetAssemblyIncludePaths(context);
+            context.Options["AdditionalAssemblyIncludeDirectories"] = assemblyIncludePaths.Any() ? Util.PathGetRelative(context.ProjectDirectory, assemblyIncludePaths).JoinStrings(";") : FileGeneratorUtilities.RemoveLineTag;
+
             // Fill using dirs
             Strings additionalUsingDirectories = Options.GetStrings<Options.Vc.Compiler.AdditionalUsingDirectories>(context.Configuration);
             additionalUsingDirectories.AddRange(context.Configuration.AdditionalUsingDirectories);
@@ -833,7 +813,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             Strings ignoreSpecificLibraryNames = Options.GetStrings<Options.Vc.Linker.IgnoreSpecificLibraryNames>(context.Configuration);
             ignoreSpecificLibraryNames.ToLower();
-            ignoreSpecificLibraryNames.InsertSuffix(platformVcxproj.StaticLibraryFileFullExtension, true);
+            ignoreSpecificLibraryNames.InsertSuffix(platformVcxproj.StaticLibraryFileFullExtension, true, new[] { platformVcxproj.SharedLibraryFileFullExtension });
 
             context.Options["AdditionalDependencies"] = FileGeneratorUtilities.RemoveLineTag;
             context.Options["AdditionalLibraryDirectories"] = FileGeneratorUtilities.RemoveLineTag;
@@ -914,7 +894,7 @@ namespace Sharpmake.Generators.VisualStudio
                 string decoratedName = libraryFile;
                 string extension = Path.GetExtension(libraryFile).ToLowerInvariant();
 
-                if (extension != platformVcxproj.StaticLibraryFileFullExtension && extension != platformVcxproj.SharedLibraryFileFullExtension)
+                if (extension != platformVcxproj.StaticLibraryFileFullExtension && extension != platformVcxproj.SharedLibraryFileFullExtension && !context.Configuration.BypassAdditionalDependenciesPrefix)
                 {
                     decoratedName = libPrefix + libraryFile;
                     if (!string.IsNullOrEmpty(platformVcxproj.StaticLibraryFileFullExtension))
@@ -1016,9 +996,7 @@ namespace Sharpmake.Generators.VisualStudio
                 string projectDependenciesCopyLocal = firstConf.Project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ProjectReferences).ToString().ToLower();
 
                 Options.ExplicitOptions options = new Options.ExplicitOptions();
-                options["ReferenceOutputAssembly"] = FileGeneratorUtilities.RemoveLineTag;
                 options["CopyLocalSatelliteAssemblies"] = FileGeneratorUtilities.RemoveLineTag;
-                options["LinkLibraryDependencies"] = FileGeneratorUtilities.RemoveLineTag;
                 options["UseLibraryDependencyInputs"] = FileGeneratorUtilities.RemoveLineTag;
 
                 // The check for the blobbed is so we add references to blobed projects over non blobed projects.
@@ -1028,16 +1006,17 @@ namespace Sharpmake.Generators.VisualStudio
                 var privateDotNetDependenciesConf = context.ProjectConfigurations.Where(x => x.IsBlobbed).FirstOrDefault(x => x.DotNetPrivateDependencies.Count > 0) ??
                                                     context.ProjectConfigurations.FirstOrDefault(x => x.DotNetPrivateDependencies.Count > 0);
 
-                var dotNetDependenciesLists = new List<IEnumerable<Project.Configuration>>();
+                var dotNetDependenciesLists = new List<IEnumerable<DotNetDependency>>();
                 if (publicDotNetDependenciesConf != null)
-                    dotNetDependenciesLists.Add(publicDotNetDependenciesConf.DotNetPublicDependencies.Select(x => x.Configuration));
+                    dotNetDependenciesLists.Add(publicDotNetDependenciesConf.DotNetPublicDependencies);
                 if (privateDotNetDependenciesConf != null)
-                    dotNetDependenciesLists.Add(privateDotNetDependenciesConf.DotNetPrivateDependencies.Select(x => x.Configuration));
+                    dotNetDependenciesLists.Add(privateDotNetDependenciesConf.DotNetPrivateDependencies);
 
                 foreach (var dotNetDependencies in dotNetDependenciesLists)
                 {
-                    foreach (var dependency in dotNetDependencies)
+                    foreach (var dotNetDependency in dotNetDependencies)
                     {
+                        var dependency = dotNetDependency.Configuration;
                         // Don't add any Fastbuild deps to fastbuild projects, that's already handled
                         if (fastbuildOnly && dependency.IsFastBuild)
                             continue;
@@ -1054,16 +1033,14 @@ namespace Sharpmake.Generators.VisualStudio
                                 dependency.ProjectGuid = ReadGuidFromProjectFile(dependency);
                         }
 
+                        bool? linkLibraryDependencies = dotNetDependency.ReferenceOutputAssembly;
                         // avoid linking with .lib from a dependency that doesn't create a lib
-                        if (dependency.Output == Project.Configuration.OutputType.DotNetClassLibrary &&
-                           !dependency.CppCliExportsNativeLib)
+                        if (dependency.Output == Project.Configuration.OutputType.DotNetClassLibrary && !dependency.CppCliExportsNativeLib)
                         {
-                            options["LinkLibraryDependencies"] = "false";
+                            linkLibraryDependencies = false;
                         }
-                        else
-                        {
-                            options["LinkLibraryDependencies"] = FileGeneratorUtilities.RemoveLineTag;
-                        }
+                        options["ReferenceOutputAssembly"] = (dotNetDependency.ReferenceOutputAssembly == false) ? "false" : FileGeneratorUtilities.RemoveLineTag;
+                        options["LinkLibraryDependencies"] = (linkLibraryDependencies == false) ? "false" : FileGeneratorUtilities.RemoveLineTag;
 
                         using (projectFilesWriter.Declare("include", include))
                         using (projectFilesWriter.Declare("projectGUID", dependency.ProjectGuid ?? FileGeneratorUtilities.RemoveLineTag))
@@ -1152,11 +1129,10 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
 
-            var projectFilesText = projectFilesWriter.ToString();
-            if (!string.IsNullOrWhiteSpace(projectFilesText))
+            if (!projectFilesWriter.IsEmpty())
             {
                 fileGenerator.Write(Template.Project.ProjectFilesBegin);
-                fileGenerator.Write(projectFilesText);
+                projectFilesWriter.WriteTo(fileGenerator);
                 fileGenerator.Write(Template.Project.ProjectFilesEnd);
             }
 
@@ -1359,7 +1335,7 @@ namespace Sharpmake.Generators.VisualStudio
             // Write the project file
             FileInfo projectFiltersFileInfo = new FileInfo(filtersFileName);
 
-            if (context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectFiltersFileInfo, fileGenerator.ToMemoryStream()))
+            if (context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectFiltersFileInfo, fileGenerator))
                 generatedFiles.Add(projectFiltersFileInfo.FullName);
             else
                 skipFiles.Add(projectFiltersFileInfo.FullName);
@@ -1483,7 +1459,7 @@ namespace Sharpmake.Generators.VisualStudio
                                 continue;
 
                             using (fileGenerator.Declare("conf", conf))
-                            using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
+                            using (fileGenerator.Declare("platformName", Util.GetToolchainPlatformString(conf.Platform, conf.Project, conf.Target)))
                             using (fileGenerator.Declare("description", conf.CustomBuildForAllIncludes.Description))
                             using (fileGenerator.Declare("command", conf.CustomBuildForAllIncludes.CommandLines.JoinStrings(Environment.NewLine, escapeXml: true)))
                             using (fileGenerator.Declare("inputs", FileGeneratorUtilities.RemoveLineTag))
@@ -1528,16 +1504,18 @@ namespace Sharpmake.Generators.VisualStudio
                             if (configurationCustomFileBuildSteps[conf].TryGetValue(file.FileNameProjectRelative, out buildStep))
                             {
                                 using (fileGenerator.Declare("conf", conf))
-                                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
+                                using (fileGenerator.Declare("platformName", Util.GetToolchainPlatformString(conf.Platform, conf.Project, conf.Target)))
                                 using (fileGenerator.Declare("description", buildStep.Description))
                                 using (fileGenerator.Declare("command", buildStep.Commands))
                                 using (fileGenerator.Declare("inputs", buildStep.AdditionalInputs))
                                 using (fileGenerator.Declare("outputs", buildStep.Outputs))
+                                using (fileGenerator.Declare("outputItemType", string.IsNullOrEmpty(buildStep.OutputItemType) ? FileGeneratorUtilities.RemoveLineTag : buildStep.OutputItemType))
                                 {
                                     fileGenerator.Write(Template.Project.ProjectFilesCustomBuildDescription);
                                     fileGenerator.Write(Template.Project.ProjectFilesCustomBuildCommand);
                                     fileGenerator.Write(Template.Project.ProjectFilesCustomBuildInputs);
                                     fileGenerator.Write(Template.Project.ProjectFilesCustomBuildOutputs);
+                                    fileGenerator.Write(Template.Project.ProjectFilesCustomBuildOutputItemType);
                                 }
                             }
                         }
@@ -1626,7 +1604,7 @@ namespace Sharpmake.Generators.VisualStudio
                                 continue;
 
                             using (fileGenerator.Declare("conf", conf))
-                            using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
+                            using (fileGenerator.Declare("platformName", Util.GetToolchainPlatformString(conf.Platform, conf.Project, conf.Target)))
                             using (fileGenerator.Declare("description", conf.CustomBuildForAllSources.Description))
                             using (fileGenerator.Declare("command", conf.CustomBuildForAllSources.CommandLines.JoinStrings(Environment.NewLine, escapeXml: true)))
                             using (fileGenerator.Declare("inputs", FileGeneratorUtilities.RemoveLineTag))
@@ -1733,7 +1711,7 @@ namespace Sharpmake.Generators.VisualStudio
                             if (haveFileOptions)
                             {
                                 using (fileGenerator.Declare("conf", conf))
-                                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
+                                using (fileGenerator.Declare("platformName", Util.GetToolchainPlatformString(conf.Platform, conf.Project, conf.Target)))
                                 {
                                     if (closeFileSource)
                                     {
@@ -1898,7 +1876,7 @@ namespace Sharpmake.Generators.VisualStudio
                             {
                                 Project.Configuration conf = context.ProjectConfigurations[i];
                                 using (fileGenerator.Declare("conf", conf))
-                                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
+                                using (fileGenerator.Declare("platformName", Util.GetToolchainPlatformString(conf.Platform, conf.Project, conf.Target)))
                                 {
                                     var compiledFiles = configurationCompiledFiles[i];
                                     bool isExcludeFromBuild = conf.ResolvedSourceFilesBuildExclude.Contains(file.FileName);
@@ -1969,7 +1947,7 @@ namespace Sharpmake.Generators.VisualStudio
                         Project.Configuration.FileCustomBuild copyDependencies = pair.Value;
 
                         using (fileGenerator.Declare("conf", conf))
-                        using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
+                        using (fileGenerator.Declare("platformName", Util.GetToolchainPlatformString(conf.Platform, conf.Project, conf.Target)))
                         using (fileGenerator.Declare("description", copyDependencies.Description))
                         using (fileGenerator.Declare("command", copyDependencies.CommandLines.JoinStrings(Environment.NewLine, escapeXml: true)))
                         using (fileGenerator.Declare("inputs", copyDependencies.Inputs.JoinStrings(";")))
@@ -2053,7 +2031,7 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 FileInfo copyDependenciesFileInfo = new FileInfo(copyDependenciesFileName);
 
-                if (context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), copyDependenciesFileInfo, dependenciesFileGenerator.ToMemoryStream()))
+                if (context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), copyDependenciesFileInfo, dependenciesFileGenerator))
                     generatedFiles.Add(copyDependenciesFileInfo.FullName);
                 else
                     skipFiles.Add(copyDependenciesFileInfo.FullName);

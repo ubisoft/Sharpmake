@@ -1,16 +1,6 @@
-﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -24,21 +14,25 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
-#if NETFRAMEWORK
-using BasicReferenceAssemblies = Basic.Reference.Assemblies.Net472;
-#else
+#if NET5_0
 using BasicReferenceAssemblies = Basic.Reference.Assemblies.Net50;
+#elif NET6_0
+using BasicReferenceAssemblies = Basic.Reference.Assemblies.Net60;
+#else
+#error unhandled framework version
 #endif
 
 namespace Sharpmake
 {
     public class Assembler
     {
-        public const Options.CSharp.LanguageVersion SharpmakeScriptsCSharpVersion = Options.CSharp.LanguageVersion.CSharp7;
-#if NETFRAMEWORK
-        public const DotNetFramework SharpmakeDotNetFramework = DotNetFramework.v4_7_2;
-#else
+        public const Options.CSharp.LanguageVersion SharpmakeScriptsCSharpVersion = Options.CSharp.LanguageVersion.CSharp10;
+#if NET5_0
         public const DotNetFramework SharpmakeDotNetFramework = DotNetFramework.net5_0;
+#elif NET6_0
+        public const DotNetFramework SharpmakeDotNetFramework = DotNetFramework.net6_0;
+#else
+#error unhandled framework version
 #endif
 
         /// <summary>
@@ -47,9 +41,14 @@ namespace Sharpmake
         public List<Assembly> Assemblies { get { return _assemblies; } }
 
         /// <summary>
-        /// Extra user assembly file name to use while compiling
+        /// Extra user assembly file name to use while compiling/running
         /// </summary>
         public IReadOnlyList<string> References { get { return _references; } }
+
+        /// <summary>
+        /// Extra user assembly file name to use while compiling
+        /// </summary>
+        public IReadOnlyList<string> BuildReferences { get { return _buildReferences; } }
 
         private readonly HashSet<string> _defines;
 
@@ -68,7 +67,7 @@ namespace Sharpmake
         [Obsolete("Default references are always used.")]
         public bool UseDefaultReferences = true;
 
-        public static readonly string[] DefaultReferences = BasicReferenceAssemblies.References.All.Select(r => r.FileName).ToArray();
+        public static readonly string[] DefaultReferences = BasicReferenceAssemblies.ReferenceInfos.All.Select(r => r.FileName).ToArray();
 
         private class AssemblyInfo : IAssemblyInfo
         {
@@ -76,12 +75,21 @@ namespace Sharpmake
             public string DebugProjectName { get; set; }
             public Assembly Assembly { get; set; }
             public IReadOnlyCollection<string> SourceFiles => _sourceFiles;
-            public IReadOnlyCollection<string> References => _references;
+            public IReadOnlyCollection<string> NoneFiles => _noneFiles;
+            
+            
+            [Obsolete("Use RuntimeReference instead")]
+            public IReadOnlyCollection<string> References => RuntimeReferences;
+            public IReadOnlyCollection<string> RuntimeReferences => _runtimeReferences;
+            public IReadOnlyCollection<string> BuildReferences => _buildReferences;
             public IReadOnlyDictionary<string, IAssemblyInfo> SourceReferences => _sourceReferences;
             public bool UseDefaultReferences { get; set; }
 
             public List<string> _sourceFiles = new List<string>();
-            public List<string> _references = new List<string>();
+            public List<string> _noneFiles = new List<string>();
+
+            public List<string> _runtimeReferences = new List<string>();
+            public List<string> _buildReferences = new List<string>();
             public Dictionary<string, IAssemblyInfo> _sourceReferences = new Dictionary<string, IAssemblyInfo>();
         }
 
@@ -298,9 +306,9 @@ namespace Sharpmake
 
         #region Private
 
-        private List<string> _assemblyDirectory = new List<string>();
         private List<Assembly> _assemblies = new List<Assembly>();
         private List<string> _references = new List<string>();
+        private List<string> _buildReferences = new List<string>();
         private List<ISourceAttributeParser> _attributeParsers = new List<ISourceAttributeParser>();
         private List<IParsingFlowParser> _parsingFlowParsers = new List<IParsingFlowParser>();
 
@@ -364,25 +372,45 @@ namespace Sharpmake
                 }
             }
 
-            public void AddReference(string file)
+            public void AddNoneFile(string file)
             {
-                if (!_assemblyInfo._references.Contains(file))
+                if (!_assemblyInfo._noneFiles.Contains(file))
+                    _assemblyInfo._noneFiles.Add(file);
+            }
+
+            [Obsolete("Use AddRuntimeReference() instead")]
+            public void AddReference(string file) => AddRuntimeReference(file);
+
+            public void AddRuntimeReference(string file)
+            {
+                if (!_assemblyInfo._runtimeReferences.Contains(file))
                 {
-                    _assemblyInfo._references.Add(file);
+                    _assemblyInfo._runtimeReferences.Add(file);
                     var loadInfo = _builderContext.LoadExtension(file);
                     this.AddSourceAttributeParsers(loadInfo.Parsers);
                 }
             }
 
-            public void AddReference(IAssemblyInfo info)
+            public void AddBuildReference(string file)
+            {
+                if (!_assemblyInfo._buildReferences.Contains(file))
+                {
+                    _assemblyInfo._buildReferences.Add(file);
+                }
+            }
+
+            [Obsolete("Use AddRuntimeReference() instead")]
+            public void AddReference(IAssemblyInfo info) => AddRuntimeReference(info);
+
+            public void AddRuntimeReference(IAssemblyInfo info)
             {
                 if (info.Assembly == null)
                 {
                     _assemblyInfo._sourceReferences.Add(info.Id, info);
                 }
-                else if (!_assemblyInfo._references.Contains(info.Id))
+                else if (!_assemblyInfo._runtimeReferences.Contains(info.Id))
                 {
-                    _assemblyInfo._references.Add(info.Assembly.Location);
+                    _assemblyInfo._runtimeReferences.Add(info.Assembly.Location);
                     _assemblyInfo._sourceReferences.Add(info.Id, info);
                 }
             }
@@ -417,27 +445,42 @@ namespace Sharpmake
         private IAssemblyInfo Build(IBuilderContext builderContext, string libraryFile, params string[] sources)
         {
             var assemblyInfo = LoadAssemblyInfo(builderContext, sources);
-            HashSet<string> references = GetReferences();
+            HashSet<string> references = GetReferencesForBuild();
 
             assemblyInfo.Assembly = Compile(builderContext, assemblyInfo.SourceFiles.ToArray(), libraryFile, references);
             assemblyInfo.Id = assemblyInfo.Assembly.Location;
             return assemblyInfo;
         }
 
-        private HashSet<string> GetReferences()
-        {
-            HashSet<string> references = new HashSet<string>();
+        private ConcurrentDictionary<string, string> _buildReferenceFullNames = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-            foreach (string assemblyFile in _references)
-                references.Add(assemblyFile);
+        private HashSet<string> GetReferencesForBuild()
+        {
+            // First find the assembly
+            Parallel.ForEach(_buildReferences, (buildAssemblyfile) =>
+            {
+                string fullPath = AssemblyName.GetAssemblyName(buildAssemblyfile).FullName;
+                _buildReferenceFullNames.TryAdd(fullPath, buildAssemblyfile);
+            });
+
+            var references = new ConcurrentDictionary<string, bool>();
+
+            // Search if we have a more suitable build reference for each runtime reference
+            Parallel.ForEach(_references, (assemblyFile) =>
+            {
+                var assemblyFullName = AssemblyName.GetAssemblyName(assemblyFile).FullName;
+                string buildAssemblyFile = null;
+                _buildReferenceFullNames.TryGetValue(assemblyFullName, out buildAssemblyFile);
+                references.TryAdd(buildAssemblyFile ?? assemblyFile, true);
+            });
 
             foreach (Assembly assembly in _assemblies)
             {
                 if (!assembly.IsDynamic)
-                    references.Add(assembly.Location);
+                    references.TryAdd(assembly.Location, true);
             }
 
-            return references;
+            return references.Keys.ToHashSet<string>();
         }
 
         private SourceText ReadSourceCode(string path)
@@ -468,12 +511,12 @@ namespace Sharpmake
             foreach (var reference in fileReferences.Where(r => !string.IsNullOrEmpty(r)))
             {
                 // Skip references that are already provided by the runtime
-                if (BasicReferenceAssemblies.All.Any(a => string.Equals(Path.GetFileName(reference), a.FilePath, StringComparison.OrdinalIgnoreCase)))
+                if (BasicReferenceAssemblies.References.All.Any(a => string.Equals(Path.GetFileName(reference), a.FilePath, StringComparison.OrdinalIgnoreCase)))
                     continue;
                 metadataReferences.Add(MetadataReference.CreateFromFile(reference));
             }
 
-            metadataReferences.AddRange(BasicReferenceAssemblies.All);
+            metadataReferences.AddRange(BasicReferenceAssemblies.References.All);
 
             // suppress assembly redirect warnings
             // cf. https://github.com/dotnet/roslyn/issues/19640
@@ -577,7 +620,8 @@ namespace Sharpmake
             var context = new AssemblerContext(this, assemblyInfo, builderContext, sources);
             AnalyseSourceFiles(context);
 
-            _references.AddRange(assemblyInfo.References);
+            _references.AddRange(assemblyInfo.RuntimeReferences);
+            _buildReferences.AddRange(assemblyInfo.BuildReferences);
 
             return assemblyInfo;
         }

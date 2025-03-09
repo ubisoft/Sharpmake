@@ -1,16 +1,6 @@
-// Copyright (c) 2017-2022 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -19,6 +9,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.CodeAnalysis;
 using Sharpmake.Generators.VisualStudio;
 
 namespace Sharpmake.Generators.FastBuild
@@ -116,15 +107,14 @@ namespace Sharpmake.Generators.FastBuild
 
         public static string GetShortProjectName(Project project, Project.Configuration conf)
         {
-            string platformString = conf.Platform.ToString();
+            string platformString = Util.GetSimplePlatformString(conf.Platform);
             if (conf.Platform != Platform.win64) // this is to reduce changes compared to old format
             {
-                // use custom platform name if a reserved platform or append it if different
-                string fullPlatformString = Util.GetPlatformString(conf.Platform, project, conf.Target, isForSolution: false).ToLowerInvariant();
-                if (conf.Platform >= Platform._reserved9)
-                    platformString = fullPlatformString;
-                else if (!fullPlatformString.Equals(platformString, StringComparison.OrdinalIgnoreCase))
-                    platformString += "_" + fullPlatformString;
+                // Append the toolchain-specific platform name if it differs from the simple name,
+                // in order to prevent clashes between different build targets on the same platform
+                string vsPlatformString = Util.GetToolchainPlatformString(conf.Platform, project, conf.Target, isForSolution: false);
+                if (!vsPlatformString.Equals(platformString, StringComparison.OrdinalIgnoreCase))
+                    platformString += "_" + vsPlatformString;
             }
 
             string dirtyConfigName = string.Join("_", project.Name, conf.Name, platformString);
@@ -135,7 +125,7 @@ namespace Sharpmake.Generators.FastBuild
         {
             string define = PlatformRegistry.Get<IPlatformBff>(platform).BffPlatformDefine;
             if (define == null)
-                throw new NotImplementedException($"Please add {platform} specific define for bff sections, ideally the same as ExplicitDefine, to get Intellisense.");
+                throw new NotImplementedException($"Please add {Util.GetSimplePlatformString(platform)} specific define for bff sections, ideally the same as ExplicitDefine, to get Intellisense.");
 
             return define;
         }
@@ -182,6 +172,39 @@ namespace Sharpmake.Generators.FastBuild
         // ===================================================================================
         // BFF Generation
         // ===================================================================================
+        [Flags]
+        private enum Languages
+        {
+            None = 0,
+            Asm = 1,
+            C = 2,
+            CPP = 4,
+            ObjC = 8,
+            ObjCPP = 16,
+            Swift = 32,
+            Nasm = 64
+        }
+
+        [Flags]
+        private enum LanguageFeatures
+        {
+            None = 0,
+            ConsumeWinRTExtensions = 1,
+            CLR = 2,
+            NonCLR = 4 // TODO: remove this
+        }
+
+        private struct SubConfig
+        {
+            public SubConfig()
+            { }
+
+            public bool IsUsePrecomp = true;
+            public Languages Languages = Languages.None;
+            public LanguageFeatures LanguageFeatures = LanguageFeatures.None;
+            public Options.Vc.Compiler.Exceptions Exceptions = Options.Vc.Compiler.Exceptions.Disable;
+        }
+
         public void Generate(
             Builder builder,
             Project project,
@@ -205,7 +228,7 @@ namespace Sharpmake.Generators.FastBuild
             var context = new BffGenerationContext(builder, project, projectPath, configurations);
             string projectBffFile = Bff.GetBffFileName(projectPath, firstConf.BffFileName); // TODO: bff file name could be different per conf, hence we would generate more than one file
             List<Vcxproj.ProjectFile> filesInNonDefaultSection;
-            Dictionary<Project.Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>> confSourceFiles;
+            Dictionary<Project.Configuration, Dictionary<SubConfig, List<Vcxproj.ProjectFile>>> confSourceFiles;
             using (builder.CreateProfilingScope("BffGenerator.Generate:GetGeneratedFiles"))
             {
                 confSourceFiles = GetGeneratedFiles(context, configurations, out filesInNonDefaultSection);
@@ -250,6 +273,7 @@ namespace Sharpmake.Generators.FastBuild
             // Start writing Bff
             Resolver resolver = new Resolver();
             var bffGenerator = new FileGenerator(resolver);
+            var bffGeneratorProject = new FileGenerator(resolver);
             var bffWholeFileGenerator = new FileGenerator(resolver);
 
             using (bffWholeFileGenerator.Declare("fastBuildProjectName", projectName))
@@ -259,8 +283,9 @@ namespace Sharpmake.Generators.FastBuild
 
             int configIndex = 0;
 
-            var defaultTuple = GetDefaultTupleConfig();
             var allFileCustomBuild = new Dictionary<string, Project.Configuration.CustomFileBuildStepData>();
+
+            Dictionary<string, bool> confBffHasMasters = new Dictionary<string, bool>();
 
             var configurationsToBuild = confSourceFiles.Keys.OrderBy(x => x.Platform).ToList();
             foreach (Project.Configuration conf in configurationsToBuild)
@@ -270,8 +295,14 @@ namespace Sharpmake.Generators.FastBuild
 
                 var platformBff = PlatformRegistry.Get<IPlatformBff>(conf.Platform);
                 var clangPlatformBff = PlatformRegistry.Query<IClangPlatformBff>(conf.Platform);
+                var applePlatformBff = PlatformRegistry.Query<IApplePlatformBff>(conf.Platform);
                 var microsoftPlatformBff = PlatformRegistry.Query<IMicrosoftPlatformBff>(conf.Platform);
                 var dotNetConf = Util.IsDotNet(conf);
+
+                if (conf.FastBuildMasterBffList.Any())
+                    confBffHasMasters[conf.BffFullFileName] = true;
+                else
+                    confBffHasMasters.TryAdd(conf.BffFullFileName, false);
 
                 // TODO: really not ideal, refactor and move the properties we need from it someplace else
                 var vcxprojPlatform = PlatformRegistry.Query<IPlatformVcxproj>(conf.Platform);
@@ -306,27 +337,32 @@ namespace Sharpmake.Generators.FastBuild
                     string outputFile = confOptions["OutputFile"];
 
                     bool isOutputTypeExe = conf.Output == Project.Configuration.OutputType.Exe;
+                    bool isOutputTypeAppleApp = conf.Output == Project.Configuration.OutputType.AppleApp;
                     bool isOutputTypeDll = conf.Output == Project.Configuration.OutputType.Dll;
                     bool isOutputTypeLib = conf.Output == Project.Configuration.OutputType.Lib;
-                    bool isOutputTypeExeOrDll = isOutputTypeExe || isOutputTypeDll;
+                    bool isOutputTypeExeOrDllOrAppleApp = isOutputTypeExe || isOutputTypeDll || isOutputTypeAppleApp;
 
                     var dependenciesInfo = dependenciesInfoPerConf[conf];
                     OrderableStrings additionalDependencies = dependenciesInfo.AdditionalDependencies;
 
-                    foreach (var tuple in confSubConfigs.Keys)
+                    foreach (var subConfig in confSubConfigs.Keys)
                     {
                         var scopedOptions = new List<Options.ScopedOption>();
 
-                        bool isDefaultTuple = defaultTuple.Equals(tuple);
+                        bool isDefaultSubConfig = s_DefaultSubConfig.Equals(subConfig);
 
-                        bool isUsePrecomp = tuple.Item1 && conf.PrecompSource != null;
-                        bool isCompileAsCFile = tuple.Item2;
-                        bool isCompileAsCPPFile = tuple.Item3;
-                        bool isCompileAsCLRFile = tuple.Item4;
-                        bool isConsumeWinRTExtensions = tuple.Item5 || (Options.GetObject<Options.Vc.Compiler.CompileAsWinRT>(conf) == Options.Vc.Compiler.CompileAsWinRT.Enable);
-                        bool isASMFileSection = tuple.Item6;
-                        Options.Vc.Compiler.Exceptions exceptionsSetting = tuple.Item7;
-                        bool isCompileAsNonCLRFile = tuple.Rest.Item1;
+                        bool isUsePrecomp = subConfig.IsUsePrecomp && conf.PrecompSource != null;
+                        bool isCompileAsCFile = subConfig.Languages.HasFlag(Languages.C);
+                        bool isCompileAsCPPFile = subConfig.Languages.HasFlag(Languages.CPP);
+                        bool isCompileAsObjCFile = subConfig.Languages.HasFlag(Languages.ObjC);
+                        bool isCompileAsObjCPPFile = subConfig.Languages.HasFlag(Languages.ObjCPP);
+                        bool isCompileAsSwiftFile = subConfig.Languages.HasFlag(Languages.Swift);
+                        bool isASMFileSection = subConfig.Languages.HasFlag(Languages.Asm);
+                        bool isNASMFileSection = subConfig.Languages.HasFlag(Languages.Nasm);
+                        bool isCompileAsCLRFile = subConfig.LanguageFeatures.HasFlag(LanguageFeatures.CLR);
+                        bool isCompileAsNonCLRFile = subConfig.LanguageFeatures.HasFlag(LanguageFeatures.NonCLR);
+                        bool isConsumeWinRTExtensions = subConfig.LanguageFeatures.HasFlag(LanguageFeatures.ConsumeWinRTExtensions) || (Options.GetObject<Options.Vc.Compiler.CompileAsWinRT>(conf) == Options.Vc.Compiler.CompileAsWinRT.Enable);
+                        Options.Vc.Compiler.Exceptions exceptionsSetting = subConfig.Exceptions;
 
                         bool isFirstSubConfig = subConfigIndex == 0;
                         bool isLastSubConfig = subConfigIndex == confSubConfigs.Keys.Count - 1;
@@ -339,7 +375,7 @@ namespace Sharpmake.Generators.FastBuild
                         }
 
                         // For now, this will do.
-                        if (conf.FastBuildBlobbed && isDefaultTuple && !isUnity)
+                        if (conf.FastBuildBlobbed && isDefaultSubConfig && !isUnity)
                         {
                             isUnity = true;
                         }
@@ -351,7 +387,6 @@ namespace Sharpmake.Generators.FastBuild
                         var useClr = dotNetConf && !isCompileAsNonCLRFile || isCompileAsCLRFile;
                         var fastBuildSubConfigClrSupport = useClr ? "/clr" : FileGeneratorUtilities.RemoveLineTag;
 
-                        Trace.Assert(!isCompileAsCPPFile, "Sharpmake-FastBuild : CompiledAsCPP isn't yet supported.");
                         Trace.Assert(!isCompileAsCLRFile || !isCompileAsNonCLRFile, "Sharpmake-FastBuild : a file cannot be simultaneously compiled with and without the CLR");
 
                         Strings fastBuildCompilerInputPatternList = isCompileAsCFile ? new Strings { ".c" } : project.SourceFilesCPPExtensions;
@@ -406,7 +441,7 @@ namespace Sharpmake.Generators.FastBuild
                             useObjectLists = true;
                         }
 
-                        if (isOutputTypeExeOrDll)
+                        if (isOutputTypeExeOrDllOrAppleApp)
                         {
                             var orderedProjectDeps = UtilityMethods.GetOrderedFlattenedProjectDependencies(conf, false);
                             foreach (var depProjConfig in orderedProjectDeps)
@@ -420,6 +455,7 @@ namespace Sharpmake.Generators.FastBuild
                                     continue;
 
                                 if (depProjConfig.Output != Project.Configuration.OutputType.Exe &&
+                                    depProjConfig.Output != Project.Configuration.OutputType.AppleApp &&
                                     depProjConfig.Output != Project.Configuration.OutputType.Utility)
                                 {
                                     string shortProjectName = GetShortProjectName(depProjConfig.Project, depProjConfig);
@@ -447,6 +483,7 @@ namespace Sharpmake.Generators.FastBuild
                                     continue;
 
                                 if (depProjConfig.Output != Project.Configuration.OutputType.Exe &&
+                                    depProjConfig.Output != Project.Configuration.OutputType.AppleApp &&
                                     depProjConfig.Output != Project.Configuration.OutputType.Utility)
                                 {
                                     fastBuildBuildOnlyDependencies.Add(GetShortProjectName(depProjConfig.Project, depProjConfig));
@@ -467,6 +504,7 @@ namespace Sharpmake.Generators.FastBuild
                                 outputType = "Library";
                                 break;
                             case Project.Configuration.OutputType.Exe:
+                            case Project.Configuration.OutputType.AppleApp:
                                 outputType = "Executable";
                                 break;
                             case Project.Configuration.OutputType.Dll:
@@ -496,7 +534,7 @@ namespace Sharpmake.Generators.FastBuild
 
                                 foreach (string subConfigObject in subConfigObjectList)
                                 {
-                                    if (!useObjectLists && conf.Output != Project.Configuration.OutputType.Dll && conf.Output != Project.Configuration.OutputType.Exe)
+                                    if (!useObjectLists && conf.Output != Project.Configuration.OutputType.Dll && conf.Output != Project.Configuration.OutputType.Exe && conf.Output != Project.Configuration.OutputType.AppleApp)
                                         fastBuildProjectDependencies.Add(subConfigObject + "_" + outputType);
                                     else
                                         fastBuildProjectDependencies.Add(subConfigObject + "_objects");
@@ -507,6 +545,7 @@ namespace Sharpmake.Generators.FastBuild
                         string fastBuildPCHForceInclude = FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildCompilerPCHOptions = isUsePrecomp ? Template.ConfigurationFile.UsePrecomp : FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildCompilerPCHOptionsClang = isUsePrecomp ? Template.ConfigurationFile.UsePrecompClang : FileGeneratorUtilities.RemoveLineTag;
+                        string fastBuildCompilerDeoptimizeOptionClang = isCompileAsSwiftFile ? "-Onone" : "-O0";
                         string fastBuildLinkerOutputFile = fastBuildOutputFile;
                         string fastBuildStampExecutable = FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildStampArguments = FileGeneratorUtilities.RemoveLineTag;
@@ -519,7 +558,7 @@ namespace Sharpmake.Generators.FastBuild
                         {
                             if (isLastSubConfig) // post-build steps on the last subconfig
                             {
-                                if (isOutputTypeExe || conf.ExecuteTargetCopy)
+                                if (isOutputTypeExe || isOutputTypeAppleApp || conf.ExecuteTargetCopy)
                                 {
                                     if (conf.CopyDependenciesBuildStep != null)
                                         throw new NotImplementedException("CopyDependenciesBuildStep are not supported with FastBuild");
@@ -538,7 +577,10 @@ namespace Sharpmake.Generators.FastBuild
                                 }
                             }
 
-                            if (isFirstSubConfig) // pre-build steps on the first config
+                            // When we have a Library/Dll/Executable section, put the prebuild dependencies there (which is the last subconfig).
+                            // Otherwise put it on the first object list
+                            var preBuildTargetsOnLastSubconfig = isOutputTypeExeOrDllOrAppleApp || (isOutputTypeLib && !confUseLibraryDependencyInputs);
+                            if ((preBuildTargetsOnLastSubconfig && isLastSubConfig) || (!preBuildTargetsOnLastSubconfig && isFirstSubConfig))
                             {
                                 // the pre-steps are written in the master bff, we only need to refer their aliases
                                 preBuildTargets.AddRange(conf.EventPreBuildExecute.Select(e => e.Key));
@@ -586,7 +628,7 @@ namespace Sharpmake.Generators.FastBuild
                                 }
 
                                 var extraPlatformEvents = new List<Project.Configuration.BuildStepBase>();
-                                if (!FastBuildSettings.FastBuildSupportLinkerStampList)
+                                if (!FastBuildSettings.FastBuildSupportLinkerStampList && isOutputTypeExeOrDllOrAppleApp)
                                     extraPlatformEvents.AddRange(platformBff.GetExtraStampEvents(conf, fastBuildOutputFile).Select(step => { step.Resolve(resolver); return step; }));
 
                                 extraPlatformEvents.AddRange(platformBff.GetExtraPostBuildEvents(conf, fastBuildOutputFile).Select(step => { step.Resolve(resolver); return step; }));
@@ -618,15 +660,15 @@ namespace Sharpmake.Generators.FastBuild
                                 }
                             }
 
-                            if (conf.Output != Project.Configuration.OutputType.Dll && conf.Output != Project.Configuration.OutputType.Exe)
+                            if (conf.Output != Project.Configuration.OutputType.Dll && conf.Output != Project.Configuration.OutputType.Exe && conf.Output != Project.Configuration.OutputType.AppleApp)
                             {
-                                foreach (var subConfig in subConfigObjectList)
+                                foreach (var subConfigObject in subConfigObjectList)
                                 {
                                     string subTarget;
                                     if (useObjectLists)
-                                        subTarget = subConfig + "_objects";
+                                        subTarget = subConfigObject + "_objects";
                                     else
-                                        subTarget = subConfig + "_" + outputType;
+                                        subTarget = subConfigObject + "_" + outputType;
 
                                     if (!fastBuildTargetSubTargets.Contains(subTarget))
                                         fastBuildTargetSubTargets.Add(subTarget);
@@ -657,9 +699,47 @@ namespace Sharpmake.Generators.FastBuild
                             // MSVC
                             scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "LanguageStandard", FileGeneratorUtilities.RemoveLineTag));
 
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "ClangEnableObjC_ARC", FileGeneratorUtilities.RemoveLineTag));
+
                             if (clangPlatformBff != null)
                                 clangFileLanguage = "-x c "; // Compiler option to indicate that its a C file
                             fastBuildSourceFileType = "/TC";
+                        }
+                        else if (isCompileAsObjCFile)
+                        {
+                            // Do not take Cpp Language conformance into account while compiling in objc
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "CppLanguageStd", FileGeneratorUtilities.RemoveLineTag));
+                            scopedOptions.Add(new Options.ScopedOption(confOptions, "ClangCppLanguageStandard", FileGeneratorUtilities.RemoveLineTag));
+                            // and remove the stdlib specification as well
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "StdLib", FileGeneratorUtilities.RemoveLineTag));
+                            // MSVC
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "LanguageStandard", FileGeneratorUtilities.RemoveLineTag));
+
+                            if (clangPlatformBff != null)
+                                clangFileLanguage = "-x objective-c ";
+                            fastBuildUsingPlatformConfig = platformBff.CConfigName(conf);
+
+                            fastBuildSourceFileType = "";
+                        }
+                        else if (isCompileAsObjCPPFile)
+                        {
+                            // Do not take C Language conformance into account while compiling in objcpp
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "CLanguageStd", FileGeneratorUtilities.RemoveLineTag));
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "ClangCLanguageStandard", FileGeneratorUtilities.RemoveLineTag));
+                            // MSVC
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "LanguageStandard_C", FileGeneratorUtilities.RemoveLineTag));
+
+                            if (clangPlatformBff != null)
+                                clangFileLanguage = "-x objective-c++ ";
+                            fastBuildUsingPlatformConfig = platformBff.CppConfigName(conf);
+
+                            fastBuildSourceFileType = "";
+                        }
+                        else if (isCompileAsSwiftFile)
+                        {
+                            clangFileLanguage = "";
+                            fastBuildUsingPlatformConfig = applePlatformBff.SwiftConfigName(conf);
+                            fastBuildSourceFileType = "";
                         }
                         else
                         {
@@ -669,31 +749,57 @@ namespace Sharpmake.Generators.FastBuild
                             // MSVC
                             scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "LanguageStandard_C", FileGeneratorUtilities.RemoveLineTag));
 
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "ClangEnableObjC_ARC", FileGeneratorUtilities.RemoveLineTag));
+
+                            // if files are specifically c++, we need to add the language flag to make sure the compiler sees them as c++
+                            if (isCompileAsCPPFile && clangPlatformBff != null)
+                                clangFileLanguage = "-x c++ ";
+
                             fastBuildSourceFileType = "/TP";
                             fastBuildUsingPlatformConfig = platformBff.CppConfigName(conf);
                         }
 
+                        // TODOANT: Add nasm/masm change
                         if (isASMFileSection)
                         {
                             fastBuildUsingPlatformConfig += Template.ConfigurationFile.MasmConfigNameSuffix;
                         }
+                        if (isNASMFileSection)
+                        {
+                            fastBuildUsingPlatformConfig += Template.ConfigurationFile.NasmConfigNameSuffix;
+                        }
 
-                        string fastBuildCompilerExtraOptions = !isASMFileSection ? Template.ConfigurationFile.CPPCompilerExtraOptions : Template.ConfigurationFile.MasmCompilerExtraOptions;
+                        string fastBuildCompilerExtraOptions = Template.ConfigurationFile.CPPCompilerExtraOptions;
+                        if (isASMFileSection)
+                        {
+                            fastBuildCompilerExtraOptions = Template.ConfigurationFile.MasmCompilerExtraOptions;
+                        }
+                        if (isNASMFileSection)
+                        {
+                            fastBuildCompilerExtraOptions = Template.ConfigurationFile.NasmCompilerExtraOptions;
+                        }
+
                         string fastBuildCompilerOptionsDeoptimize = FileGeneratorUtilities.RemoveLineTag;
                         if (!isASMFileSection && conf.FastBuildDeoptimization != Project.Configuration.DeoptimizationWritableFiles.NoDeoptimization)
                             fastBuildCompilerOptionsDeoptimize = Template.ConfigurationFile.CPPCompilerOptionsDeoptimize;
 
-                        string compilerOptions = !isASMFileSection ? Template.ConfigurationFile.CompilerOptionsCPP : Template.ConfigurationFile.CompilerOptionsMasm;
+                        string compilerOptions = Template.ConfigurationFile.CompilerOptionsCPP;
+                        if (isASMFileSection)
+                        {
+                            compilerOptions = Template.ConfigurationFile.CompilerOptionsMasm;
+                        }
+                        if (isNASMFileSection)
+                        {
+                            compilerOptions = Template.ConfigurationFile.CompilerOptionsNasm;
+                        }
                         compilerOptions += Template.ConfigurationFile.CompilerOptionsCommon;
 
-                        string compilerOptionsClang = Template.ConfigurationFile.CompilerOptionsClang +
-                                                        Template.ConfigurationFile.CompilerOptionsCommon;
-
-                        string compilerOptionsClangDeoptimized = FileGeneratorUtilities.RemoveLineTag;
-                        if (conf.FastBuildDeoptimization != Project.Configuration.DeoptimizationWritableFiles.NoDeoptimization)
-                            compilerOptionsClangDeoptimized =
-                                Template.ConfigurationFile.ClangCompilerOptionsDeoptimize +
-                                Template.ConfigurationFile.CompilerOptionsCommon;
+                        string compilerOptionsClang = Template.ConfigurationFile.CompilerOptionsClang;
+                        if (isNASMFileSection)
+                        {
+                            compilerOptionsClang = Template.ConfigurationFile.CompilerOptionsNasm;
+                        }
+                        compilerOptionsClang += Template.ConfigurationFile.CompilerOptionsCommon;
 
                         string fastBuildDeoptimizationWritableFiles = null;
                         string fastBuildDeoptimizationWritableFilesWithToken = null;
@@ -743,51 +849,29 @@ namespace Sharpmake.Generators.FastBuild
                                 {
                                     case Options.Vc.General.PlatformToolset.LLVM:
                                     case Options.Vc.General.PlatformToolset.ClangCL:
-                                        // <!-- Set the value of _MSC_VER to claim for compatibility -->
-                                        string mscVer = Options.GetString<Options.Clang.Compiler.MscVersion>(conf);
-                                        if (string.IsNullOrEmpty(mscVer))
-                                        {
-                                            Options.Vc.General.PlatformToolset overridenPlatformToolset = Options.Vc.General.PlatformToolset.Default;
-                                            if (Options.WithArgOption<Options.Vc.General.PlatformToolset>.Get<Options.Clang.Compiler.LLVMVcPlatformToolset>(conf, ref overridenPlatformToolset)
-                                                && overridenPlatformToolset != Options.Vc.General.PlatformToolset.Default
-                                                && !overridenPlatformToolset.IsDefaultToolsetForDevEnv(context.DevelopmentEnvironment))
-                                            {
-                                                switch (overridenPlatformToolset)
-                                                {
-                                                    case Options.Vc.General.PlatformToolset.v141:
-                                                    case Options.Vc.General.PlatformToolset.v141_xp:
-                                                        mscVer = "1910";
-                                                        break;
-                                                    case Options.Vc.General.PlatformToolset.v142:
-                                                        mscVer = "1920";
-                                                        break;
-                                                    case Options.Vc.General.PlatformToolset.v143:
-                                                        mscVer = "1930";
-                                                        break;
-                                                    default:
-                                                        throw new Error("LLVMVcPlatformToolset! Platform toolset override '{0}' not supported", overridenPlatformToolset);
-                                                }
-                                            }
-                                            else
-                                            {
-                                                switch (context.DevelopmentEnvironment)
-                                                {
-                                                    case DevEnv.vs2017:
-                                                        mscVer = "1910";
-                                                        break;
-                                                    case DevEnv.vs2019:
-                                                        mscVer = "1920";
-                                                        break;
-                                                    case DevEnv.vs2022:
-                                                        mscVer = "1930";
-                                                        break;
-                                                    default:
-                                                        throw new Error("Clang-cl used with unsupported DevEnv: " + context.DevelopmentEnvironment.ToString());
-                                                }
-                                            }
-                                        }
-                                        llvmClangCompilerOptions = string.Format("-m64 -fmsc-version={0}", mscVer); // -m$(PlatformArchitecture)
+                                        llvmClangCompilerOptions = "-m64"; // -m$(PlatformArchitecture)
                                         fastBuildPCHForceInclude = @"/FI""[cmdLineOptions.PrecompiledHeaderThrough]""";
+
+
+                                        // <!-- Set the value of _MSC_VER and _MSC_FULL_VER to claim for compatibility -->
+                                        Project.Configuration.FastBuildClangMscVersionDetectionType detectionType = conf.FastBuildClangMscVersionDetectionInfo;
+                                        string overridenMscVer = Options.GetString<Options.Clang.Compiler.MscVersion>(conf);
+                                        Options.Vc.General.PlatformToolset overridenPlatformToolset = Options.Vc.General.PlatformToolset.Default;
+                                        Options.WithArgOption<Options.Vc.General.PlatformToolset>.Get<Options.Clang.Compiler.LLVMVcPlatformToolset>(conf, ref overridenPlatformToolset);
+
+                                        CompilerVersionForClangCl detectedVersion = DetectCompilerVersionForClangCl(
+                                            detectionType, overridenMscVer, overridenPlatformToolset, context.DevelopmentEnvironment, conf.Target.GetPlatform());
+
+                                        switch (detectedVersion.versionType)
+                                        {
+                                            case CompilerVersionForClangClType.MscVersion :
+                                                llvmClangCompilerOptions += string.Format(" -fmsc-version={0}", detectedVersion.mscVersion);
+                                                break;
+                                            case CompilerVersionForClangClType.MsCompatibilityVersion :
+                                                llvmClangCompilerOptions += string.Format(" -fms-compatibility-version={0}.{1}.{2}", detectedVersion.msCompatibilityVersion.Major, detectedVersion.msCompatibilityVersion.Minor, detectedVersion.msCompatibilityVersion.Build);
+                                                break;
+                                        }
+                                        
                                         break;
                                 }
                             }
@@ -836,7 +920,7 @@ namespace Sharpmake.Generators.FastBuild
                             fastBuildCompilerForceUsing = builderForceUsingFiles.ToString();
                         }
 
-                        if (isOutputTypeExeOrDll)
+                        if (isOutputTypeExeOrDllOrAppleApp)
                         {
                             var extraPlatformEvents = new List<Project.Configuration.BuildStepExecutable>();
                             if (FastBuildSettings.FastBuildSupportLinkerStampList)
@@ -862,7 +946,7 @@ namespace Sharpmake.Generators.FastBuild
                         }
 
                         bool linkObjects = false;
-                        if (isOutputTypeExeOrDll)
+                        if (isOutputTypeExeOrDllOrAppleApp)
                         {
                             linkObjects = confUseLibraryDependencyInputs;
                         }
@@ -872,7 +956,7 @@ namespace Sharpmake.Generators.FastBuild
                         string fastBuildInputExcludedFiles = FileGeneratorUtilities.RemoveLineTag;
                         {
                             Strings excludedSourceFiles = new Strings();
-                            if (isNoBlobImplicitConfig && isDefaultTuple)
+                            if (isNoBlobImplicitConfig && isDefaultSubConfig)
                             {
                                 fullInputPaths.Add(context.ProjectSourceCapitalized);
                                 fullInputPaths.AddRange(project.AdditionalSourceRootPaths.Select(Util.GetCapitalizedPath));
@@ -880,7 +964,7 @@ namespace Sharpmake.Generators.FastBuild
                                 excludedSourceFiles.AddRange(filesInNonDefaultSection.Select(f => f.FileName));
                             }
 
-                            if (isDefaultTuple && conf.FastBuildBlobbingStrategy == Project.Configuration.InputFileStrategy.Exclude && conf.FastBuildBlobbed)
+                            if (isDefaultSubConfig && conf.FastBuildBlobbingStrategy == Project.Configuration.InputFileStrategy.Exclude && conf.FastBuildBlobbed)
                             {
                                 // Adding the folders excluded from unity to the folders to build without unity(building each file individually)
                                 fullInputPaths.AddRange(project.SourcePathsBlobExclude.Select(Util.GetCapitalizedPath));
@@ -937,7 +1021,7 @@ namespace Sharpmake.Generators.FastBuild
                             List<string> fastbuildResourceFilesList = new List<string>();
                             List<string> fastbuildEmbeddedResourceFilesList = new List<string>();
 
-                            var sourceFiles = confSubConfigs[tuple];
+                            var sourceFiles = confSubConfigs[subConfig];
                             foreach (var sourceFile in sourceFiles)
                             {
                                 string sourceFileName = CurrentBffPathKeyCombine(sourceFile.FileNameProjectRelative);
@@ -1003,12 +1087,23 @@ namespace Sharpmake.Generators.FastBuild
                                 return false;
                             });
 
-                        fastBuildBuildOnlyDependencies.AddRange(fileCustomBuildKeys);
-
                         Strings fastBuildPreBuildDependencies = new Strings();
                         var orderedForceUsingDeps = UtilityMethods.GetOrderedFlattenedProjectDependencies(conf, false, true);
                         fastBuildPreBuildDependencies.AddRange(orderedForceUsingDeps.Select(dep => GetShortProjectName(dep.Project, dep)));
-                        fastBuildPreBuildDependencies.AddRange(preBuildTargets);
+
+                        // fastBuildBuildOnlyDependencies only gets added to exe/dll sections.
+                        // Add the prebuild steps to fastBuildPreBuildDependencies if we are building a lib
+                        if (isOutputTypeExeOrDllOrAppleApp)
+                        {
+                            fastBuildBuildOnlyDependencies.AddRange(preBuildTargets);
+                            fastBuildBuildOnlyDependencies.AddRange(fileCustomBuildKeys);
+                        }
+                        else if (isOutputTypeLib)
+                        {
+                            fastBuildPreBuildDependencies.AddRange(preBuildTargets);
+                            if (isLastSubConfig)
+                                fastBuildPreBuildDependencies.AddRange(fileCustomBuildKeys);
+                        }
 
                         if (projectHasResourceFiles)
                             resourceFilesSections.Add(fastBuildOutputFileShortName + "_resources");
@@ -1035,6 +1130,13 @@ namespace Sharpmake.Generators.FastBuild
                         fastBuildProjectDependencies.Add("[fastBuildOutputFileShortName]_objects");
                         string fastBuildObjectListEmbeddedResources = FormatListPartForTag(embeddedResourceFilesSections, 32, true);
 
+                        string fastBuildInputFilesRootPath = FileGeneratorUtilities.RemoveLineTag;
+
+                        if (conf.FastBuildInputFilesRootPath != null)
+                        {
+                            fastBuildInputFilesRootPath = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectory, conf.FastBuildInputFilesRootPath));
+                        }
+
                         using (bffGenerator.Declare("conf", conf))
                         using (bffGenerator.Declare("project", project))
                         using (bffGenerator.Declare("target", conf.Target))
@@ -1043,6 +1145,7 @@ namespace Sharpmake.Generators.FastBuild
                             {
                                 case Project.Configuration.OutputType.Lib:
                                 case Project.Configuration.OutputType.Exe:
+                                case Project.Configuration.OutputType.AppleApp:
                                 case Project.Configuration.OutputType.Dll:
                                     using (bffGenerator.Declare("$(ProjectName)", projectName))
                                     using (bffGenerator.Declare("options", confOptions))
@@ -1067,12 +1170,14 @@ namespace Sharpmake.Generators.FastBuild
                                     using (bffGenerator.Declare("fastBuildObjectListEmbeddedResources", fastBuildObjectListEmbeddedResources))
                                     using (bffGenerator.Declare("fastBuildCompilerPCHOptions", fastBuildCompilerPCHOptions))
                                     using (bffGenerator.Declare("fastBuildCompilerPCHOptionsClang", fastBuildCompilerPCHOptionsClang))
+                                    using (bffGenerator.Declare("fastBuildCompilerDeoptimizeOptionClang", fastBuildCompilerDeoptimizeOptionClang))
                                     using (bffGenerator.Declare("fastBuildPCHForceInclude", isUsePrecomp ? fastBuildPCHForceInclude : FileGeneratorUtilities.RemoveLineTag))
                                     using (bffGenerator.Declare("fastBuildConsumeWinRTExtension", fastBuildConsumeWinRTExtension))
                                     using (bffGenerator.Declare("fastBuildOutputType", outputType))
                                     using (bffGenerator.Declare("fastBuildLibrarianAdditionalInputs", librarianAdditionalInputs))
                                     using (bffGenerator.Declare("fastBuildCompileAsC", fastBuildCompileAsC))
                                     using (bffGenerator.Declare("fastBuildUnityName", fastBuildUnityName ?? FileGeneratorUtilities.RemoveLineTag))
+                                    using (bffGenerator.Declare("fastBuildInputFilesRootPath", fastBuildInputFilesRootPath))
                                     using (bffGenerator.Declare("fastBuildClangFileLanguage", clangFileLanguage))
                                     using (bffGenerator.Declare("fastBuildDeoptimizationWritableFiles", fastBuildDeoptimizationWritableFiles))
                                     using (bffGenerator.Declare("fastBuildDeoptimizationWritableFilesWithToken", fastBuildDeoptimizationWritableFilesWithToken))
@@ -1082,6 +1187,7 @@ namespace Sharpmake.Generators.FastBuild
                                     using (bffGenerator.Declare("fastBuildStampExecutable", fastBuildStampExecutable))
                                     using (bffGenerator.Declare("fastBuildStampArguments", fastBuildStampArguments))
                                     using (bffGenerator.Declare("fastBuildEmbeddedOutputPrefix", fastBuildEmbeddedOutputPrefix))
+                                    using (bffGenerator.Declare("fastbuildConcurrencyGroupName", conf.FastBuildLinkConcurrencyGroup ?? FileGeneratorUtilities.RemoveLineTag))
                                     {
                                         if (projectHasResourceFiles)
                                         {
@@ -1102,8 +1208,8 @@ namespace Sharpmake.Generators.FastBuild
                                             }
                                         }
 
-                                        // Exe and DLL will always add an extra objectlist
-                                        if (isOutputTypeExeOrDll && isLastSubConfig // only last subconfig will generate objectlist
+                                        // Exe, DLL and AppleApp will always add an extra objectlist
+                                        if (isOutputTypeExeOrDllOrAppleApp && isLastSubConfig // only last subconfig will generate objectlist
                                         )
                                         {
                                             bffGenerator.Write(Template.ConfigurationFile.ObjectListBeginSection);
@@ -1126,10 +1232,12 @@ namespace Sharpmake.Generators.FastBuild
                                             }
                                             else
                                             {
-                                                //  CLANG Specific
-
-                                                // TODO: This checks twice if the platform supports Clang -- fix?
-                                                clangPlatformBff?.SetupClangOptions(bffGenerator);
+                                                if (isCompileAsSwiftFile)
+                                                    applePlatformBff?.SetupSwiftOptions(bffGenerator);
+                                                else  if (!isNASMFileSection)
+                                                    clangPlatformBff?.SetupClangOptions(bffGenerator); // TODO: This checks twice if the platform supports Clang -- fix?
+                                                else
+                                                    bffGenerator.Write(fastBuildCompilerExtraOptions);
 
                                                 if (conf.Platform.IsUsingClang())
                                                 {
@@ -1138,10 +1246,9 @@ namespace Sharpmake.Generators.FastBuild
                                                     bffGenerator.Write(compilerOptionsClang);
                                                     if (conf.FastBuildDeoptimization != Project.Configuration.DeoptimizationWritableFiles.NoDeoptimization)
                                                     {
-                                                        bffGenerator.Write(Template.ConfigurationFile.ClangCompilerOptionsDeoptimize);
                                                         if (isUsePrecomp)
                                                             bffGenerator.Write(Template.ConfigurationFile.PCHOptionsDeoptimize);
-                                                        bffGenerator.Write(compilerOptionsClangDeoptimized);
+                                                        bffGenerator.Write(Template.ConfigurationFile.ClangCompilerOptionsDeoptimize);
                                                         bffGenerator.Write(Template.ConfigurationFile.DeOptimizeOption);
                                                     }
                                                 }
@@ -1175,10 +1282,12 @@ namespace Sharpmake.Generators.FastBuild
                                             }
                                             else
                                             {
-                                                // CLANG Specific
-
-                                                // TODO: This checks twice if the platform supports Clang -- fix?
-                                                clangPlatformBff?.SetupClangOptions(bffGenerator);
+                                                if (isCompileAsSwiftFile)
+                                                    applePlatformBff?.SetupSwiftOptions(bffGenerator);
+                                                else if (!isNASMFileSection)
+                                                    clangPlatformBff?.SetupClangOptions(bffGenerator);  // TODO: This checks twice if the platform supports Clang -- fix?
+                                                else
+                                                    bffGenerator.Write(fastBuildCompilerExtraOptions);
 
                                                 if (conf.Platform.IsUsingClang())
                                                 {
@@ -1190,7 +1299,7 @@ namespace Sharpmake.Generators.FastBuild
                                                     {
                                                         if (isUsePrecomp)
                                                             bffGenerator.Write(Template.ConfigurationFile.PCHOptionsDeoptimize);
-                                                        bffGenerator.Write(compilerOptionsClangDeoptimized);
+                                                        bffGenerator.Write(Template.ConfigurationFile.ClangCompilerOptionsDeoptimize);
                                                         bffGenerator.Write(Template.ConfigurationFile.DeOptimizeOption);
                                                     }
                                                 }
@@ -1209,6 +1318,7 @@ namespace Sharpmake.Generators.FastBuild
                                             string beginSectionType = null;
                                             switch (conf.Output)
                                             {
+                                                case Project.Configuration.OutputType.AppleApp:
                                                 case Project.Configuration.OutputType.Exe:
                                                     {
                                                         if (isLastSubConfig)
@@ -1272,21 +1382,24 @@ namespace Sharpmake.Generators.FastBuild
                                                 }
                                                 else
                                                 {
-                                                    // TODO: This checks twice if the platform supports Clang -- fix?
-                                                    clangPlatformBff?.SetupClangOptions(bffGenerator);
+                                                    if (isCompileAsSwiftFile)
+                                                        applePlatformBff?.SetupSwiftOptions(bffGenerator);
+                                                    else if (!isNASMFileSection)
+                                                        clangPlatformBff?.SetupClangOptions(bffGenerator);  // TODO: This checks twice if the platform supports Clang -- fix?
+                                                    else
+                                                        bffGenerator.Write(fastBuildCompilerExtraOptions);;
 
                                                     if (conf.Platform.IsUsingClang())
                                                     {
                                                         if (isUsePrecomp)
                                                             bffGenerator.Write(Template.ConfigurationFile.PCHOptionsClang);
 
-                                                        bffGenerator.Write(Template.ConfigurationFile.CompilerOptionsCommon);
-                                                        bffGenerator.Write(Template.ConfigurationFile.CompilerOptionsClang);
+                                                        bffGenerator.Write(compilerOptionsClang);
                                                         if (conf.FastBuildDeoptimization != Project.Configuration.DeoptimizationWritableFiles.NoDeoptimization)
                                                         {
                                                             if (isUsePrecomp)
                                                                 bffGenerator.Write(Template.ConfigurationFile.PCHOptionsDeoptimize);
-                                                            bffGenerator.Write(compilerOptionsClangDeoptimized);
+                                                            bffGenerator.Write(Template.ConfigurationFile.ClangCompilerOptionsDeoptimize);
                                                             bffGenerator.Write(Template.ConfigurationFile.DeOptimizeOption);
                                                         }
                                                         if (!useObjectLists)
@@ -1377,8 +1490,13 @@ namespace Sharpmake.Generators.FastBuild
                     }
                 }
 
+                bffGenerator.WriteTo(bffGeneratorProject);
+                bffGenerator.Clear();
                 ++configIndex;
             }
+
+            foreach (string masterlessBff in confBffHasMasters.Where(x => !x.Value).Select(x => x.Key))
+                Builder.Instance.LogWarningLine("Bff {0} doesn't appear in any master bff, it won't be buildable.", masterlessBff + FastBuildSettings.FastBuildConfigFileExtension);
 
             // Write all unity sections together at the beginning of the .bff just after the header.
             if (_unities.Any())
@@ -1413,16 +1531,15 @@ namespace Sharpmake.Generators.FastBuild
             }
 
             // Now combine all the streams.
-            bffWholeFileGenerator.Write(bffGenerator.ToString());
+            bffGeneratorProject.WriteTo(bffWholeFileGenerator);
 
             // remove all line that contain RemoveLineTag
             bffWholeFileGenerator.RemoveTaggedLines();
-            MemoryStream bffCleanMemoryStream = bffWholeFileGenerator.ToMemoryStream();
 
             // Write bff file
             FileInfo bffFileInfo = new FileInfo(projectBffFile);
 
-            if (builder.Context.WriteGeneratedFile(project.GetType(), bffFileInfo, bffCleanMemoryStream))
+            if (builder.Context.WriteGeneratedFile(project.GetType(), bffFileInfo, bffWholeFileGenerator))
             {
                 Project.IncrementFastBuildGeneratedFileCount();
                 generatedFiles.Add(bffFileInfo.FullName);
@@ -1475,6 +1592,7 @@ namespace Sharpmake.Generators.FastBuild
             context.EnvironmentVariableResolver = platformDescriptor.GetPlatformEnvironmentResolver(resolverParams);
             projectOptionsGen.GenerateOptions(context);
             platformBff.SelectPreprocessorDefinitionsBff(context);
+            platformBff.SelectAdditionalCompilerOptionsBff(context);
 
             FillIncludeDirectoriesOptions(context);
 
@@ -1482,6 +1600,199 @@ namespace Sharpmake.Generators.FastBuild
 
             var dependenciesInfo = FillLibrariesOptions(context);
             dependenciesInfoPerConf.Add(context.Configuration, dependenciesInfo);
+
+            FillNasmOptions(context);
+        }
+
+        internal enum CompilerVersionForClangClType
+        {
+            /// <summary>
+            /// Version is for the -fmsc-version compilation flag
+            /// </summary>
+            MscVersion,
+            /// <summary>
+            /// Version is for the -fms-compatibility-version compilation flag
+            /// </summary>
+            MsCompatibilityVersion,
+            /// <summary>
+            /// Version is not set
+            /// </summary>
+            None
+        }
+
+        internal class CompilerVersionForClangCl
+        {
+            public CompilerVersionForClangClType versionType { get; }
+
+            public string mscVersion { get; }
+            public System.Version msCompatibilityVersion { get; }
+            
+
+            public CompilerVersionForClangCl(System.Version version)
+            {
+                versionType = CompilerVersionForClangClType.MsCompatibilityVersion;
+                msCompatibilityVersion = version;
+            }
+            public CompilerVersionForClangCl(string version)
+            {
+                versionType = CompilerVersionForClangClType.MscVersion;
+                mscVersion = version;
+            }
+
+            public CompilerVersionForClangCl()
+            {
+                versionType = CompilerVersionForClangClType.None;
+            }
+
+            public override string ToString()
+            {
+                switch (versionType)
+                {
+                    case CompilerVersionForClangClType.MsCompatibilityVersion:
+                        return string.Format("MsCompatibilityVersion : {0}.{1}.{2}", msCompatibilityVersion.Major, msCompatibilityVersion.Minor, msCompatibilityVersion.Build);
+                    case CompilerVersionForClangClType.MscVersion:
+                        return string.Format("MscVersion : {0}", mscVersion);
+                    case CompilerVersionForClangClType.None:
+                    default:
+                        return string.Format("No version");
+                }
+            }
+
+            #region IEquatable
+            public override bool Equals(object obj)
+            {
+                CompilerVersionForClangCl other = obj as CompilerVersionForClangCl;
+                if (other != null)
+                {
+                    return Equals(other);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            public override int GetHashCode()
+            {
+                switch (versionType)
+                {
+                    case CompilerVersionForClangClType.MsCompatibilityVersion:
+                        return msCompatibilityVersion.GetHashCode();
+                    case CompilerVersionForClangClType.MscVersion:
+                        return Int32.TryParse(mscVersion, out int numValue) ? numValue : -1;
+                    case CompilerVersionForClangClType.None:
+                        return 0;
+                    default:
+                        return -2;
+                }
+            }
+
+            public bool Equals(CompilerVersionForClangCl other)
+            {
+                if (other.versionType != versionType)
+                {
+                    return false;
+                }
+
+                switch (versionType)
+                {
+                    case CompilerVersionForClangClType.MsCompatibilityVersion:
+                        return other.msCompatibilityVersion == msCompatibilityVersion;
+                    case CompilerVersionForClangClType.MscVersion:
+                        return other.mscVersion == mscVersion;
+                    case CompilerVersionForClangClType.None:
+                    default:
+                        return true;
+                }
+            }
+            #endregion
+        }
+        internal static CompilerVersionForClangCl DetectCompilerVersionForClangCl(
+            Project.Configuration.FastBuildClangMscVersionDetectionType detectionType, string overridenMscVer, 
+            Options.Vc.General.PlatformToolset overridenPlatformToolset, DevEnv devenv, Platform platform)
+        {
+            switch (detectionType)
+            {
+                case Project.Configuration.FastBuildClangMscVersionDetectionType.MajorVersion :
+                    {
+                        if (!string.IsNullOrEmpty(overridenMscVer))
+                        {
+                            return new CompilerVersionForClangCl(overridenMscVer);
+                        }
+
+                        string mscVer = DetectMscVerForClang(devenv, overridenPlatformToolset);
+                        return new CompilerVersionForClangCl(mscVer);
+                    }
+
+                case Project.Configuration.FastBuildClangMscVersionDetectionType.FullVersion:
+                    {
+                        if (!string.IsNullOrEmpty(overridenMscVer))
+                        {
+                            throw new Error("Options.Clang.Compiler.MscVersion and FastBuildClangMscVersionDetection.FullVersion are both set but are mutually exclusive.");
+                        }
+
+                        System.Version mscFullVer = new System.Version();
+                        try
+                        {
+                            mscFullVer = devenv.GetVisualStudioVCToolsCompilerVersion(platform);
+                        }
+                        catch
+                        {
+                            // mscFullVer couldn't be retrieved, fallback to MajorVersion behavior
+                            string mscVer = DetectMscVerForClang(devenv, overridenPlatformToolset);
+                            return new CompilerVersionForClangCl(mscVer);
+                        }
+                        return new CompilerVersionForClangCl(mscFullVer);
+                    }
+
+                case Project.Configuration.FastBuildClangMscVersionDetectionType.Disabled:
+                    {
+                        if (!string.IsNullOrEmpty(overridenMscVer))
+                        {
+                            // Detection is disabled but the Clang option version is set, set the version
+                            return new CompilerVersionForClangCl(overridenMscVer);
+                        }
+
+                        return new CompilerVersionForClangCl();
+                    }
+                default:
+                    {
+                        return new CompilerVersionForClangCl();
+                    }
+            }
+        }
+
+        internal static string DetectMscVerForClang(DevEnv devenv, Options.Vc.General.PlatformToolset overridenPlatformToolset)
+        {
+            if (overridenPlatformToolset != Options.Vc.General.PlatformToolset.Default
+                && !overridenPlatformToolset.IsDefaultToolsetForDevEnv(devenv))
+            {
+                switch (overridenPlatformToolset)
+                {
+                    case Options.Vc.General.PlatformToolset.v141:
+                    case Options.Vc.General.PlatformToolset.v141_xp:
+                        return "1910";
+                    case Options.Vc.General.PlatformToolset.v142:
+                        return "1920";
+                    case Options.Vc.General.PlatformToolset.v143:
+                        return "1930";
+                    default:
+                        throw new Error("LLVMVcPlatformToolset! Platform toolset override '{0}' not supported", overridenPlatformToolset);
+                }
+            }
+            else
+            {
+                switch (devenv)
+                {
+                    case DevEnv.vs2017:
+                        return "1910";
+                    case DevEnv.vs2019:
+                        return "1920";
+                    case DevEnv.vs2022:
+                        return "1930";
+                    default:
+                        throw new Error("Clang-cl used with unsupported DevEnv: " + devenv.ToString());
+                }
+            }
         }
 
         private static void FillIncludeDirectoriesOptions(BffGenerationContext context)
@@ -1491,9 +1802,12 @@ namespace Sharpmake.Generators.FastBuild
 
             var includePaths = new OrderableStrings(platformVcxproj.GetIncludePaths(context));
             var resourceIncludePaths = new OrderableStrings(platformVcxproj.GetResourceIncludePaths(context));
+            var assemblyIncludePaths = new OrderableStrings(platformVcxproj.GetAssemblyIncludePaths(context));
             context.CommandLineOptions["AdditionalIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
+            context.CommandLineOptions["SwiftAdditionalIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
             context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
             context.CommandLineOptions["AdditionalUsingDirectories"] = FileGeneratorUtilities.RemoveLineTag;
+            context.CommandLineOptions["AdditionalAssemblyIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
 
             var platformDescriptor = PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform);
             if (context.EnvironmentVariableResolver != null)
@@ -1501,14 +1815,24 @@ namespace Sharpmake.Generators.FastBuild
                 string defaultCmdLineIncludePrefix = platformDescriptor.IsUsingClang ? "-I " : "/I";
 
                 // Fill include dirs
+                var platformIncludePaths = platformVcxproj.GetPlatformIncludePathsWithPrefix(context);
+
                 var dirs = new List<string>();
                 dirs.AddRange(includePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p, defaultCmdLineIncludePrefix)));
-
-                var platformIncludePaths = platformVcxproj.GetPlatformIncludePathsWithPrefix(context);
-                var platformIncludePathsPrefixed = platformIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p.Path, p.CmdLinePrefix)).ToList();
-                dirs.AddRange(platformIncludePathsPrefixed);
+                dirs.AddRange(platformIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p.Path, p.CmdLinePrefix)));
                 if (dirs.Any())
                     context.CommandLineOptions["AdditionalIncludeDirectories"] = string.Join($"'{Environment.NewLine}            + ' ", dirs);
+
+                var applePlatformBff = PlatformRegistry.Query<IApplePlatformBff>(context.Configuration.Platform);
+                if (applePlatformBff != null && applePlatformBff.IsSwiftSupported())
+                {
+                    string swifttCmdLineIncludePrefix = "-Xcc " + defaultCmdLineIncludePrefix.Replace(" ", " -Xcc ");
+                    var swiftDirs = new List<string>();
+                    swiftDirs.AddRange(includePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p, swifttCmdLineIncludePrefix)));
+                    swiftDirs.AddRange(platformIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p.Path, "-Xcc " + p.CmdLinePrefix.Replace(" ", " -Xcc "))));
+                    if (swiftDirs.Any())
+                        context.CommandLineOptions["SwiftAdditionalIncludeDirectories"] = string.Join($"'{Environment.NewLine}            + ' ", swiftDirs);
+                }
 
                 // Fill resource include dirs
                 var resourceDirs = new List<string>();
@@ -1521,6 +1845,12 @@ namespace Sharpmake.Generators.FastBuild
 
                 if (resourceDirs.Any())
                     context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = string.Join($"'{Environment.NewLine}                                    + ' ", resourceDirs);
+
+                // Fill Assembly include dirs
+                var assemblyDirs = new List<string>();
+                assemblyDirs.AddRange(assemblyIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p, defaultCmdLineIncludePrefix)));
+                if (assemblyDirs.Any())
+                    context.CommandLineOptions["AdditionalAssemblyIncludeDirectories"] = string.Join($"'{Environment.NewLine}                                    + ' ", assemblyDirs);
 
                 // Fill using dirs
                 Strings additionalUsingDirectories = Options.GetStrings<Options.Vc.Compiler.AdditionalUsingDirectories>(context.Configuration);
@@ -1544,12 +1874,12 @@ namespace Sharpmake.Generators.FastBuild
             Project.Configuration projectConfig = context.Configuration;
 
             var natvisFiles = new Strings(projectConfig.Project.NatvisFiles);
-            if (projectConfig.Output == Project.Configuration.OutputType.Dll || projectConfig.Output == Project.Configuration.OutputType.Exe)
+            if (projectConfig.Output == Project.Configuration.OutputType.Dll || projectConfig.Output == Project.Configuration.OutputType.Exe || projectConfig.Output == Project.Configuration.OutputType.AppleApp)
             {
                 var visitedProjects = new HashSet<Project>();
                 foreach (Project.Configuration resolvedDepConfig in projectConfig.ResolvedDependencies)
                 {
-                    if (resolvedDepConfig.Output != Project.Configuration.OutputType.Dll && resolvedDepConfig.Output != Project.Configuration.OutputType.Exe)
+                    if (resolvedDepConfig.Output != Project.Configuration.OutputType.Dll && resolvedDepConfig.Output != Project.Configuration.OutputType.Exe && resolvedDepConfig.Output != Project.Configuration.OutputType.AppleApp)
                     {
                         if (!visitedProjects.Contains(resolvedDepConfig.Project))
                         {
@@ -1604,7 +1934,7 @@ namespace Sharpmake.Generators.FastBuild
 
             Strings ignoreSpecificLibraryNames = Options.GetStrings<Options.Vc.Linker.IgnoreSpecificLibraryNames>(context.Configuration);
             ignoreSpecificLibraryNames.ToLower();
-            ignoreSpecificLibraryNames.InsertSuffix(platformVcxproj.StaticLibraryFileFullExtension, true);
+            ignoreSpecificLibraryNames.InsertSuffix(platformVcxproj.StaticLibraryFileFullExtension, true, new[] { platformVcxproj.SharedLibraryFileFullExtension });
             dependenciesInfo.IgnoredLibraryNames = ignoreSpecificLibraryNames;
 
             context.CommandLineOptions["AdditionalDependencies"] = FileGeneratorUtilities.RemoveLineTag;
@@ -1641,6 +1971,54 @@ namespace Sharpmake.Generators.FastBuild
             }
 
             return dependenciesInfo;
+        }
+
+        private static void FillNasmOptions(BffGenerationContext context)
+        {
+            // Compiler path for nasm
+            context.CommandLineOptions["PathExe"] = context.Project.NasmExePath;
+
+            // Pre included files for NASM syntax
+            var preIncludedFiles = new List<string>();
+            preIncludedFiles.AddRange(context.Project.NasmPreIncludedFiles.Select(p => "-P\"" + p + "\""));
+            string preIncludedFilesJoined = string.Join(' ', preIncludedFiles);
+            context.CommandLineOptions["PreIncludedFiles"] = preIncludedFilesJoined;
+
+            // Fill Assembly include dirs in nasm syntax
+            var nasmAssemblyDirs = new List<string>();
+            var platformVcxproj = PlatformRegistry.Query<IPlatformVcxproj>(context.Configuration.Platform);
+            var assemblyIncludePaths = new OrderableStrings(platformVcxproj.GetAssemblyIncludePaths(context));
+            nasmAssemblyDirs.AddRange(assemblyIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p, "-I ")));
+
+            if (nasmAssemblyDirs.Any())
+            {
+                context.CommandLineOptions["AdditionalAssemblyNasmIncludeDirectories"] = string.Join($"'{Environment.NewLine}                                    + ' ", nasmAssemblyDirs);
+            }
+            else
+            {
+                context.CommandLineOptions["AdditionalAssemblyNasmIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
+            }
+
+            // Defines in NASM syntax
+            var defines = new Strings();
+            defines.AddRange(context.Options.ExplicitDefines);
+            defines.AddRange(context.Configuration.Defines);
+
+            if (defines.Count > 0)
+            {
+                var fastBuildNasmDefines = new List<string>();
+
+                foreach (string define in defines.SortedValues)
+                {
+                    if (!string.IsNullOrWhiteSpace(define))
+                        fastBuildNasmDefines.Add(string.Format(@"{0}{1}{2}{1}", "-D", Util.DoubleQuotes, define.Replace(Util.DoubleQuotes, Util.EscapedDoubleQuotes)));
+                }
+                context.CommandLineOptions["NasmPreprocessorDefinitions"] = string.Join($"'{Environment.NewLine}            + ' ", fastBuildNasmDefines);
+            }
+            else
+            {
+                context.CommandLineOptions["NasmPreprocessorDefinitions"] = FileGeneratorUtilities.RemoveLineTag;
+            }
         }
 
         private static void SelectAdditionalLibraryDirectoriesOption(BffGenerationContext context)
@@ -1686,11 +2064,7 @@ namespace Sharpmake.Generators.FastBuild
             // TODO: really not ideal, refactor and move the properties we need from it someplace else
             var platformVcxproj = PlatformRegistry.Query<IPlatformVcxproj>(context.Configuration.Platform);
 
-            string platformLibraryExtension = string.Empty;
-            string platformOutputLibraryExtension = string.Empty;
-            string platformPrefix = string.Empty;
-            platformVcxproj.SetupPlatformLibraryOptions(ref platformLibraryExtension, ref platformOutputLibraryExtension, ref platformPrefix);
-            string libPrefix = configurationTasks.GetOutputFileNamePrefix(Project.Configuration.OutputType.Lib);
+            platformVcxproj.SetupPlatformLibraryOptions(out var platformLibraryExtension, out var platformOutputLibraryExtension, out var platformPrefix, out var libPrefix);
 
             var additionalDependencies = new OrderableStrings();
 
@@ -1714,21 +2088,29 @@ namespace Sharpmake.Generators.FastBuild
                     //      Ex:  On clang we add -l (supposedly because the exact file is named lib<library>.a)
                     // - With a filename with a static or shared lib extension (eg. .a/.lib/.so), we shouldn't touch it as it's already set by the script.
                     string extension = Path.GetExtension(libraryFile).ToLower();
-
-                    // here we could also verify that the path is rooted
-                    if (extension != platformVcxproj.StaticLibraryFileFullExtension && extension != platformVcxproj.SharedLibraryFileFullExtension)
+                    string filenameOnly = Path.GetFileNameWithoutExtension(libraryFile);
+                    string finalFilename = null;
+                    if (string.IsNullOrEmpty(extension))
                     {
-                        libraryFile = libPrefix + libraryFile;
-                        if (!string.IsNullOrEmpty(platformVcxproj.StaticLibraryFileFullExtension))
-                            libraryFile += platformVcxproj.StaticLibraryFileFullExtension;
+                        finalFilename = libPrefix + filenameOnly + platformOutputLibraryExtension;
                     }
-                    libraryFile = platformPrefix + libraryFile + platformOutputLibraryExtension;
+                    else if (extension != platformVcxproj.StaticLibraryFileFullExtension && extension != platformVcxproj.SharedLibraryFileFullExtension)
+                    {
+                        // Handle case such SomeLib.Platform
+                        finalFilename = libPrefix + libraryFile + platformOutputLibraryExtension;
+                    }
+                    else
+                    {
+                        finalFilename = libraryFile;
+                    }
+
+                    string libDependencyFile = platformPrefix + finalFilename;
 
                     // LCTODO: this might be broken, clarify the rules for which this is supposed to work
-                    if (!ignoreSpecificLibraryNames.Contains(libraryFile))
-                        additionalDependencies.Add(libraryFile);
+                    if (!ignoreSpecificLibraryNames.Contains(finalFilename))
+                        additionalDependencies.Add(libDependencyFile);
                     else
-                        ignoreSpecificLibraryNames.Remove(libraryFile);
+                        ignoreSpecificLibraryNames.Remove(finalFilename);
                 }
             }
 
@@ -1780,7 +2162,7 @@ namespace Sharpmake.Generators.FastBuild
             return null;
         }
 
-        private void ConfigureUnities(IGenerationContext context, Dictionary<Project.Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>> confSourceFiles)
+        private void ConfigureUnities(IGenerationContext context, Dictionary<Project.Configuration, Dictionary<SubConfig, List<Vcxproj.ProjectFile>>> confSourceFiles)
         {
             var conf = context.Configuration;
             // Only add unity build to non blobbed projects -> which they will be blobbed by FBuild
@@ -1791,8 +2173,8 @@ namespace Sharpmake.Generators.FastBuild
                 return;
 
             var confSubConfigs = confSourceFiles[conf];
-            var unityTuple = GetDefaultTupleConfig();
-            var sourceFiles = confSubConfigs[unityTuple];
+            var unitySubConfig = s_DefaultSubConfig;
+            var sourceFiles = confSubConfigs[unitySubConfig];
             var project = context.Project;
 
             const int spaceLength = 42;
@@ -1810,6 +2192,8 @@ namespace Sharpmake.Generators.FastBuild
                 fastBuildUnityCount = unityCount.ToString(CultureInfo.InvariantCulture);
 
             var fastbuildUnityInputExcludePathList = new Strings(project.SourcePathsBlobExclude.Select(Util.GetCapitalizedPath));
+
+            string fastBuildUnityInputIsolateListFile = FileGeneratorUtilities.RemoveLineTag;
 
             bool srcDirsAreEmpty = true;
             var items = new List<string>();
@@ -1892,9 +2276,9 @@ namespace Sharpmake.Generators.FastBuild
             if (fastBuildUnityInputFiles == FileGeneratorUtilities.RemoveLineTag &&
                 fastBuildUnityPaths == FileGeneratorUtilities.RemoveLineTag)
             {
-                // completely drop the subconfig in case it was only a unity tuple, without any files
+                // completely drop the subconfig in case it was only a unity subConfig, without any files
                 if (sourceFiles.Count == 0)
-                    confSubConfigs.Remove(unityTuple);
+                    confSubConfigs.Remove(unitySubConfig);
 
                 // no input path nor files => no unity
                 return;
@@ -1914,6 +2298,9 @@ namespace Sharpmake.Generators.FastBuild
                 fastBuildUnityInputPattern = UtilityMethods.FBuildCollectionFormat(inputPatterns, spaceLength);
             }
 
+            if (!string.IsNullOrEmpty(conf.FastBuildUnityInputIsolateListFile))
+                fastBuildUnityInputIsolateListFile = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, conf.FastBuildUnityInputIsolateListFile, true));
+
             Unity unityFile = new Unity
             {
                 // Note that the UnityName and UnityOutputPattern are intentionally left empty: they will be set in the Resolve
@@ -1921,6 +2308,7 @@ namespace Sharpmake.Generators.FastBuild
                 UnityFullOutputPath = Path.Combine(context.ProjectDirectoryCapitalized, conf.FastBuildUnityPath),
                 UnityInputIsolateWritableFiles = conf.FastBuildUnityInputIsolateWritableFiles.ToString().ToLower(),
                 UnityInputIsolateWritableFilesLimit = conf.FastBuildUnityInputIsolateWritableFiles ? conf.FastBuildUnityInputIsolateWritableFilesLimit.ToString() : FileGeneratorUtilities.RemoveLineTag,
+                UnityInputIsolateListFile = fastBuildUnityInputIsolateListFile,
                 UnityPCH = conf.PrecompHeader ?? FileGeneratorUtilities.RemoveLineTag,
                 UnityInputExcludePath = fastBuildUnityInputExcludePath,
                 UnityNumFiles = fastBuildUnityCount,
@@ -1929,6 +2317,7 @@ namespace Sharpmake.Generators.FastBuild
                 UnityInputExcludedFiles = fastBuildUnityInputExcludedfiles,
                 UnityInputPattern = fastBuildUnityInputPattern,
                 UseRelativePaths = conf.FastBuildUnityUseRelativePaths ? "true" : FileGeneratorUtilities.RemoveLineTag,
+                UnitySectionBucket = conf.FastBuildUnitySectionBucket,
             };
 
             // _unities being a dictionary, a new entry will be created only
@@ -1948,20 +2337,7 @@ namespace Sharpmake.Generators.FastBuild
         }
 
         // For now, this will do.
-        private static Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>> GetDefaultTupleConfig()
-        {
-            bool isConsumeWinRTExtensions = false;
-            bool isCompileAsCLRFile = false;
-            bool isCompileAsNonCLRFile = false;
-            bool isASMFile = false;
-            bool isCompileAsCPPFile = false;
-            bool isCompileAsCFile = false;
-            bool usePrecomp = true;
-            Options.Vc.Compiler.Exceptions exceptionSetting = Options.Vc.Compiler.Exceptions.Disable;
-            var tuple = Tuple.Create(usePrecomp, isCompileAsCFile, isCompileAsCPPFile, isCompileAsCLRFile, isConsumeWinRTExtensions, isASMFile, exceptionSetting, isCompileAsNonCLRFile);
-            return tuple;
-        }
-
+        private static SubConfig s_DefaultSubConfig = new SubConfig();
 
         private static string FormatListPartForTag(List<string> items, int spaceLength, bool addSeparatorAfterList)
         {
@@ -1990,14 +2366,14 @@ namespace Sharpmake.Generators.FastBuild
             writer.Flush();
         }
 
-        private static Dictionary<Project.Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>>
+        private static Dictionary<Project.Configuration, Dictionary<SubConfig, List<Vcxproj.ProjectFile>>>
         GetGeneratedFiles(
             IGenerationContext context,
             List<Project.Configuration> configurations,
             out List<Vcxproj.ProjectFile> filesInNonDefaultSections
         )
         {
-            var confSubConfigs = new Dictionary<Project.Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>>();
+            var confSubConfigs = new Dictionary<Project.Configuration, Dictionary<SubConfig, List<Vcxproj.ProjectFile>>>();
             filesInNonDefaultSections = new List<Vcxproj.ProjectFile>();
 
             // Add source files
@@ -2031,50 +2407,80 @@ namespace Sharpmake.Generators.FastBuild
                                                 conf.PrecompSourceExcludeExtension.Contains(file.FileExtension);
                         bool isCompileAsCFile = conf.ResolvedSourceFilesWithCompileAsCOption.Contains(file.FileName);
                         bool isCompileAsCPPFile = conf.ResolvedSourceFilesWithCompileAsCPPOption.Contains(file.FileName);
+                        bool isCompileAsObjCFile = conf.ResolvedSourceFilesWithCompileAsObjCOption.Contains(file.FileName);
+                        bool isCompileAsObjCPPFile = conf.ResolvedSourceFilesWithCompileAsObjCPPOption.Contains(file.FileName);
                         bool isCompileAsCLRFile = conf.ResolvedSourceFilesWithCompileAsCLROption.Contains(file.FileName);
                         bool isCompileAsNonCLRFile = conf.ResolvedSourceFilesWithCompileAsNonCLROption.Contains(file.FileName);
                         bool isConsumeWinRTExtensions = (conf.ConsumeWinRTExtensions.Contains(file.FileName) ||
                                                         conf.ResolvedSourceFilesWithCompileAsWinRTOption.Contains(file.FileName)) &&
                                                         !(conf.ExcludeWinRTExtensions.Contains(file.FileName) ||
                                                         conf.ResolvedSourceFilesWithExcludeAsWinRTOption.Contains(file.FileName));
+                        // TODOANT: Also trigger on .nasm files
                         bool isASMFile = string.Compare(file.FileExtension, ".asm", StringComparison.OrdinalIgnoreCase) == 0;
+                        bool isSwiftFile = string.Compare(file.FileExtension, ".swift", StringComparison.OrdinalIgnoreCase) == 0 &&
+                                           (PlatformRegistry.Query<IApplePlatformBff>(conf.Platform)?.IsSwiftSupported() ?? false);
+                        bool isNASMFile = string.Compare(file.FileExtension, ".nasm", StringComparison.OrdinalIgnoreCase) == 0;
 
                         Options.Vc.Compiler.Exceptions exceptionSetting = conf.GetExceptionSettingForFile(file.FileName);
 
                         if (isCompileAsCLRFile || isConsumeWinRTExtensions)
                             isDontUsePrecomp = true;
-                        if (string.Compare(file.FileExtension, ".c", StringComparison.OrdinalIgnoreCase) == 0)
+                        if (!isCompileAsCPPFile && string.Compare(file.FileExtension, ".c", StringComparison.OrdinalIgnoreCase) == 0)
                         {
                             isDontUsePrecomp = true;
                             isCompileAsCFile = true;
                         }
+                        else if (isCompileAsObjCFile || isCompileAsObjCPPFile || isSwiftFile)
+                        {
+                            isDontUsePrecomp = true;
+                        }
+                        Languages languageKind = Languages.None;
+                        if (isCompileAsCFile)
+                            languageKind |= Languages.C;
+                        if (isCompileAsCPPFile)
+                            languageKind |= Languages.CPP;
+                        if (isCompileAsObjCFile)
+                            languageKind |= Languages.ObjC;
+                        if (isCompileAsObjCPPFile)
+                            languageKind |= Languages.ObjCPP;
+                        if (isSwiftFile)
+                            languageKind |= Languages.Swift;
+                        if (isASMFile)
+                            languageKind |= Languages.Asm;
+                        if (isNASMFile)
+                            languageKind |= Languages.Nasm;
 
-                        var tuple = Tuple.Create(
-                            !isDontUsePrecomp,
-                            isCompileAsCFile,
-                            isCompileAsCPPFile,
-                            isCompileAsCLRFile,
-                            isConsumeWinRTExtensions,
-                            isASMFile,
-                            exceptionSetting,
-                            isCompileAsNonCLRFile);
+                        LanguageFeatures languageFeatures = LanguageFeatures.None;
+                        if (isCompileAsCLRFile)
+                            languageFeatures |= LanguageFeatures.CLR;
+                        if (isCompileAsNonCLRFile)
+                            languageFeatures |= LanguageFeatures.NonCLR;
+                        if (isConsumeWinRTExtensions)
+                            languageFeatures |= LanguageFeatures.ConsumeWinRTExtensions;
 
-                        Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>> subConfigs = null;
+                        var subConfig = new SubConfig()
+                        {
+                            IsUsePrecomp = !isDontUsePrecomp,
+                            Languages = languageKind,
+                            LanguageFeatures = languageFeatures,
+                            Exceptions = exceptionSetting
+                        };
+
+                        Dictionary<SubConfig, List<Vcxproj.ProjectFile>> subConfigs = null;
                         if (!confSubConfigs.TryGetValue(conf, out subConfigs))
                         {
-                            subConfigs = new Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>();
+                            subConfigs = new Dictionary<SubConfig, List<Vcxproj.ProjectFile>>();
                             confSubConfigs.Add(conf, subConfigs);
                         }
                         List<Vcxproj.ProjectFile> subConfigFiles = null;
-                        if (!subConfigs.TryGetValue(tuple, out subConfigFiles))
+                        if (!subConfigs.TryGetValue(subConfig, out subConfigFiles))
                         {
                             subConfigFiles = new List<Vcxproj.ProjectFile>();
-                            subConfigs.Add(tuple, subConfigFiles);
+                            subConfigs.Add(subConfig, subConfigFiles);
                         }
                         subConfigFiles.Add(file);
 
-                        var defaultTuple = GetDefaultTupleConfig();
-                        if (!tuple.Equals(defaultTuple))
+                        if (!subConfig.Equals(s_DefaultSubConfig))
                         {
                             filesInNonDefaultSections.Add(file);
                         }
@@ -2088,19 +2494,19 @@ namespace Sharpmake.Generators.FastBuild
                 if (conf.FastBuildBlobbed && (sourceFiles.Count > 0 || conf.Project.IsFastBuildAll))
                 {
                     // For now, this will do.
-                    var tuple = GetDefaultTupleConfig();
+                    var subConfig = s_DefaultSubConfig;
 
-                    Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>> subConfigs = null;
+                    Dictionary<SubConfig, List<Vcxproj.ProjectFile>> subConfigs = null;
                     if (!confSubConfigs.TryGetValue(conf, out subConfigs))
                     {
-                        subConfigs = new Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>();
+                        subConfigs = new Dictionary<SubConfig, List<Vcxproj.ProjectFile>>();
                         confSubConfigs.Add(conf, subConfigs);
                     }
                     List<Vcxproj.ProjectFile> subConfigFiles = null;
-                    if (!subConfigs.TryGetValue(tuple, out subConfigFiles))
+                    if (!subConfigs.TryGetValue(subConfig, out subConfigFiles))
                     {
                         subConfigFiles = new List<Vcxproj.ProjectFile>();
-                        subConfigs.Add(tuple, subConfigFiles);
+                        subConfigs.Add(subConfig, subConfigFiles);
                     }
                 }
             }

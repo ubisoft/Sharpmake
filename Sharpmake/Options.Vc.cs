@@ -1,16 +1,6 @@
-﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 
 namespace Sharpmake
@@ -86,6 +76,7 @@ namespace Sharpmake
                     v10_0_20348_0, // 2104/21H1
                     v10_0_22000_0, // Windows 11
                     v10_0_22621_0, // Windows 11 22H2
+                    v10_0_26100_0, // Windows 11 24H2
                     Latest,        // latest available in host machine
                 }
 
@@ -429,7 +420,15 @@ namespace Sharpmake
                     SafeMsilClrSupport,  // clr:safe
 
                     [Obsolete("This option is not supported by msvc anymore.", true)]
-                    SafeMsilClrSupportOldSyntax  // clr:oldSyntax
+                    SafeMsilClrSupportOldSyntax,  // clr:oldSyntax
+
+                    /// <summary>
+                    /// Common Language RunTime Support for .NET Core
+                    /// </summary>
+                    /// <remarks>
+                    /// Creates metadata and code for the component using the latest cross-platform .NET framework, also known as .NET Core. The metadata can be consumed by other .NET Core applications. And, the option enables the component to consume types and data in the metadata of other .NET Core components.
+                    /// </remarks>
+                    ClrNetCoreSupport // clr:netcore
                 }
 
                 public enum MfcSupport
@@ -677,6 +676,17 @@ namespace Sharpmake
                 public enum KeepComment
                 {
                     [Default]
+                    Disable,
+                    Enable
+                }
+
+                /// <summary>
+                /// Enables a token-based preprocessor that conforms to C99 and C++11 and later standards.
+                /// </summary>
+                public enum UseStandardConformingPreprocessor
+                {
+                    [Default]
+                    Default,
                     Disable,
                     Enable
                 }
@@ -1352,6 +1362,20 @@ namespace Sharpmake
                 /// Compiles and links program with AddressSanitizer. Currently available for x86 and x64 builds.
                 /// </remarks>
                 public enum EnableAsan
+                {
+                    [Default]
+                    Disable,
+                    [DevEnvVersion(minimum = DevEnv.vs2019)]
+                    Enable
+                }
+
+                /// <summary>
+                /// Enable Jumbo/Unity builds for msbuild. Only usable with msbuild.
+                /// </summary>
+                /// <remarks>
+                /// Merges multiple translation units together
+                /// </remarks>
+                public enum JumboBuild
                 {
                     [Default]
                     Disable,

@@ -1,16 +1,5 @@
-﻿// Copyright (c) 2020 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-// http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -24,39 +13,51 @@ namespace Sharpmake.Generators.VisualStudio
     internal static partial class VsProjCommon
     {
         public static void WriteCustomProperties(Dictionary<string, string> customProperties, IFileGenerator fileGenerator)
-        {
-            if (customProperties.Count == 0)
-                return;
+            => WritePropertyGroup(customProperties, Template.PropertyGroupStart, fileGenerator);
 
-            fileGenerator.Write(Template.PropertyGroupStart);
-            foreach (var kvp in customProperties)
+        public static void WriteConfigurationsCustomProperties(Project.Configuration conf, IFileGenerator fileGenerator) 
+            => WritePropertyGroup(conf.CustomProperties, Template.PropertyGroupWithConditionStart, fileGenerator);
+        
+        private static void WritePropertyGroup(
+            Dictionary<string, string> props,
+            string headerTemplate,
+            IFileGenerator fileGenerator
+        )
+        {
+            if (props.Any())
             {
-                using (fileGenerator.Declare("custompropertyname", kvp.Key))
-                using (fileGenerator.Declare("custompropertyvalue", kvp.Value))
-                    fileGenerator.Write(Template.CustomProperty);
+                fileGenerator.Write(headerTemplate);
+                foreach (KeyValuePair<string, string> kvp in props)
+                {
+                    using (fileGenerator.Declare("custompropertyname", kvp.Key))
+                    using (fileGenerator.Declare("custompropertyvalue", kvp.Value))
+                    {
+                        fileGenerator.Write(VsProjCommon.Template.CustomProperty);
+                    }
+                }
+                fileGenerator.Write(Template.PropertyGroupEnd);
             }
-            fileGenerator.Write(Template.PropertyGroupEnd);
         }
 
         public static void WriteProjectConfigurationsDescription(IEnumerable<Project.Configuration> configurations, IFileGenerator fileGenerator)
         {
             fileGenerator.Write(Template.Project.ProjectBeginConfigurationDescription);
 
-            var platformNames = new Strings();
+            var toolchainPlatformNames = new Strings();
             var configNames = new Strings();
             foreach (var conf in configurations)
             {
-                var platformName = Util.GetPlatformString(conf.Platform, conf.Project, conf.Target);
-                platformNames.Add(platformName);
+                var toolchainPlatformName = Util.GetToolchainPlatformString(conf.Platform, conf.Project, conf.Target);
+                toolchainPlatformNames.Add(toolchainPlatformName);
                 configNames.Add(conf.Name);
             }
 
             // write all combinations to avoid "Incomplete Configuration" VS warning
             foreach (var configName in configNames.SortedValues)
             {
-                foreach (var platformName in platformNames.SortedValues)
+                foreach (var toolchainPlatformName in toolchainPlatformNames.SortedValues)
                 {
-                    using (fileGenerator.Declare("platformName", platformName))
+                    using (fileGenerator.Declare("platformName", toolchainPlatformName))
                     using (fileGenerator.Declare("configName", configName))
                     {
                         fileGenerator.Write(Template.Project.ProjectConfigurationDescription);
@@ -93,7 +94,7 @@ namespace Sharpmake.Generators.VisualStudio
         {
             foreach (Project.Configuration conf in configurations)
             {
-                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
+                using (fileGenerator.Declare("platformName", Util.GetToolchainPlatformString(conf.Platform, conf.Project, conf.Target)))
                 using (fileGenerator.Declare("conf", conf))
                 {
                     foreach (string propsFile in conf.CustomPropsFiles)

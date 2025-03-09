@@ -1,16 +1,6 @@
-﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -422,8 +412,10 @@ namespace Sharpmake.Generators.VisualStudio
             // TODO: What happens if we define an existing folder?
             foreach (var items in solution.ExtraItems)
             {
-                using (fileGenerator.Declare("folderName", items.Key))
-                using (fileGenerator.Declare("folderGuid", Util.BuildGuid(items.Key)))
+                var folder = GetSolutionFolder(items.Key);
+
+                using (fileGenerator.Declare("folderName", folder.Name))
+                using (fileGenerator.Declare("folderGuid", folder.Guid))
                 using (fileGenerator.Declare("solution", solution))
                 {
                     fileGenerator.Write(Template.Solution.ProjectFolder);
@@ -577,7 +569,7 @@ namespace Sharpmake.Generators.VisualStudio
                         category = solutionConfiguration.PlatformName;
                     }
 
-                    if (containsMultiDotNetFramework)
+                    if (containsMultiDotNetFramework && includedProject.Project is CSharpProject)
                     {
                         if (multiDotNetFrameworkConfigurationNames.Contains(configurationName))
                             continue;
@@ -588,11 +580,12 @@ namespace Sharpmake.Generators.VisualStudio
                     using (fileGenerator.Declare("solutionConf", solutionConfiguration))
                     using (fileGenerator.Declare("projectGuid", solutionProject.UserData["Guid"]))
                     using (fileGenerator.Declare("projectConf", projectConf))
-                    using (fileGenerator.Declare("projectPlatform", Util.GetPlatformString(projectPlatform, solutionProject.Project, solutionConfiguration.Target, true)))
+                    using (fileGenerator.Declare("projectPlatform", Util.GetToolchainPlatformString(projectPlatform, solutionProject.Project, solutionConfiguration.Target, true)))
                     using (fileGenerator.Declare("category", category))
                     using (fileGenerator.Declare("configurationName", configurationName))
                     {
                         bool build = false;
+                        bool forceDeploy = false;
                         if (solution is PythonSolution)
                         {
                             // nothing is built in python solutions
@@ -600,6 +593,7 @@ namespace Sharpmake.Generators.VisualStudio
                         else if (perfectMatch)
                         {
                             build = includedProject.ToBuild == Solution.Configuration.IncludedProjectInfo.Build.Yes;
+                            forceDeploy = includedProject.Project.DeployProjectType == Project.DeployType.AlwaysDeploy || includedProject.Configuration.DeployProjectType == Project.DeployType.AlwaysDeploy;
 
                             // for fastbuild, only build the projects that cannot be built through dependency chain
                             if (!projectConf.IsFastBuild)
@@ -612,13 +606,16 @@ namespace Sharpmake.Generators.VisualStudio
                         }
 
                         fileGenerator.Write(Template.Solution.GlobalSectionProjectConfigurationActive);
+                        bool buildDeploy = false;
                         if (build)
                         {
+                            buildDeploy = includedProject.Project.DeployProjectType == Project.DeployType.OnlyIfBuild || includedProject.Configuration.DeployProjectType == Project.DeployType.OnlyIfBuild;
                             fileGenerator.Write(Template.Solution.GlobalSectionProjectConfigurationBuild);
+                        }
 
-                            bool deployProject = includedProject.Project.DeployProject || includedProject.Configuration.DeployProject;
-                            if (deployProject)
-                                fileGenerator.Write(Template.Solution.GlobalSectionProjectConfigurationDeploy);
+                        if (forceDeploy || buildDeploy)
+                        {
+                            fileGenerator.Write(Template.Solution.GlobalSectionProjectConfigurationDeploy);
                         }
                     }
                 }
@@ -675,7 +672,7 @@ namespace Sharpmake.Generators.VisualStudio
             fileGenerator.Write(Template.Solution.GlobalEnd);
 
             // Write the solution file
-            updated = _builder.Context.WriteGeneratedFile(solution.GetType(), solutionFileInfo, fileGenerator.ToMemoryStream());
+            updated = _builder.Context.WriteGeneratedFile(solution.GetType(), solutionFileInfo, fileGenerator);
 
             solution.PostGenerationCallback?.Invoke(solutionPath, solutionFile, SolutionExtension);
 

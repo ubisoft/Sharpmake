@@ -1,16 +1,6 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -257,6 +247,7 @@ namespace Sharpmake
 
         private static ConcurrentDictionary<FieldInfo, object[]> s_cachedDefaultAttributes = new ConcurrentDictionary<FieldInfo, object[]>();
         private static ConcurrentDictionary<FieldInfo, object[]> s_cachedDevEnvAttributes = new ConcurrentDictionary<FieldInfo, object[]>();
+        private static ConcurrentDictionary<Type, FieldInfo[]> s_cachedFieldInfos = new ConcurrentDictionary<Type, FieldInfo[]>();
 
         public static void SelectOption(Configuration conf, params OptionAction[] options)
         {
@@ -329,7 +320,7 @@ namespace Sharpmake
 
                 foreach (Options.Default defaultOption in attributes)
                 {
-                    if (Util.FlagsTest(defaultOption.DefaultTarget, conf.DefaultOption))
+                    if (defaultOption.DefaultTarget.HasFlag(conf.DefaultOption))
                     {
                         object fieldValue = field.GetValue(optionType);
                         foreach (OptionAction optionAction in options)
@@ -374,14 +365,15 @@ namespace Sharpmake
                 return default(T);
 
             // find the default options
-            FieldInfo[] optionTypeFields = optionType.GetFields();
+            FieldInfo[] optionTypeFields = s_cachedFieldInfos.GetOrAdd(optionType, type => type.GetFields());
+
             foreach (FieldInfo field in optionTypeFields)
             {
                 object[] attributes = s_cachedDefaultAttributes.GetOrAdd(field, fi => fi.GetCustomAttributes(typeof(Options.Default), true));
 
                 foreach (Default defaultOption in attributes)
                 {
-                    if (Util.FlagsTest(defaultOption.DefaultTarget, defaultTarget))
+                    if (defaultOption.DefaultTarget.HasFlag(defaultTarget))
                     {
                         object fieldValue = field.GetValue(optionType);
                         return (T)fieldValue;

@@ -1,16 +1,6 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -34,7 +24,8 @@ namespace Sharpmake
         public sealed class Win64Platform : BaseWindowsPlatform
         {
             #region IPlatformDescriptor implementation
-            public override string SimplePlatformString => "x64";
+            public override string SimplePlatformString => "Win64";
+            public override string GetToolchainPlatformString(ITarget target) => "x64";
 
             public override EnvironmentVariableResolver GetPlatformEnvironmentResolver(params VariableAssignment[] assignments)
             {
@@ -83,9 +74,9 @@ namespace Sharpmake
             {
                 var projectRootPath = conf.Project.RootPath;
                 var devEnv = conf.Target.GetFragment<DevEnv>();
-                var platform = Platform.win64; // could also been retrieved from conf.Target.GetPlatform(), if we want
+                var platform = conf.Target.GetPlatform();
 
-                string compilerName = "Compiler-" + Util.GetSimplePlatformString(platform);
+                string compilerName = "Compiler-" + Util.GetToolchainPlatformString(platform, conf.Target);
 
                 var platformToolset = Options.GetObject<Options.Vc.General.PlatformToolset>(conf);
                 if (platformToolset.IsLLVMToolchain())
@@ -339,6 +330,19 @@ namespace Sharpmake
                     masmConfigurationName,
                     masmConfiguration
                 );
+
+                string nasmConfigurationName = configName + "Nasm";
+                var nasmConfiguration = new CompilerSettings.Configuration(
+                    Platform.win64,
+                    compiler: "Nasm" + nasmConfigurationName,
+                    usingOtherConfiguration: configName
+                );
+                nasmConfiguration.Nasm = conf.Project.NasmExePath;
+
+                configurations.Add(
+                    nasmConfigurationName,
+                    nasmConfiguration
+                );
             }
             #endregion
 
@@ -357,6 +361,7 @@ namespace Sharpmake
             {
                 context.Options["TargetMachine"] = "MachineX64";
                 context.CommandLineOptions["TargetMachine"] = "/MACHINE:X64";
+                context.CommandLineOptions["NasmCompilerFormat"] = "-fwin64";
             }
 
             public override void SelectPlatformAdditionalDependenciesOptions(IGenerationContext context)
@@ -472,7 +477,7 @@ namespace Sharpmake
                     if (context.DevelopmentEnvironmentsRange.MinDevEnv != context.DevelopmentEnvironmentsRange.MaxDevEnv)
                         throw new Error("Different vs versions not supported in the same vcxproj");
 
-                    using (generator.Declare("platformName", SimplePlatformString))
+                    using (generator.Declare("platformName", GetToolchainPlatformString(null)))
                     {
                         generator.Write(Vcxproj.Template.Project.ProjectDescriptionStartPlatformConditional);
                         generator.WriteVerbatim(propertyGroups);

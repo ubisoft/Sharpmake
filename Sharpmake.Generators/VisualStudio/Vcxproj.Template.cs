@@ -1,16 +1,6 @@
-﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 namespace Sharpmake.Generators.VisualStudio
 {
     public partial class Vcxproj
@@ -116,6 +106,11 @@ namespace Sharpmake.Generators.VisualStudio
 @"    <Import Project=""[vcTargetsPath]\BuildCustomizations\masm.props"" />
 ";
 
+                public static string ProjectImportedNasmProps =
+@"    <Import Project=""[importedNasmPropsFile]"" />
+";
+
+
                 public static string ProjectConfigurationImportedProps =
 @"    <Import Project=""[importedPropsFile]"" Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"" />
 ";
@@ -154,6 +149,10 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public static string ProjectMasmTargetsItem =
 @"    <Import Project=""[vcTargetsPath]\BuildCustomizations\masm.targets"" />
+";
+
+                public static string ProjectNasmTargetsItem =
+@"    <Import Project=""[importedNasmTargetsFile]"" />
 ";
 
                 public static string ProjectConfigurationImportedTargets =
@@ -307,6 +306,10 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public static string ProjectFilesCustomBuildLinkObject =
 @"      <LinkObjects Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">[linkobjects]</LinkObjects>
+";
+
+                public static string ProjectFilesCustomBuildOutputItemType =
+@"      <OutputItemType>[outputItemType]</OutputItemType>
 ";
 
                 public static string ProjectFilesCustomBuildEnd =

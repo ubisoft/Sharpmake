@@ -1,16 +1,5 @@
-﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -37,11 +26,12 @@ namespace Sharpmake.Generators.FastBuild
             public string UnityInputObjectLists = FileGeneratorUtilities.RemoveLineTag; // (optional) ObjectList(s) to use as input
             public string UnityInputIsolateWritableFiles = FileGeneratorUtilities.RemoveLineTag; // (optional) Build writable files individually (default false)
             public string UnityInputIsolateWritableFilesLimit = FileGeneratorUtilities.RemoveLineTag; // (optional) Disable isolation when many files are writable (default 0)
+            public string UnityInputIsolateListFile = FileGeneratorUtilities.RemoveLineTag; // (optional) Text file containing list of files to isolate
             public string UnityOutputPattern = FileGeneratorUtilities.RemoveLineTag; // (optional) Pattern of output Unity file names (default Unity*cpp)
             public string UnityNumFiles = FileGeneratorUtilities.RemoveLineTag; // (optional) Number of Unity files to generate (default 1)
             public string UnityPCH = FileGeneratorUtilities.RemoveLineTag; // (optional) Precompiled Header file to add to generated Unity files
             public string UseRelativePaths = FileGeneratorUtilities.RemoveLineTag; // (optional) Use relative paths for generated Unity files
-
+            public Byte UnitySectionBucket = 0; // Internal sharpmake field used to force separate unity sections in certain cases.
             public const string DefaultUnityInputPatternExtension = ".cpp";
             public const string DefaultUnityOutputPatternExtension = "Unity*.cpp";
 
@@ -64,10 +54,12 @@ namespace Sharpmake.Generators.FastBuild
                     hash = hash * 23 + UnityInputObjectLists.GetDeterministicHashCode();
                     hash = hash * 23 + UnityInputIsolateWritableFiles.GetDeterministicHashCode();
                     hash = hash * 23 + UnityInputIsolateWritableFilesLimit.GetDeterministicHashCode();
+                    hash = hash * 23 + UnityInputIsolateListFile.GetDeterministicHashCode();
                     hash = hash * 23 + UnityOutputPattern.GetDeterministicHashCode();
                     hash = hash * 23 + UnityNumFiles.GetDeterministicHashCode();
                     hash = hash * 23 + UnityPCH.GetDeterministicHashCode();
                     hash = hash * 23 + UseRelativePaths.GetDeterministicHashCode();
+                    hash = hash * 23 + UnitySectionBucket;
 
                     return hash;
                 }
@@ -99,10 +91,12 @@ namespace Sharpmake.Generators.FastBuild
                     && string.Equals(UnityInputObjectLists, unity.UnityInputObjectLists)
                     && string.Equals(UnityInputIsolateWritableFiles, unity.UnityInputIsolateWritableFiles)
                     && string.Equals(UnityInputIsolateWritableFilesLimit, unity.UnityInputIsolateWritableFilesLimit)
+                    && string.Equals(UnityInputIsolateListFile, unity.UnityInputIsolateListFile)
                     && string.Equals(UnityOutputPattern, unity.UnityOutputPattern)
                     && string.Equals(UnityNumFiles, unity.UnityNumFiles)
                     && string.Equals(UnityPCH, unity.UnityPCH)
-                    && string.Equals(UseRelativePaths, unity.UseRelativePaths);
+                    && string.Equals(UseRelativePaths, unity.UseRelativePaths)
+                    && UnitySectionBucket == unity.UnitySectionBucket;
             }
         }
 
@@ -211,6 +205,9 @@ namespace Sharpmake.Generators.FastBuild
                 Destination = buildStep.DestinationPath;
                 Recurse = buildStep.IsRecurse;
                 FilePattern = buildStep.CopyPattern;
+
+                if (buildStep.Mirror)
+                    throw new Exception("Copy build step with the '{nameof(Project.Configuration.BuildStepCopy.Mirror)}' option enabled is not supported in a FastBuild context");
             }
 
             public override string Resolve(string rootPath, string bffFilePath, Resolver resolver)
@@ -270,25 +267,42 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
-        // This NMake command generator is for supporting legacy code without any client code change.
-        internal class FastBuildDefaultNMakeCommandGenerator : FastBuildMakeCommandGenerator
+        /// <summary>
+        /// This class is used as a helper for generating fastbuild commands for vcxproj and xcode projects. 
+        /// By default is uses the default fastbuild executable defined in FastBuildSettings but scripts could define another class to 
+        /// to launch a totally different launcher with other parameters.
+        /// </summary>
+        public class FastBuildDefaultCommandGenerator : FastBuildMakeCommandGenerator
         {
-            public override string GetCommand(BuildType buildType, Sharpmake.Project.Configuration conf, string fastbuildArguments)
+            public override string GetExecutablePath(Sharpmake.Project.Configuration conf)
             {
-                Project project = conf.Project;
-                string fastBuildShortProjectName = Bff.GetShortProjectName(project, conf);
+                string fastbuildMakeCommand = FastBuildSettings.FastBuildMakeCommand;
+                if (fastbuildMakeCommand != null)
+                {
+                    if (!Path.IsPathRooted(FastBuildSettings.FastBuildMakeCommand))
+                        fastbuildMakeCommand = Path.Combine(conf.Project.RootPath, FastBuildSettings.FastBuildMakeCommand);
+                    fastbuildMakeCommand = Util.SimplifyPath(fastbuildMakeCommand);
+                }
+                return fastbuildMakeCommand ?? "<Please define FastBuildSettings.FastBuildMakeCommand>";
+            }
 
-                string makePath = FastBuildSettings.FastBuildMakeCommand;
-                if (!Path.IsPathRooted(FastBuildSettings.FastBuildMakeCommand))
-                    makePath = conf.Project.RootPath + Path.DirectorySeparatorChar + FastBuildSettings.FastBuildMakeCommand;
-                makePath = Util.SimplifyPath(makePath);
+            public override string GetArguments(BuildType buildType, Sharpmake.Project.Configuration conf, string fastbuildArguments)
+            {
+                // Note: XCode is special, the target identifier is written in the xcode project file for each target using the FASTBUILD_TARGET special variable.
+                string targetIdentifier = "";
+                if (!conf.Target.TryGetFragment<DevEnv>(out DevEnv devEnv) || devEnv != DevEnv.xcode)
+                {
+                    targetIdentifier = GetTargetIdentifier(conf);
+                }
 
-                string fastBuildExecutable = Util.PathGetRelative(conf.ProjectPath, makePath, true);
+                string buildCommand = buildType == BuildType.Rebuild ? " -clean" : "";
 
-                string rebuildCmd = buildType == BuildType.Rebuild ? " -clean" : "";
+                return $@"{buildCommand} {targetIdentifier} {fastbuildArguments}";
+            }
 
-                // $(ProjectDir) has a trailing slash
-                return $@"""$(ProjectDir){fastBuildExecutable}""{rebuildCmd} {fastBuildShortProjectName} {fastbuildArguments}";
+            public override string GetTargetIdentifier(Sharpmake.Project.Configuration conf)
+            {
+                return Bff.GetShortProjectName(conf.Project, conf);
             }
         }
 
@@ -428,18 +442,14 @@ namespace Sharpmake.Generators.FastBuild
             // Fragments are enums by contract, so Enum.ToObject works
             var typedFragment = Enum.ToObject(fragmentFieldInfo.FieldType, unityFragment);
 
-            if (typedFragment is Platform)
+            if (typedFragment is Platform platformFragment)
             {
-                Platform platformFragment = (Platform)typedFragment;
                 foreach (Platform platformEnum in Enum.GetValues(typeof(Platform)))
                 {
                     if (!platformFragment.HasFlag(platformEnum))
                         continue;
 
-                    string platformString = platformEnum.ToString();
-                    if (platformEnum >= Platform._reserved9)
-                        platformString = Util.GetSimplePlatformString(platformEnum);
-                    fragmentString += "_" + SanitizeForUnityName(platformString).ToLower();
+                    fragmentString += "_" + SanitizeForUnityName(Util.GetSimplePlatformString(platformEnum)).ToLower();
                 }
             }
             else
@@ -586,7 +596,7 @@ namespace Sharpmake.Generators.FastBuild
         internal static string GetBffFileCopyPattern(string copyPattern)
         {
             if (string.IsNullOrEmpty(copyPattern))
-                return copyPattern;
+                return FileGeneratorUtilities.RemoveLineTag;
 
             string[] patterns = copyPattern.Split(null);
 
@@ -594,6 +604,74 @@ namespace Sharpmake.Generators.FastBuild
                 return "'" + copyPattern + "'";
 
             return "{ " + string.Join(", ", patterns.Select(p => "'" + p + "'")) + " }";
+        }
+
+        internal static string GetFastBuildCommandLineArguments(this Project.Configuration conf)
+        {
+            // FastBuild command line
+            var fastBuildCommandLineOptions = new List<string>();
+
+            if (FastBuildSettings.FastBuildUseIDE)
+                fastBuildCommandLineOptions.Add("-ide");
+
+            if (FastBuildSettings.FastBuildReport)
+                fastBuildCommandLineOptions.Add("-report");
+
+            if (FastBuildSettings.FastBuildNoSummaryOnError)
+                fastBuildCommandLineOptions.Add("-nosummaryonerror");
+
+            if (FastBuildSettings.FastBuildSummary)
+                fastBuildCommandLineOptions.Add("-summary");
+
+            if (FastBuildSettings.FastBuildVerbose)
+                fastBuildCommandLineOptions.Add("-verbose");
+
+            if (FastBuildSettings.FastBuildMonitor)
+                fastBuildCommandLineOptions.Add("-monitor");
+
+            // Configuring cache mode if that configuration is allowed to use caching
+            if (conf.FastBuildCacheAllowed)
+            {
+                // Setting the appropriate cache type commandline for that target.
+                switch (FastBuildSettings.CacheType)
+                {
+                    case FastBuildSettings.CacheTypes.CacheRead:
+                        fastBuildCommandLineOptions.Add("-cacheread");
+                        break;
+                    case FastBuildSettings.CacheTypes.CacheWrite:
+                        fastBuildCommandLineOptions.Add("-cachewrite");
+                        break;
+                    case FastBuildSettings.CacheTypes.CacheReadWrite:
+                        fastBuildCommandLineOptions.Add("-cache");
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (FastBuildSettings.FastBuildDistribution && conf.FastBuildDistribution)
+                fastBuildCommandLineOptions.Add("-dist");
+
+            if (FastBuildSettings.FastBuildWait)
+                fastBuildCommandLineOptions.Add("-wait");
+
+            if (FastBuildSettings.FastBuildNoStopOnError)
+                fastBuildCommandLineOptions.Add("-nostoponerror");
+
+            if (FastBuildSettings.FastBuildFastCancel)
+                fastBuildCommandLineOptions.Add("-fastcancel");
+
+            if (FastBuildSettings.FastBuildNoUnity)
+                fastBuildCommandLineOptions.Add("-nounity");
+
+            if (!string.IsNullOrEmpty(conf.FastBuildCustomArgs))
+                fastBuildCommandLineOptions.Add(conf.FastBuildCustomArgs);
+
+            if (!string.IsNullOrEmpty(FastBuildSettings.FastBuildCustomArguments))
+                fastBuildCommandLineOptions.Add(FastBuildSettings.FastBuildCustomArguments);
+
+            string commandLine = string.Join(" ", fastBuildCommandLineOptions);
+            return commandLine;
         }
 
         internal static List<Project.Configuration> GetOrderedFlattenedProjectDependencies(Project.Configuration conf, bool allDependencies = true, bool fuDependencies = false)

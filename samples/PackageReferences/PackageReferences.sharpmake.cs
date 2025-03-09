@@ -1,16 +1,5 @@
-﻿// Copyright (c) 2017-2019, 2021-2022 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-// http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System;
 using Sharpmake;
@@ -25,7 +14,7 @@ namespace PackageReference
             AddTargets(
                 new Target(
                     Platform.win64,
-                    DevEnv.vs2017 | DevEnv.vs2019,
+                    DevEnv.vs2022 | DevEnv.vs2019,
                     Optimization.Debug | Optimization.Release,
                     OutputType.Dll,
                     Blob.NoBlob,
@@ -51,6 +40,10 @@ namespace PackageReference
 
             conf.Options.Add(Options.CSharp.TreatWarningsAsErrors.Enabled);
 
+            // Avoid NuGet security vulnerabilities audit warnings breaks the build.
+            // .NET Framework 4.x has known vulnerabilities.
+            conf.Options.Add(new Options.CSharp.WarningsNotAsErrors("NU1901", "NU1902", "NU1903", "NU1904"));
+
             conf.ReferencesByNuGetPackage.Add("NUnit", "3.6.0");
             conf.ReferencesByNuGetPackage.Add("Newtonsoft.Json", "13.0.1");
             conf.ReferencesByNuGetPackage.Add("Mono.Cecil", "0.9.6.4", privateAssets: Sharpmake.PackageReferences.AssetsDependency.All);
@@ -66,7 +59,7 @@ namespace PackageReference
             AddTargets(
                 new Target(
                     Platform.win64,
-                    DevEnv.vs2017 | DevEnv.vs2019,
+                    DevEnv.vs2022 | DevEnv.vs2019,
                     Optimization.Debug | Optimization.Release,
                     OutputType.Dll,
                     Blob.NoBlob,
@@ -103,7 +96,7 @@ namespace PackageReference
             AddTargets(
                 new Target(
                     Platform.win64,
-                    DevEnv.vs2017 | DevEnv.vs2019,
+                    DevEnv.vs2022 | DevEnv.vs2019,
                     Optimization.Debug | Optimization.Release,
                     OutputType.Dll,
                     Blob.NoBlob,
@@ -129,7 +122,7 @@ namespace PackageReference
         [Main]
         public static void SharpmakeMain(Arguments arguments)
         {
-            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2017, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17763_0);
+            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2022, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17763_0);
             KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2019, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_19041_0);
             arguments.Generate<PackageReferenceSolution>();
         }

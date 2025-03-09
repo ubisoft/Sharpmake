@@ -1,16 +1,6 @@
-// Copyright (c) 2017-2022 Ubisoft Entertainment
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,7 +20,7 @@ namespace Sharpmake
         internal static string RootPath { get; private set; }
         internal static string[] MainSources { get; private set; }
         internal static DevEnv DevEnv { get; private set; }
-        internal static readonly DevEnv DefaultDevEnv = DevEnv.vs2019;
+        internal static readonly DevEnv DefaultDevEnv = DevEnv.vs2022;
 
         public interface IDebugProjectExtension
         {
@@ -79,7 +69,7 @@ namespace Sharpmake
             {
                 string sharpmakeApplicationExePath = Process.GetCurrentProcess().MainModule.FileName;
 
-                if (Util.IsRunningInMono())
+                if (Util.IsRunningInMono() || Util.GetExecutingPlatform() == Platform.mac)
                 {
                     // When running within Mono, sharpmakeApplicationExePath will at this point wrongly refer to the
                     // mono (or mono-sgen) executable. Fix it so that it points to Sharpmake.Application.exe.
@@ -148,6 +138,7 @@ namespace Sharpmake
 
             public string ProjectFolder;
             public readonly HashSet<string> ProjectFiles = new HashSet<string>();
+            public readonly HashSet<string> ProjectNoneFiles = new HashSet<string>();
 
             public readonly List<string> References = new List<string>();
             public readonly List<Type> ProjectReferences = new List<Type>();
@@ -217,10 +208,14 @@ namespace Sharpmake
             {
                 project.ProjectFiles.Add(source);
             }
+            
+            // Add files in project that aren't meant to be compiled
+            project.ProjectNoneFiles.UnionWith(assemblyInfo.NoneFiles);
+
 
             // Add references
             var references = new HashSet<string>();
-            foreach (var assemblerRef in assemblyInfo.References)
+            foreach (var assemblerRef in assemblyInfo.RuntimeReferences)
             {
                 if (!assemblyInfo.SourceReferences.ContainsKey(assemblerRef))
                 {
@@ -331,13 +326,13 @@ namespace Sharpmake
             PreserveLinkFolderPaths = true;
 
             // set paths
-
             RootPath = Util.FindCommonRootPath(_projectInfo.ProjectFiles.Select(f => Path.GetDirectoryName(f)).Distinct()) ?? _projectInfo.ProjectFolder;
             SourceRootPath = RootPath;
 
             // add selected source files
             SourceFiles.AddRange(_projectInfo.ProjectFiles);
-
+            NoneFiles.AddRange(_projectInfo.ProjectNoneFiles);
+            
             // ensure that no file will be automagically added
             SourceFilesExtensions.Clear();
             ResourceFilesExtensions.Clear();
@@ -375,12 +370,13 @@ namespace Sharpmake
 
             conf.Options.Add(Assembler.SharpmakeScriptsCSharpVersion);
 
-            // suppress assembly redirect warnings
-            // cf. https://github.com/dotnet/roslyn/issues/19640
+            // Suppress assembly redirect warnings: https://github.com/dotnet/roslyn/issues/19640
+            // Also suppress NuGet downgrade warnings, as this is not MsBuild that drive how Sharpmake load its assemblies.
             conf.Options.Add(
                 new Options.CSharp.SuppressWarning(
                     "CS1701",
-                    "CS1702"
+                    "CS1702",
+                    "NU1605"
                 )
             );
 
@@ -399,6 +395,32 @@ namespace Sharpmake
             {
                 conf.SetupProjectOptions(_projectInfo.StartArguments);
             }
+        }
+
+        /// <summary>
+        /// Get the link folder for a file considering that the path is relative to the debug project folder but that we want
+        /// the link to represent the path relative to the SourceRootPath. 
+        /// </summary>
+        public override string GetLinkFolder(string file)
+        {
+            string absolutePath = Path.IsPathFullyQualified(file) ? file : Path.GetFullPath(Path.Combine(DebugProjectGenerator.RootPath, file));
+            
+            string relativePath = Util.PathGetRelative(SourceRootPath, Path.GetDirectoryName(absolutePath));
+            
+            // Remove the root, if it exists.
+            // This will only happen if file is rooted *and* doesn't share the same root as SourceRootPath.
+            if (Path.IsPathRooted(relativePath))
+            {
+                relativePath = relativePath.Substring(Path.GetPathRoot(relativePath).Length);
+            }
+            
+            // If the relative path is elsewhere, we leave the file in the root.
+            if (relativePath.Contains(".."))
+            {
+                return string.Empty;
+            }
+            
+            return relativePath;
         }
     }
 

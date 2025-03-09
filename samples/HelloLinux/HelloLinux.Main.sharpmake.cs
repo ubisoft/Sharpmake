@@ -1,27 +1,12 @@
-﻿// Copyright (c) 2020-2021 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-// http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Sharpmake;
 using Sharpmake.Generators.FastBuild;
-
-[module: Sharpmake.DebugProjectName("Sharpmake.HelloLinux")]
 
 [module: Sharpmake.Include("HelloLinux.*.sharpmake.cs")]
 [module: Sharpmake.Include("codebase/*.sharpmake.cs")]
@@ -56,6 +41,16 @@ namespace HelloLinux
                 Directory.CreateDirectory(Util.FilesAutoCleanupDBPath);
         }
 
+        public static void OverrideLinuxPlatformDescriptor()
+        {
+            // Workaround for regression introduced in Sharpmake@0.20.0.
+            // Default value for IsLinkerInvokedViaCompiler should be true when generating makefile on Linux.
+            // See Sharpmake commit e3142832edb3af7f5cc1401365d1e0c1c84fc08e.
+
+            var platformDescriptor = (Linux.LinuxPlatform)PlatformRegistry.Get<IPlatformDescriptor>(Platform.linux);
+            platformDescriptor.IsLinkerInvokedViaCompiler = true;   
+        }
+
         [Sharpmake.Main]
         public static void SharpmakeMain(Sharpmake.Arguments arguments)
         {
@@ -68,6 +63,8 @@ namespace HelloLinux
             FastBuildSettings.FastBuildDistribution = false;
             FastBuildSettings.FastBuildMonitor = true;
             FastBuildSettings.FastBuildAllowDBMigration = true;
+
+            OverrideLinuxPlatformDescriptor();
 
             // for the purpose of this sample, we'll reuse the FastBuild executables that live in the sharpmake source repo
             string sharpmakeFastBuildDir = Util.PathGetAbsolute(Globals.RootDirectory, @"..\..\..\tools\FastBuild");

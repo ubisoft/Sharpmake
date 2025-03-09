@@ -1,16 +1,5 @@
-// Copyright (c) 2020 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-// http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -21,10 +10,14 @@ namespace Sharpmake.Generators.Apple
 {
     public static class XCodeUtil
     {
+        public const string CustompropertiesFilename = "customproperties.xml";
+
         public static string XCodeFormatSingleItem(string item, bool forceQuotes = false)
         {
-            if (forceQuotes || item.Contains(' ') || item.Contains(Util.DoubleQuotes))
+            if (forceQuotes || item.Contains(Util.DoubleQuotes) || item.Contains(' '))
                 return $"{Util.DoubleQuotes}{Util.EscapedDoubleQuotes}{item.Replace(Util.DoubleQuotes, @"\\\""")}{Util.EscapedDoubleQuotes}{Util.DoubleQuotes}";
+            else if (item.Contains('+'))
+                return $"{Util.DoubleQuotes}{item}{Util.DoubleQuotes}";
             return $"{item}";
         }
 
@@ -55,14 +48,18 @@ namespace Sharpmake.Generators.Apple
             return strBuilder.ToString();
         }
 
-        public static string ResolveProjectPaths(Project project, string stringToResolve)
+        public static string ResolveProjectVariable(Project project, string stringToResolve)
         {
             Resolver resolver = new Resolver();
             using (resolver.NewScopedParameter("project", project))
             {
-                string resolvedString = resolver.Resolve(stringToResolve);
-                return Util.SimplifyPath(resolvedString);
+                return resolver.Resolve(stringToResolve);
             }
+        }
+
+        public static string ResolveProjectPaths(Project project, string stringToResolve)
+        {
+            return Util.SimplifyPath(ResolveProjectVariable(project, stringToResolve));
         }
 
         public static void ResolveProjectPaths(Project project, Strings stringsToResolve)
@@ -71,6 +68,17 @@ namespace Sharpmake.Generators.Apple
             {
                 string newValue = ResolveProjectPaths(project, value);
                 stringsToResolve.UpdateValue(value, newValue);
+            }
+        }
+
+        public static void ResolveProjectPaths(Project project, OrderableStrings stringsToResolve)
+        {
+            var count = stringsToResolve.Count;
+            for (var i = 0; i < count; i++)
+            {
+                string value = stringsToResolve[i];
+                string newValue = ResolveProjectPaths(project, value);
+                stringsToResolve[i] = newValue;
             }
         }
     }

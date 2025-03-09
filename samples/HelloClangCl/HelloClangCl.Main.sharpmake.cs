@@ -1,16 +1,5 @@
-﻿// Copyright (c) 2021 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-// http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -20,8 +9,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Sharpmake;
 using Sharpmake.Generators.FastBuild;
-
-[module: Sharpmake.DebugProjectName("Sharpmake.HelloClangCl")]
+using static Sharpmake.Options;
 
 [module: Sharpmake.Include("HelloClangCl.*.sharpmake.cs")]
 [module: Sharpmake.Include("codebase/*.sharpmake.cs")]
@@ -36,6 +24,22 @@ namespace HelloClangCl
         public static string RootDirectory;
         public static string TmpDirectory { get { return Path.Combine(RootDirectory, "temp"); } }
         public static string OutputDirectory { get { return Path.Combine(TmpDirectory, "bin"); } }
+
+        public static DevEnv DevEnvVersion = DevEnv.vs2019 | DevEnv.vs2022;
+        [CommandLine.Option("devenvversion", @"restrict vs version to a specific one")]
+        public static void CommandLineDevVersion(string value)
+        {
+            Console.WriteLine($"DevEnvVersion argument - {value}");
+            switch (value)
+            {
+                case "vs2019":
+                    DevEnvVersion = DevEnv.vs2019;
+                    break;
+                case "vs2022":
+                    DevEnvVersion = DevEnv.vs2022;
+                    break;
+            }
+        }
     }
 
     public static class Main
@@ -59,6 +63,7 @@ namespace HelloClangCl
         [Sharpmake.Main]
         public static void SharpmakeMain(Sharpmake.Arguments arguments)
         {
+            CommandLine.ExecuteOnType(typeof(Globals));
             ConfigureRootDirectory();
             ConfigureAutoCleanup();
 
@@ -71,6 +76,7 @@ namespace HelloClangCl
             FastBuildSettings.SetPathToResourceCompilerInEnvironment = true;
 
             KitsRootPaths.SetKitsRoot10ToHighestInstalledVersion(DevEnv.vs2019);
+            KitsRootPaths.SetKitsRoot10ToHighestInstalledVersion(DevEnv.vs2022);
 
             // for the purpose of this sample, we'll reuse the FastBuild executables that live in the sharpmake source repo
             string sharpmakeFastBuildDir = Util.PathGetAbsolute(Globals.RootDirectory, @"..\..\..\tools\FastBuild");

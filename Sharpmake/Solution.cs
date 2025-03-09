@@ -1,16 +1,6 @@
-﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -127,7 +117,7 @@ namespace Sharpmake
             public string ProjectFile;
 
             // Resolved Project dependencies
-            public List<ResolvedProject> Dependencies = new List<ResolvedProject>();
+            public HashSet<ResolvedProject> Dependencies = new HashSet<ResolvedProject>();
 
             // User data, may be use by generator to attach user data
             public Dictionary<string, object> UserData = new Dictionary<string, object>();
@@ -201,8 +191,7 @@ namespace Sharpmake
                     resolvedProject.Configurations.Add(includedProjectInfo.Configuration);
                     resolvedProject.SolutionConfigurationsBuild.Add(solutionConfiguration, includedProjectInfo.ToBuild);
 
-                    if (!configurationsToProjects.ContainsKey(includedProjectInfo.Configuration))
-                        configurationsToProjects[includedProjectInfo.Configuration] = resolvedProject;
+                    configurationsToProjects.TryAdd(includedProjectInfo.Configuration, resolvedProject);
                 }
             }
 
@@ -229,12 +218,11 @@ namespace Sharpmake
 
                     foreach (Project.Configuration dependencyConfiguration in resolvedProjectConf.ResolvedDependencies)
                     {
-                        if (configurationsToProjects.ContainsKey(dependencyConfiguration))
-                        {
-                            var resolvedProjectToAdd = configurationsToProjects[dependencyConfiguration];
+                        ResolvedProject resolvedProjectToAdd;
 
-                            if (!resolvedProject.Dependencies.Contains(resolvedProjectToAdd))
-                                resolvedProject.Dependencies.Add(resolvedProjectToAdd);
+                        if (configurationsToProjects.TryGetValue(dependencyConfiguration, out resolvedProjectToAdd))
+                        {
+                            resolvedProject.Dependencies.Add(resolvedProjectToAdd);
                         }
                     }
                 }
@@ -342,8 +330,14 @@ namespace Sharpmake
                         if (!configurationProject.Configuration.IsFastBuild && configurationProject.Configuration.ResolvedDependencies.Any(d => d.IsFastBuild))
                             unlinkedList.Add(configurationProject.Configuration);
                         unlinkedList.AddRange(dependenciesConfiguration.Where(c => !c.IsFastBuild && c.ResolvedDependencies.Any(d => d.IsFastBuild)));
+
                         foreach (Project.Configuration dependencyConfiguration in dependenciesConfiguration)
                         {
+                            // Skip configuration that only have swapped-to-dll dependencies
+                            var projectsSwappedToDll = configurationProject.Configuration.ConfigurationsSwappedToDll;
+                            if (projectsSwappedToDll is not null && projectsSwappedToDll.Contains(dependencyConfiguration))
+                                continue;
+
                             Project dependencyProject = dependencyConfiguration.Project;
                             if (dependencyProject.SharpmakeProjectType == Project.ProjectTypeAttribute.Export)
                                 continue;

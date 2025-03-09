@@ -1,22 +1,14 @@
-﻿// Copyright (c) 2017, 2019-2021 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 namespace Sharpmake.Generators.Generic
 {
     public partial class Makefile
     {
         public static class Template
         {
+            private static string NewLine = System.Environment.NewLine;
+
             public static class Solution
             {
                 public static string Header =
@@ -29,47 +21,47 @@ endif
 export config
 
 ";
-                public static string ProjectsVariableBegin = "PROJECTS := \\\n";
+                public static string ProjectsVariableBegin = $"PROJECTS := \\{NewLine}";
 
-                public static string ProjectsVariableElement = "\t[projectName] \\\n";
+                public static string ProjectsVariableElement = $"\t[projectName] \\{NewLine}";
 
-                public static string ProjectsVariableEnd = "\n";
+                public static string ProjectsVariableEnd = NewLine;
 
-                public static string PhonyTargets = ".PHONY: all clean help $(PROJECTS)\n\n";
+                public static string PhonyTargets = $".PHONY: all clean help $(PROJECTS){NewLine}{NewLine}";
 
-                public static string AllRule = "all: $(PROJECTS)\n\n";
+                public static string AllRule = $"all: $(PROJECTS){NewLine}{NewLine}";
 
                 public static string ProjectRuleBegin = "[projectName]: ";
 
                 public static string ProjectRuleDependency = "[dependencyName] ";
 
                 public static string ProjectRuleEnd =
-                    "\n\t@echo \" ==== Building [projectName] ($(config)) ====\"" +
-                    "\n\t@${MAKE} --no-print-directory -C \"[projectFileDirectory]\" -f \"[projectFileName]\"\n\n";
+                    $"{NewLine}\t@echo \" ==== Building [projectName] ($(config)) ====\"" +
+                    $"{NewLine}\t@${{MAKE}} --no-print-directory -C \"[projectFileDirectory]\" -f \"[projectFileName]\"{NewLine}{NewLine}";
 
-                public static string CleanRuleBegin = "clean:\n";
+                public static string CleanRuleBegin = $"clean:{NewLine}";
 
-                public static string CleanRuleProject = "\t@${MAKE} --no-print-directory -C \"[projectFileDirectory]\" -f \"[projectFileName]\" clean\n";
+                public static string CleanRuleProject = $"\t@${{MAKE}} --no-print-directory -C \"[projectFileDirectory]\" -f \"[projectFileName]\" clean{NewLine}";
 
-                public static string CleanRuleEnd = "\n";
+                public static string CleanRuleEnd = NewLine;
 
                 public static string HelpRuleBegin =
-                    "help:\n" +
-                    "\t@echo \"Usage: make [config = name] [target]\"\n" +
-                    "\t@echo \"\"\n" +
-                    "\t@echo \"CONFIGURATIONS:\"\n";
+                    $"help:{NewLine}" +
+                    $"\t@echo \"Usage: make [config = name] [target]\"{NewLine}" +
+                    $"\t@echo \"\"{NewLine}" +
+                    $"\t@echo \"CONFIGURATIONS:\"{NewLine}";
 
-                public static string HelpRuleConfiguration = "\t@echo \"   [optimization]\"\n";
+                public static string HelpRuleConfiguration = $"\t@echo \"   [optimization]\"{NewLine}";
 
                 public static string HelpRuleTargetsBegin =
-                    "\t@echo \"\"\n" +
-                    "\t@echo \"TARGETS:\"\n" +
-                    "\t@echo \"   all (default)\"\n" +
-                    "\t@echo \"   clean\"\n";
+                    $"\t@echo \"\"{NewLine}" +
+                    $"\t@echo \"TARGETS:\"{NewLine}" +
+                    $"\t@echo \"   all (default)\"{NewLine}" +
+                    $"\t@echo \"   clean\"{NewLine}";
 
-                public static string HelpRuleTarget = "\t@echo \"   [projectName]\"\n";
+                public static string HelpRuleTarget = $"\t@echo \"   [projectName]\"{NewLine}";
 
-                public static string HelpRuleEnd = "\n";
+                public static string HelpRuleEnd = NewLine;
             }
 
             public static class Project
@@ -127,11 +119,11 @@ endif
 
                 public static string LinkCommandExe = "$(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(LDLIBS)";
 
-                public static string ObjectsVariableBegin = "ifeq ($(config),[name])\n";
+                public static string ObjectsVariableBegin = $"ifeq ($(config),[name]){NewLine}";
 
-                public static string ObjectsVariableElement = "  [excludeChar]OBJECTS += $(OBJDIR)/[objectFile]\n";
+                public static string ObjectsVariableElement = $"  [excludeChar]OBJECTS += $(OBJDIR)/[objectFile]{NewLine}";
 
-                public static string ObjectsVariableEnd = "endif\n\n";
+                public static string ObjectsVariableEnd = $"endif{NewLine}{NewLine}";
 
                 public static string ProjectRulesGeneral =
 @"RESOURCES := \

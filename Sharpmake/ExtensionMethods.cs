@@ -1,19 +1,10 @@
-// Copyright (c) 2017-2022 Ubisoft Entertainment
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -43,7 +34,7 @@ namespace Sharpmake
 
         public static string GetLinkerOptionPrefix(this Platform platform)
         {
-            if (IsUsingClang(platform) && IsLinkerInvokedViaCompiler(platform))
+            if(IsLinkerInvokedViaCompiler(platform))
                 return "-Wl,";
 
             return "";
@@ -109,6 +100,12 @@ namespace Sharpmake
                     return "net5.0";
                 case DotNetFramework.net6_0:
                     return "net6.0";
+                case DotNetFramework.net7_0:
+                    return "net7.0";
+                case DotNetFramework.net8_0:
+                    return "net8.0";
+                case DotNetFramework.net9_0:
+                    return "net9.0";
                 case DotNetFramework.all_netframework:
                 case DotNetFramework.all_netcore:
                 case DotNetFramework.all_netstandard:
@@ -158,6 +155,12 @@ namespace Sharpmake
                     return "net5.0";
                 case DotNetFramework.net6_0:
                     return "net6.0";
+                case DotNetFramework.net7_0:
+                    return "net7.0";
+                case DotNetFramework.net8_0:
+                    return "net8.0";
+                case DotNetFramework.net9_0:
+                    return "net9.0";
                 case DotNetFramework.netstandard1_0:
                     return "netstandard1.0";
                 case DotNetFramework.netstandard1_1:
@@ -357,7 +360,7 @@ namespace Sharpmake
                 string vsDir = visualVersion.GetVisualStudioDir();
                 if (visualVersion > DevEnv.vs2015)
                 {
-                    return Path.Combine(vsDir, @"VC\Tools\MSVC", visualVersion.GetVisualStudioVCToolsVersion().ToString());
+                    return Path.Combine(vsDir, "VC", "Tools", "MSVC", visualVersion.GetVisualStudioVCToolsVersion().ToString());
                 }
                 else
                 {
@@ -391,6 +394,20 @@ namespace Sharpmake
                 return new Version(versionString);
             });
 
+            return version;
+        }
+
+        private static ConcurrentDictionary<(DevEnv, Platform), Version> s_visualStudioCompilerVersionCache = new ConcurrentDictionary<(DevEnv, Platform), Version>();
+
+        public static Version GetVisualStudioVCToolsCompilerVersion(this DevEnv visualVersion, Platform platform)
+        {
+            var cacheKey = (visualVersion, platform);
+            Version version = s_visualStudioCompilerVersionCache.GetOrAdd(cacheKey, ((DevEnv, Platform) key) =>
+            {
+                string clExeFile = Path.Combine(visualVersion.GetVisualStudioBinPath(platform), "cl.exe");
+                FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(clExeFile);
+                return new Version(fileVersionInfo.FileMajorPart, fileVersionInfo.FileMinorPart, fileVersionInfo.FileBuildPart, fileVersionInfo.FilePrivatePart);
+            });
             return version;
         }
 
@@ -487,7 +504,7 @@ namespace Sharpmake
                 case DevEnv.vs2019:
                 case DevEnv.vs2022:
                     {
-                        string targetPlatform = (platform == Platform.win64) ? "x64" : "x86";
+                        string targetPlatform = (platform == Platform.win32) ? "x86" : "x64";
                         string compilerHost = Environment.Is64BitOperatingSystem ? "HostX64" : "HostX86";
                         return Path.Combine(visualVersion.GetVisualStudioVCRootPath(), "bin", compilerHost, targetPlatform);
                     }
@@ -739,6 +756,8 @@ namespace Sharpmake
                     return "10.0.22000.0";
                 case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_22621_0:
                     return "10.0.22621.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_26100_0:
+                    return "10.0.26100.0";
                 case Options.Vc.General.WindowsTargetPlatformVersion.Latest:
                     return "$(LatestTargetPlatformVersion)";
                 default:

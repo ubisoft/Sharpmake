@@ -1,89 +1,103 @@
-# Sharpmake
+# <img src="/docs/sharpmake_logo.svg" width="32" height="32"> Sharpmake
 
 ![build](https://github.com/ubisoft/Sharpmake/workflows/build/badge.svg)
 
 ## Introduction
-Sharpmake is a generator for Visual Studio projects and solutions. It is
-similar to CMake and Premake, but it is designed for **speed** and
-**scale**. Sharpmake has been used at Ubisoft to generate several thousands
-of *vcxproj*, *csproj* and *sln* files in a matter of seconds, and each of
-these projects can support a large number of Visual Studio configurations as
-well.
 
-That makes Sharpmake ideal for the development of multi-platform games, where
-the number of platforms, the different levels of optimization, the multiple
-rendering APIs on PC and the level editor can quickly multiply the number of
-configurations a given code base must support. Sharpmake generates all those
-configurations at once, very quickly. Thus, it becomes trivial to generate
-and regenerate the entire project.
+Sharpmake is a generator for Visual Studio projects and solutions. It is similar to *CMake* and *Premake*, but it is designed for **speed** and **scale**. Sharpmake has been used at Ubisoft to generate several thousands of `.vcxproj`, `.csproj` and `.sln` files in a matter of seconds, and each of these projects can support a large number of Visual Studio configurations as well.
 
-Sharpmake uses C# for scripting, hence the name. That means that you can edit
-your scripts in Visual Studio (or Visual Studio Code) and have a complete
-IntelliSense programming experience.
+That makes Sharpmake ideal for the development of multi-platform games, where the number of platforms, the different levels of optimization, the multiple rendering APIs on PC and the level editor can quickly multiply the number of configurations a given code base must support. Sharpmake generates all those configurations at once, very quickly. Thus, it becomes trivial to generate and regenerate the entire project.
 
-Sharpmake can also generate makefiles and Xcode projects, but it is currently
-only available for Windows. With .NET Core and .NET Standard though, it is
-our hope that it will eventually cross the platform barrier. In the
-meanwhile, you may have luck using it with Mono.
+Sharpmake uses the C# language for its scripts, hence the name. That means you can edit your scripts in Visual Studio (or Visual Studio Code) and benefits from the default C# tooling (auto-completion, refactoring, debugger...).
 
-Sharpmake was developed internally at Ubisoft for Assassin's Creed 3 in 2011.
-After experimenting with the other existing tools, it became clear that none
-of these solutions were performant enough to generate the number of
-configurations needed (at least not in a trivial way) and that a custom
-generator was needed.
+Sharpmake can also generate makefiles and Xcode projects and can be run "natively" on any modern OSes that support recent version of the dotnet runtime.
 
+Sharpmake was developed internally at Ubisoft for Assassin's Creed 3 in 2011. After experimenting with the other existing tools, it became clear that none of these solutions were performant enough to generate the number of configurations needed (at least not in a trivial way) and that a custom generator was needed.
 
 ## Documentation
-The best place for the Sharpmake documentation is the
-[wiki on GitHub](https://github.com/ubisoftinc/Sharpmake/wiki). The Sharpmake
-source code also comes with samples that you can study.
 
+The Sharpmake documentation is split in two places:
+- the [wiki on GitHub](https://github.com/ubisoftinc/Sharpmake/wiki).
+- the `doc` folder at the root of the project.
 
-## Building Sharpmake
-Building Sharpmake is quite straightforward. Clone the repo on GitHub, run the 
-"bootstrap" script (".bat" for Windows, ".sh" for Unix platforms), open the
-solution in Visual Studio and build the solution in *Release*. The binaries
-will be found in the *tmp/bin/release* directory.
+The Sharpmake source code also comes with samples that you can study.
 
+## Building and running Sharpmake
+
+Building and running Sharpmake is quite straightforward:
+
+- Clone the Git repository
+- Open the `Sharpmake.sln` solution located in the root folder
+- If you want to debug Sharpmake using a _sample_:
+  1. Set the `Samples` project as the Startup Project
+  2. Choose from the dropdown list which sample you want to run
+- If you want to debug Sharpmake using a _functional test_:
+  1. Set the `Sharpmake.FunctionalTests` project as the Startup Project
+  2. Choose from the dropdown list which functional test you want to run
 
 ## More Platforms
-Sharpmake originally had support for game consoles, but Ubisoft pulled it out
-because those could not be open sourced. Sharpmake now has an extension system
-that allows support for these consoles to be added back at runtime.
 
-If you need support for these platforms and are an authorized developer, you
-can contact the SDK provider to get platform extension for Sharpmake.
+Sharpmake originally had support for game consoles, but Ubisoft pulled it out because those could not be open sourced. Sharpmake now has an extension system that allows support for these consoles to be added back at runtime.
 
+More information about platforms can be found [here](docs/Platforms.md).
 
-## Contributing
+## Extending Sharpmake
 
-### Tests
-We will only accept merge requests that pass every tests. The unit tests are
-written with NUnit and the regression tests are ran by comparing the samples'
-output with a reference output. You can run the *regression_tests.py* script
-after having built the solution in Visual Studio to run the regression tests.
+Sharpmake is an open source project that come with some generic built-in features.
 
-Because the regression tests just do a direct comparison with the output, it is
-possible to get a false negative after having done a good change. In that case,
-please update the tests so they match the output after your change. You can run
-the *UpdateSamplesOutput.bat* and *UpdateSharpmakeProjects.bat* batch files to
-automatically overwrite the reference output files.
+But as soon as we start speaking about additional features restricted by NDA (like for platforms), or for internal use only, it is handy to have a way to extend it.
 
-Naturally, we also recommend that you put your own tests after fixing a bug or
-adding a feature to help us avoid regressions.
+The recommended solution is to follow this folder layout:
+```
+SharpmakeExtended:
+ - 📁 Sharpmake
+ - 📁 Sharpmake.Platforms
+ - 📁 Sharpmake.Extensions
+ -    Directory.build.props
+ -    SharpmakeExtended.sln
+```
 
-Functional tests are generating test projects and building them to test
-functionality
+1. `📁 Sharpmake`
 
-used toolset for functional tests:
+The `Sharpmake` folder contains all the files of this Git repository.
 
-tools\FastBuild - v1.04. http://www.fastbuild.org
+We commonly call it Sharpmake *core*.
 
+If you plan to version your *SharpmakeExtended* project under Git, you can use a *Git submodule* to pull on it directly.
 
+2. `📁 Sharpmake.Platforms` (and `📁 Sharpmake.Extensions`)
 
-### Additional Platforms
-If you want to add support for an additional platform, please make sure that
-the platform is open and that you are not breaking your NDA. Ubisoft has not
-published platform support for most video game consoles for that exact reason.
-We will not accept merge requests for new platforms that are not completely
-open for development.
+*Platforms vs. Extensions*: there is no difference between them, these two folders are only used to tidy/split things a little.
+
+These two locations are where you can add any additional platforms (or extensions) in their own dedicated folder:
+```
+📁 Sharpmake.Platforms
+ - 📁 Sharpmake.Platform_A
+      - *.cs
+      - Sharpmake.Platform_A.csproj
+ - 📁 Sharpmake.Platform_B
+      - *.cs
+      - Sharpmake.Platform_B.csproj
+```
+
+`Sharpmake.Application.csproj` (from Sharpmake *core*), automatically adds `.csproj` from these folders to its dependency list. This means they will automatically be built and copied to its output folder, and simply hitting the "Start Debugging" button will *just work*.
+
+3. `Directory.build.props`
+
+This file is used automatically by your `.csproj` from your platforms and extensions folders.
+
+We recommend to - at least - import the same file from the Sharpmake *core* folder to re-use the same basic setup (target framework...). You can also customize/override any option after the import.
+
+```xml
+<Project>
+  <!-- Rely on Sharpmake build setup -->
+  <Import Project="Sharpmake/Directory.Build.props" />
+
+  <!-- Add customization/override here -->
+  <!-- ... -->
+</Project>
+```
+
+4. `SharpmakeExtended.sln`
+
+This solution is only to ease development for humans. It allows to have in a single IDE all the projects from both Sharpmake *core* and the extended ones.

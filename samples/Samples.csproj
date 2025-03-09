@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+  <PropertyGroup>
+    <!-- While Microsoft.Build.NoTargets doesn't build anything, it still requires to have a valid TargetFramework defined -->
+    <TargetFramework>net6.0</TargetFramework>
+    
+    <!-- Disable auto discovery of file to compile, and explicitly list .sharpmake.cs files only -->
+    <EnableDefaultItems>false</EnableDefaultItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="**/*" Exclude="Samples.csproj;obj/**" />
+    <Compile Include="**/*.sharpmake.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sharpmake.Application\Sharpmake.Application.csproj" />
+  </ItemGroup>
+
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+</Project>

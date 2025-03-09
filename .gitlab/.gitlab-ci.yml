@@ -1,0 +1,126 @@
+# Pipelines runs only on branches and tags.
+# Disable merge request pipelines, pipelines for merge results and merge trains.
+include:
+  - template: 'Workflows/Branch-Pipelines.gitlab-ci.yml'
+  - project: 'Sharpmake/SharpmakeExtended'
+    file: 'build/sharpmake-ci.yml'
+
+stages:
+  - build
+  - test
+  - validation
+  - deploy
+
+
+default:
+  tags:
+  - square_windows
+
+#############
+# Stage Build: compile sharpmake solution on all targets, keep the binaries for further steps.
+
+.compilation:base:
+  stage: build
+  variables:
+    DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "true"
+    DOTNET_NOLOGO: "true"
+    DOTNET_CLI_UI_LANGUAGE: "en"
+  parallel:
+    matrix:
+    - configuration: [debug, release]
+  script:
+    - dotnet build Sharpmake.sln -c $configuration -bl:Sharpmake_$configuration.binlog -clp:ForceConsoleColor
+  artifacts:
+    untracked: true
+    expire_in: 1 day
+
+compilation:windows:
+  extends: .compilation:base
+
+compilation:mac:
+  extends: .compilation:base
+  tags: [square_mac]
+
+compilation:linux:
+  extends: .compilation:base
+  tags: [square-linux-k8s-compil]
+  image: mcr.microsoft.com/dotnet/sdk:8.0
+
+generate_samples_pipeline:
+  stage: build
+  script: |
+    pwsh -Command {
+      Install-Module -Name powershell-yaml -RequiredVersion 0.4.7 -Force
+     .\.gitlab\Get-SamplesPipeline.ps1 | Tee-Object -FilePath .gitlab/samples.yml
+    }
+  artifacts:
+    paths:
+    - .gitlab/samples.yml
+    expire_in: 1 day
+
+#############
+# Unit tests
+#############
+.unit_test:base:
+  stage: test
+  script:
+    - dotnet test Sharpmake.sln -c $configuration --no-build
+  artifacts:
+    when: on_failure
+    untracked: true
+    expire_in: 1 day
+
+unit_test:debug:
+  extends: .unit_test:base
+  needs:
+  - "compilation:windows: [debug]"
+  variables:
+    configuration: "debug"
+
+unit_test:release:
+  extends: .unit_test:base
+  needs:
+    - "compilation:windows: [release]"
+  variables:
+    configuration: "release"
+
+#############
+# Regression tests
+#############
+regression_test:
+  stage: test
+  script:
+  - python regression_test.py
+  needs:
+  - "compilation:windows: [release]"
+  artifacts:
+    when: on_failure
+    untracked: true
+    expire_in: 1 day
+
+#############
+# Functional tests
+#############
+functional_test:
+  stage: test
+  script:
+  - python functional_test.py
+  needs:
+  - "compilation:windows: [release]"
+  artifacts:
+    when: on_failure
+    untracked: true
+    expire_in: 1 day
+
+#############
+# Samples
+#############
+samples:
+  stage: test
+  variables:
+    PARENT_PIPELINE_ID: $CI_PIPELINE_ID
+  trigger:
+    include:
+    - artifact: .gitlab/samples.yml
+      job: generate_samples_pipeline
+    strategy: depend

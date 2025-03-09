@@ -1,16 +1,6 @@
-﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -198,7 +188,7 @@ namespace Sharpmake.Generators.Generic
             fileGenerator.WriteVerbatim(Template.Solution.HelpRuleEnd);
 
             // Write the solution file
-            updated = builder.Context.WriteGeneratedFile(solution.GetType(), solutionFileInfo, fileGenerator.ToMemoryStream());
+            updated = builder.Context.WriteGeneratedFile(solution.GetType(), solutionFileInfo, fileGenerator);
 
             solution.PostGenerationCallback?.Invoke(solutionPath, solutionFile, MakeExtension);
 
@@ -358,7 +348,7 @@ namespace Sharpmake.Generators.Generic
                     using (fileGenerator.Declare("objectFile", file.GetObjectFileName()))
                     using (fileGenerator.Declare("sourceFile", PathMakeUnix(file.FileNameProjectRelative)))
                     {
-                        if (file.FileExtensionLower == ".c")
+                        if (!project.SourceFilesCPPExtensions.Contains(file.FileExtensionLower))
                         {
                             fileGenerator.Write(Template.Project.ObjectRuleC);
                         }
@@ -372,7 +362,7 @@ namespace Sharpmake.Generators.Generic
                 fileGenerator.Write(Template.Project.Footer);
 
                 // Write the project file
-                updated = builder.Context.WriteGeneratedFile(project.GetType(), projectFileInfo, fileGenerator.ToMemoryStream());
+                updated = builder.Context.WriteGeneratedFile(project.GetType(), projectFileInfo, fileGenerator);
             }
 
             return projectFileInfo.FullName;
@@ -401,7 +391,7 @@ namespace Sharpmake.Generators.Generic
 
                 // Validate that 2 conf name in the same project and for a given platform don't have the same name.
                 Project.Configuration otherConf;
-                string projectUniqueName = conf.Name + Util.GetPlatformString(conf.Platform, conf.Project, conf.Target);
+                string projectUniqueName = conf.Name + Util.GetToolchainPlatformString(conf.Platform, conf.Project, conf.Target);
                 if (configurationNameMapping.TryGetValue(projectUniqueName, out otherConf))
                 {
                     throw new Error(
@@ -589,10 +579,15 @@ namespace Sharpmake.Generators.Generic
             var deps = new OrderableStrings();
             foreach (Project.Configuration depConf in conf.ResolvedDependencies)
             {
+                // Ignore projects marked as Export
+                if (depConf.Project.SharpmakeProjectType == Project.ProjectTypeAttribute.Export)
+                    continue;
+
                 switch (depConf.Output)
                 {
                     case Project.Configuration.OutputType.None:
-                        continue;
+                    case Project.Configuration.OutputType.Utility:
+                        break;
                     case Project.Configuration.OutputType.Lib:
                     case Project.Configuration.OutputType.DotNetClassLibrary:
                         deps.Add(Path.Combine(depConf.TargetLibraryPath, depConf.TargetFileFullNameWithExtension), depConf.TargetFileOrderNumber);
@@ -609,17 +604,22 @@ namespace Sharpmake.Generators.Generic
             options["LDDEPS"] = depsRelative.JoinStrings(" ");
 
             // LinkCommand
-            if (conf.Output == Project.Configuration.OutputType.Lib)
+            switch (conf.Output)
             {
-                options["LinkCommand"] = Template.Project.LinkCommandLib;
-            }
-            else if (conf.Output == Project.Configuration.OutputType.Dll)
-            {
-                options["LinkCommand"] = Template.Project.LinkCommandDll;
-            }
-            else
-            {
-                options["LinkCommand"] = Template.Project.LinkCommandExe;
+                case Project.Configuration.OutputType.Lib:
+                    options["LinkCommand"] = Template.Project.LinkCommandLib;
+                    break;
+                case Project.Configuration.OutputType.Dll:
+                    options["LinkCommand"] = Template.Project.LinkCommandDll;
+                    break;
+                case Project.Configuration.OutputType.Exe:
+                    options["LinkCommand"] = Template.Project.LinkCommandExe;
+                    break;
+                case Project.Configuration.OutputType.None:
+                case Project.Configuration.OutputType.Utility:
+                default:
+                    options["LinkCommand"] = string.Empty;
+                    break;
             }
 
             if (conf.AdditionalLibrarianOptions.Any())
@@ -656,11 +656,11 @@ namespace Sharpmake.Generators.Generic
 
             foreach (string file in projectSourceFiles)
             {
-                string fileName = Path.GetFileName(file);
+                string fileName = Path.GetFileNameWithoutExtension(file);
                 int fileNameOccurences = 0;
                 if (fileNamesOccurences.TryGetValue(fileName, out fileNameOccurences))
                 {
-                    fileNamesOccurences[fileName] = fileNameOccurences++;
+                    fileNamesOccurences[fileName] = ++fileNameOccurences;
                 }
                 else
                 {

@@ -1,0 +1,1 @@
+%define CONFIG_DEFINE 1

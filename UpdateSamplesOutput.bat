@@ -4,12 +4,11 @@
 COLOR
 
 :: First compile sharpmake to insure we are trying to deploy using an executable corresponding to the code.
-call CompileSharpmake.bat Sharpmake.sln Debug "Any CPU"
+dotnet build Sharpmake.sln /p:Configuration=Release /p:Platform="Any CPU"
 if %errorlevel% NEQ 0 goto error
 
-set SHARPMAKE_EXECUTABLE=%~dp0tmp\bin\debug\net5.0\Sharpmake.Application.exe
-if not exist %SHARPMAKE_EXECUTABLE% set SHARPMAKE_EXECUTABLE=%~dp0tmp\bin\release\net5.0\Sharpmake.Application.exe
-if not exist %SHARPMAKE_EXECUTABLE% echo Cannot find sharpmake executable in %~dp0tmp\bin\net5.0\[debug^|release] & pause & goto error
+set SHARPMAKE_EXECUTABLE=%~dp0Sharpmake.Application\bin\Release\net6.0\Sharpmake.Application.exe
+if not exist %SHARPMAKE_EXECUTABLE% echo Cannot find sharpmake executable in %~dp0Sharpmake.Application\bin\Release\net6.0 & pause & goto error
 
 echo Using executable %SHARPMAKE_EXECUTABLE%
 
@@ -23,20 +22,28 @@ call :UpdateRef samples CPPCLI                      CLRTest.sharpmake.cs        
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples CSharpHelloWorld            HelloWorld.sharpmake.cs                    reference         CSharpHelloWorld
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
+call :UpdateRef samples JumboBuild                  JumboBuild.sharpmake.cs                    reference         JumboBuild
+if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples HelloWorld                  HelloWorld.sharpmake.cs                    reference         HelloWorld
+if not "%ERRORLEVEL_BACKUP%" == "0" goto error
+call :UpdateRef samples HelloLinux                  HelloLinux.Main.sharpmake.cs               reference         HelloLinux
+if not "%ERRORLEVEL_BACKUP%" == "0" goto error
+call :UpdateRef samples HelloAssembly               HelloAssembly.sharpmake.cs                 reference         HelloAssembly
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples CSharpVsix                  CSharpVsix.sharpmake.cs                    reference         CSharpVsix
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
-call :UpdateRef samples CSharpWCF                   CSharpWCF.sharpmake.cs                     reference         CSharpWCF\codebase
+call :UpdateRef samples CSharpWCF                   CSharpWCF.sharpmake.cs                     reference         CSharpWCF
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples CSharpImports               CSharpImports.sharpmake.cs                 reference         CSharpImports
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples PackageReferences           PackageReferences.sharpmake.cs             reference         PackageReferences
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
-call :UpdateRef samples QTFileCustomBuild           QTFileCustomBuild.sharpmake.cs             reference         QTFileCustomBuild
-if not "%ERRORLEVEL_BACKUP%" == "0" goto error
-call :UpdateRef samples FastBuildSimpleExecutable   FastBuildSimpleExecutable.sharpmake.cs     reference         FastBuildSimpleExecutable\projects
-if not "%ERRORLEVEL_BACKUP%" == "0" goto error
+:: skipped in regression tests
+::call :UpdateRef samples QTFileCustomBuild           QTFileCustomBuild.sharpmake.cs             reference         QTFileCustomBuild
+::if not "%ERRORLEVEL_BACKUP%" == "0" goto error
+:: skipped in regression tests
+::call :UpdateRef samples FastBuildSimpleExecutable   FastBuildSimpleExecutable.sharpmake.cs     reference         FastBuildSimpleExecutable\projects
+::if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples SimpleExeLibDependency      SimpleExeLibDependency.sharpmake.cs        reference         SimpleExeLibDependency
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 
@@ -46,10 +53,13 @@ call :UpdateRef samples NetCore\DotNetFrameworkHelloWorld        HelloWorld.shar
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples NetCore\DotNetMultiFrameworksHelloWorld  HelloWorld.sharpmake.cs       reference         NetCore\DotNetMultiFrameworksHelloWorld
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
+call :UpdateRef samples NetCore\DotNetOSMultiFrameworksHelloWorld  HelloWorld.sharpmake.cs     reference         NetCore\DotNetOSMultiFrameworksHelloWorld
+if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 
 :: functional tests
-call :UpdateRef Sharpmake.FunctionalTests FastBuildFunctionalTest FastBuildFunctionalTest.sharpmake.cs reference FastBuildFunctionalTest
-if not "%ERRORLEVEL_BACKUP%" == "0" goto error
+:: Skipped in regression tests
+::call :UpdateRef Sharpmake.FunctionalTests FastBuildFunctionalTest FastBuildFunctionalTest.sharpmake.cs reference FastBuildFunctionalTest
+::if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 
 @COLOR 2F
 echo References update succeeded!

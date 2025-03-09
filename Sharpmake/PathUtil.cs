@@ -1,31 +1,21 @@
-// Copyright (c) 2021-2022 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.CodeAnalysis;
 
 namespace Sharpmake
 {
     public static partial class Util
     {
-        public static readonly char UnixSeparator = '/';
-        public static readonly char WindowsSeparator = '\\';
-        private static readonly string s_unixMountPointForWindowsDrives = "/mnt/";
+        public const char UnixSeparator = '/';
+        public const char WindowsSeparator = '\\';
+        private const string s_unixMountPointForWindowsDrives = "/mnt/";
 
         public static readonly bool UsesUnixSeparator = Path.DirectorySeparatorChar == UnixSeparator;
 
@@ -44,11 +34,50 @@ namespace Sharpmake
             return PathMakeStandard(path, !Util.IsRunningOnUnix());
         }
 
+        /// <summary>
+        /// Cleanup the path by replacing the other separator by the correct one for the current OS
+        /// then trim every trailing separators, except if <paramref name="path"/> is a root (i.e. 'C:\' or '/')
+        /// </summary>
+        /// <remarks>Note that if the given <paramref name="path"/> is a drive letter with volume separator,
+        /// without slash/backslash, a directory separator will be added to make the path fully qualified.
+        /// <br>But if the given <paramref name="path"/> is not just a drive letter and also has missing slash/backslah
+        /// after volume separator (for example "C:toto/tata/"), then the return path won't be fully qualified
+        /// (see here for more information on drive relative paths <see href="https://learn.microsoft.com/en-us/dotnet/standard/io/file-path-formats"/>)</br>
+        /// <para>Note that Windows paths on Unix will have slashes (and vice versa)</para>
+        /// <para>Note that network paths (like NAS) starting with "\\" are not supported</para>
+        /// </remarks>
         public static string PathMakeStandard(string path, bool forceToLower)
         {
-            // cleanup the path by replacing the other separator by the correct one for this OS
-            // then trim every trailing separators
-            var standardPath = path.Replace(OtherSeparator, Path.DirectorySeparatorChar).TrimEnd(Path.DirectorySeparatorChar);
+            ArgumentNullException.ThrowIfNull(path, nameof(path));
+
+            var standardPath = path.Replace(OtherSeparator, Path.DirectorySeparatorChar);
+
+            // C#11 is currently disable until Sharpmake is fully ported to .net8
+            //standardPath = standardPath switch
+            //{
+            //    [WindowsSeparator or UnixSeparator] => standardPath,
+            //    [_, ':'] => IsRunningOnUnix() ? standardPath : standardPath + Path.DirectorySeparatorChar,
+            //    [_, ':', WindowsSeparator or UnixSeparator] => standardPath,
+            //    _ => standardPath.TrimEnd(Path.DirectorySeparatorChar),
+            //};
+
+            if (standardPath.Length == 1 && (standardPath[0] == WindowsSeparator || standardPath[0] == UnixSeparator))
+            {
+                // Nothing to do to make the path standard
+            }
+            else if (standardPath.Length == 2 && standardPath[1] == ':')
+            {
+                standardPath = IsRunningOnUnix() ? standardPath : standardPath + Path.DirectorySeparatorChar;
+            }
+            else if (standardPath.EndsWith($":{WindowsSeparator}", StringComparison.Ordinal) || standardPath.EndsWith($":{UnixSeparator}", StringComparison.Ordinal))
+            {
+                // Nothing to do to make the path standard
+            }
+            else
+            {
+                standardPath = standardPath.TrimEnd(Path.DirectorySeparatorChar);
+            }
+
             return forceToLower ? standardPath.ToLower() : standardPath;
         }
 
@@ -144,7 +173,7 @@ namespace Sharpmake
 
             if (rootPath != null)
             {
-                string cleanPath = Util.SimplifyPath(rootPath);
+                string cleanPath = SimplifyPath(rootPath);
                 if (!tmpAbsolute.StartsWith(cleanPath, StringComparison.OrdinalIgnoreCase))
                     return tmpAbsolute;
             }
@@ -152,133 +181,118 @@ namespace Sharpmake
             return newRelativePath;
         }
 
-        private sealed unsafe class PathHelper
+        private static readonly ConcurrentDictionary<string, string> s_cachedSimplifiedPaths = new ConcurrentDictionary<string, string>();
+
+        /// <summary>
+        /// Take a path and compute a canonical version of it. It removes any extra: "..", ".", directory separators...
+        /// Note that symbolic links are not expanded, path does not need to exist on the file system.
+        /// </summary>
+        /// Basic implementation details:
+        /// - We take for granted that the simplified path will always be smaller that the input path.
+        ///   - This allow to allocate a working buffer only once, and work inside it.
+        /// - The logic starts from the end of the input path and walks it backward.
+        ///   - This allow to simply count ".." occurrences and skip folder accordingly as we move toward the root of the path.
+        ///   - Characters are written in the working buffer starting by its end, and an index is always written once (no back tracking).
+        /// - At the end, if there is remaining "..", they are added back to the path.
+        /// - At the end, the working buffer may still have some room at its beginning (when the simplified path is smaller than the input path).
+        ///   - A string is created occordingly to skip this unused/uninitialized space
+        public static unsafe string SimplifyPathImpl(string path)
         {
-            public static readonly int MaxPath = 260;
-            private int _capacity;
+            // First construct a path helper to help with the conversion
+            char* arrayPtr = stackalloc char[path.Length + 1];
 
-            // Array of stack members.
-            private char* _buffer;
-            private int _bufferLength;
+            int consecutiveDotsCounter = 0;
+            bool pathSeparatorWritePending = IsPathSeparator(path[^1]); // Explicitly handle path with a trailing path separator (we want to keep it)
+            int writePosition = path.Length;
+            int dotDotCounter = 0;
 
-            public PathHelper(char* buffer, int length)
+            // Start by the end of the path to easily handle '..' case
+            for (int index = path.Length - 1; index >= 0; --index)
             {
-                _buffer = buffer;
-                _capacity = length;
-                _bufferLength = 0;
+                char currentChar = path[index];
+                if (IsPathSeparator(currentChar))
+                {
+                    pathSeparatorWritePending = pathSeparatorWritePending
+                        || (consecutiveDotsCounter == -1 && dotDotCounter == 0); // We want to consider this path separator only if we are not on a '.' or '..'
+
+                    HandleDotDotCounter(ref consecutiveDotsCounter, ref dotDotCounter, path);
+                }
+                else
+                {
+                    // Count consecutive dots (if there is only dots in the name)
+                    if (currentChar == '.' && consecutiveDotsCounter != -1)
+                    {
+                        ++consecutiveDotsCounter;
+                        continue;
+                    }
+
+                    if (dotDotCounter == 0)
+                    {
+                        // Write pending path separator
+                        if (pathSeparatorWritePending)
+                        {
+                            arrayPtr[writePosition--] = Path.DirectorySeparatorChar;
+                            pathSeparatorWritePending = false;
+                        }
+
+                        // Write held back '.'
+                        for (int i = 0; i < consecutiveDotsCounter; ++i)
+                        {
+                            arrayPtr[writePosition--] = '.';
+                        }
+
+                        arrayPtr[writePosition--] = currentChar;
+                    }
+
+                    // We encountered something else than '.', now we don't care about them until next path separator
+                    consecutiveDotsCounter = -1;
+                }
             }
 
-            // This method is called when we find a .. in the path.
-            public bool RemoveLastDirectory(int lowestRemovableIndex)
+            // Handle additional '..' that was not taken into account nor consummed
+            HandleDotDotCounter(ref consecutiveDotsCounter, ref dotDotCounter, path);
+            for (int i = 0; i < dotDotCounter; ++i)
             {
-                if (Length == 0)
-                    return false;
+                if (pathSeparatorWritePending)
+                    arrayPtr[writePosition--] = Path.DirectorySeparatorChar;
+                arrayPtr[writePosition--] = '.';
+                arrayPtr[writePosition--] = '.';
+                pathSeparatorWritePending = true;
+            }
 
-                Trace.Assert(_buffer[_bufferLength - 1] == Path.DirectorySeparatorChar);
+            // Handle rooted path on Unix platforms
+            if (path[0] == '/')
+                arrayPtr[writePosition--] = '/';
 
-                int lastSlash = -1;
+            return new string(arrayPtr, writePosition + 1, path.Length - writePosition);
 
-                for (int i = _bufferLength - 2; i >= lowestRemovableIndex; i--)
+            static bool IsPathSeparator(char c) => c == Path.DirectorySeparatorChar || c == OtherSeparator;
+
+            static void HandleDotDotCounter(ref int consecutiveDotsCounter, ref int dotDotCounter, string path)
+            {
+                switch (consecutiveDotsCounter)
                 {
-                    if (_buffer[i] == Path.DirectorySeparatorChar)
-                    {
-                        lastSlash = i;
+                    case -1:
+                        // We encountered a real folder name (not made exclusively of dots), and it have been skipped if dotDotCounter was not 0, so we decrement it
+                        if (dotDotCounter > 0)
+                            --dotDotCounter;
                         break;
-                    }
+                    case 0:
+                        break;
+                    case 1:
+                        // skip: "./"
+                        break;
+                    case 2:
+                        ++dotDotCounter;
+                        break;
+                    default:
+                        throw new ArgumentException($"Invalid path format: '{path}' (folder made of three or more consecutive dots detected)");
                 }
 
-                if (lastSlash == -1)
-                {
-                    if (lowestRemovableIndex == 0)
-                    {
-                        _bufferLength = 0;
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-
-                // Truncate the path.
-                _bufferLength = lastSlash;
-
-                return true;
+                // We are on a path separator, consecutive dots counter must be reset
+                consecutiveDotsCounter = 0;
             }
-
-            public void Append(char value)
-            {
-                if (Length + 1 >= _capacity)
-                    throw new PathTooLongException("Path too long:");
-
-                if (value == Path.DirectorySeparatorChar)
-                {
-                    // Skipping consecutive backslashes.
-                    if (_bufferLength > 0 && _buffer[_bufferLength - 1] == Path.DirectorySeparatorChar)
-                        return;
-                }
-
-                // Important note: Must imcrement _bufferLength at the same time as writing into it as otherwise if
-                // you are stepping in the debugger and ToString() is implicitly called by the debugger this could truncate the string
-                // before the increment takes place
-                _buffer[_bufferLength++] = value;
-            }
-
-            // Append a substring path component to the 
-            public void Append(string str, int substStringIndex, int subStringLength)
-            {
-                if (Length + subStringLength >= _capacity)
-                    throw new PathTooLongException("Path too long:");
-
-                Trace.Assert(substStringIndex < str.Length);
-                Trace.Assert(substStringIndex + subStringLength <= str.Length);
-
-
-                int endLoop = substStringIndex + subStringLength;
-                for (int i = substStringIndex; i < endLoop; ++i)
-                {
-                    // Important note: Must imcrement _bufferLength at the same time as writing into it as otherwise if
-                    // you are stepping in the debugger and ToString() is implicitly called by the debugger this could truncate the string
-                    // before the increment takes place
-                    char value = str[i];
-                    _buffer[_bufferLength++] = value;
-                }
-            }
-
-            public void RemoveChar(int index)
-            {
-                Debug.Assert(index < _bufferLength);
-                for (int i = index; i < _bufferLength - 1; ++i)
-                {
-                    _buffer[i] = _buffer[i + 1];
-                }
-                --_bufferLength;
-            }
-
-            public override string ToString()
-            {
-                return new string(_buffer, 0, _bufferLength);
-            }
-
-            public int Length
-            {
-                get
-                {
-                    return _bufferLength;
-                }
-            }
-
-            internal char this[int index]
-            {
-                get
-                {
-                    Debug.Assert(index < _bufferLength);
-                    return _buffer[index];
-                }
-            }
-        };
-
-        private static ConcurrentDictionary<string, string> s_cachedSimplifiedPaths = new ConcurrentDictionary<string, string>();
+        }
 
         public static unsafe string SimplifyPath(string path)
         {
@@ -288,93 +302,13 @@ namespace Sharpmake
             if (path == ".")
                 return path;
 
-            string simplifiedPath = s_cachedSimplifiedPaths.GetOrAdd(path, s =>
-            {
-                // First construct a path helper to help with the conversion
-                char* arrayPtr = stackalloc char[PathHelper.MaxPath];
-                PathHelper pathHelper = new PathHelper(arrayPtr, PathHelper.MaxPath);
-
-                int index = 0;
-                int pathLength = path.Length;
-                int numDot = 0;
-                int lowestRemovableIndex = 0;
-                for (; index < pathLength; ++index)
-                {
-                    char currentChar = path[index];
-                    if (currentChar == OtherSeparator)
-                        currentChar = Path.DirectorySeparatorChar;
-
-                    if (currentChar == '.')
-                    {
-                        ++numDot;
-                        if (numDot > 2)
-                        {
-                            throw new ArgumentException($"Invalid path format: {path}");
-                        }
-                    }
-                    else
-                    {
-                        if (numDot == 1)
-                        {
-                            if (currentChar == Path.DirectorySeparatorChar)
-                            {
-                                // Path starts a path of the format .\
-                                numDot = 0;
-                                continue;
-                            }
-                            else
-                            {
-                                pathHelper.Append('.');
-                            }
-                            numDot = 0;
-                            pathHelper.Append(currentChar);
-                        }
-                        else if (numDot == 2)
-                        {
-                            if (currentChar != Path.DirectorySeparatorChar)
-                                throw new ArgumentException($"Invalid path format: {path}");
-
-                            // Path contains a path of the format ..\
-                            bool success = pathHelper.RemoveLastDirectory(lowestRemovableIndex);
-                            if (!success)
-                            {
-                                pathHelper.Append('.');
-                                pathHelper.Append('.');
-                                lowestRemovableIndex = pathHelper.Length;
-                            }
-                            numDot = 0;
-                            if (pathHelper.Length > 0)
-                                pathHelper.Append(currentChar);
-                        }
-                        else
-                        {
-                            if (Util.IsRunningOnUnix() &&
-                                index == 0 && currentChar == Path.DirectorySeparatorChar && Path.IsPathRooted(path))
-                                pathHelper.Append(currentChar);
-
-                            if (currentChar != Path.DirectorySeparatorChar || pathHelper.Length > 0)
-                                pathHelper.Append(currentChar);
-                        }
-                    }
-                }
-                if (numDot == 2)
-                {
-                    // Path contains a path of the format \..\
-                    if (!pathHelper.RemoveLastDirectory(lowestRemovableIndex))
-                    {
-                        pathHelper.Append('.');
-                        pathHelper.Append('.');
-                    }
-                }
-
-                return pathHelper.ToString();
-            });
+            string simplifiedPath = s_cachedSimplifiedPaths.GetOrAdd(path, s => SimplifyPathImpl(s));
 
             return simplifiedPath;
         }
 
         // Note: This method assumes that SimplifyPath has been called for the argument.
-        internal static unsafe void SplitStringUsingStack(string path, char separator, int* splitIndexes, int* splitLengths, ref int splitElementsUsedCount, int splitArraySize)
+        internal static unsafe void SplitStringUsingStack(string path, int* splitIndexes, int* splitLengths, ref int splitElementsUsedCount, int splitArraySize)
         {
             int lastSeparatorIndex = -1;
             int pathLength = path.Length;
@@ -382,10 +316,10 @@ namespace Sharpmake
             {
                 char currentChar = path[index];
 
-                if (currentChar == separator)
+                if (currentChar == Path.DirectorySeparatorChar)
                 {
                     if (splitElementsUsedCount == splitArraySize)
-                        throw new Exception("Too much path separators");
+                        throw new Exception($"Too much path separators in path '{path}'");
 
                     int startIndex = lastSeparatorIndex + 1;
                     int length = index - startIndex;
@@ -408,65 +342,125 @@ namespace Sharpmake
             }
         }
 
-        public static unsafe string PathGetRelative(string sourceFullPath, string destFullPath, bool ignoreCase = false)
+        /// <summary>
+        /// Return a relative version of a path from another.
+        /// </summary>
+        /// <param name="relativeTo">The path from which to compute the relative path.</param>
+        /// <param name="path">The path to make relative.</param>
+        /// <param name="ignoreCase">WARNING: this argument is never used. Whatever the value provided, case will always be ignored.</param>
+        /// <returns></returns>
+        public static unsafe string PathGetRelative(string relativeTo, string path, bool ignoreCase = false)
         {
-            sourceFullPath = SimplifyPath(sourceFullPath);
-            destFullPath = SimplifyPath(destFullPath);
+            // ------------------ THIS IS NOT CORRECT ----------------
+            // Force to always ignore case, whatever the user ask
+            // This keep the legacy Sharpmake behavior. It may be fixed at a later date to reduce modification scope.
+            ignoreCase = true;
+            // ------------------ THIS IS NOT CORRECT ----------------
 
-            int* sourcePathIndexes = stackalloc int[128];
-            int* sourcePathLengths = stackalloc int[128];
-            int sourcePathNbrElements = 0;
-            SplitStringUsingStack(sourceFullPath, Path.DirectorySeparatorChar, sourcePathIndexes, sourcePathLengths, ref sourcePathNbrElements, 128);
+            relativeTo = SimplifyPath(relativeTo);
+            path = SimplifyPath(path);
 
-            int* destPathIndexes = stackalloc int[128];
-            int* destPathLengths = stackalloc int[128];
-            int destPathNbrElements = 0;
-            SplitStringUsingStack(destFullPath, Path.DirectorySeparatorChar, destPathIndexes, destPathLengths, ref destPathNbrElements, 128);
+            // Check different root
+            var relativeToLength = relativeTo.Length;
+            var pathLength = path.Length;
+            if (relativeToLength == 0 || pathLength == 0 || !IsCharEqual(relativeTo[0], path[0], ignoreCase))
+                return path;
 
-            int samePathCounter = 0;
-
-            // Find out common path length.
-            //StringComparison comparison = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-            int maxPathLength = Math.Min(sourcePathNbrElements, destPathNbrElements);
-            for (int i = 0; i < maxPathLength; i++)
+            // Compute common part length
+            var lastCommonDirSepPosition = 0;
+            var commonPartLength = 0;
+            while (commonPartLength < relativeToLength && commonPartLength < pathLength && IsCharEqual(relativeTo[commonPartLength], path[commonPartLength], ignoreCase))
             {
-                int sourceLength = sourcePathLengths[i];
-                if (sourceLength != destPathLengths[i])
-                    break;
-
-                if (string.Compare(sourceFullPath, sourcePathIndexes[i], destFullPath, destPathIndexes[i], sourceLength, StringComparison.OrdinalIgnoreCase) != 0)
-                    break;
-
-                samePathCounter++;
+                if (relativeTo[commonPartLength] == Path.DirectorySeparatorChar)
+                    lastCommonDirSepPosition = commonPartLength;
+                ++commonPartLength;
             }
 
-            if (samePathCounter == 0)
-                return destFullPath;
+#if NET7_0_OR_GREATER
+            [Obsolete("Directly use 'char.IsAsciiLetter()' in 'IsCharEqual()' bellow (char.IsAsciiLetter() is available starting net7)")]
+#endif
+            static bool IsAsciiLetter(char c) => (uint)((c | 0x20) - 'a') <= 'z' - 'a';
+            static bool IsCharEqual(char a, char b, bool ignoreCase) => a == b || (ignoreCase && (a | 0x20) == (b | 0x20) && IsAsciiLetter(a));
 
-            if (sourcePathNbrElements == destPathNbrElements && sourcePathNbrElements == samePathCounter)
+            // Check if both paths are the same (ignoring the last directory separator if any)
+            if ((relativeToLength == commonPartLength && pathLength == commonPartLength)
+                || (relativeToLength == commonPartLength && pathLength == commonPartLength + 1 && path[commonPartLength] == Path.DirectorySeparatorChar)
+                || (pathLength == commonPartLength && relativeToLength == commonPartLength + 1 && relativeTo[commonPartLength] == Path.DirectorySeparatorChar))
+            {
                 return ".";
-
-            char* arrayPtr = stackalloc char[PathHelper.MaxPath];
-            PathHelper pathHelper = new PathHelper(arrayPtr, PathHelper.MaxPath);
-
-            for (int i = samePathCounter; i < sourcePathNbrElements; i++)
-            {
-                if (pathHelper.Length > 0)
-                    pathHelper.Append(Path.DirectorySeparatorChar);
-                pathHelper.Append('.');
-                pathHelper.Append('.');
             }
 
-            for (int i = samePathCounter; i < destPathNbrElements; i++)
+            // Adjust 'commonPartLength' in case we stopped the comparison in the middle of an entry name:
+            //   -> we went too far, we must move back 'commonPartLength' to the 'lastCommonDirSepPosition' position '+ 1'
+            //      - /abc_def and /abc_xyz
+            //      - /abc_    and /abc
+            if (commonPartLength < relativeToLength && commonPartLength < pathLength
+                || (relativeToLength == commonPartLength && path[commonPartLength] != Path.DirectorySeparatorChar)
+                || (pathLength == commonPartLength && relativeTo[commonPartLength] != Path.DirectorySeparatorChar))
             {
-                if (pathHelper.Length > 0)
-                    pathHelper.Append(Path.DirectorySeparatorChar);
-                pathHelper.Append(destFullPath, destPathIndexes[i], destPathLengths[i]);
+                commonPartLength = lastCommonDirSepPosition + 1;
             }
 
-            return pathHelper.ToString();
+            // Compute the number of ".." to add (to get out of the 'relativeTo' path)
+            var dotDotCount = 0;
+            var relativeToLengthWithoutTrailingDirSep = relativeTo[^1] == Path.DirectorySeparatorChar ? relativeToLength - 1 : relativeToLength;
+            if (relativeToLengthWithoutTrailingDirSep > commonPartLength)
+            {
+                dotDotCount = 1;
+                for (int i = commonPartLength + 1; i < relativeToLengthWithoutTrailingDirSep; i++)
+                {
+                    if (relativeTo[i] == Path.DirectorySeparatorChar)
+                        ++dotDotCount;
+                }
+            }
+
+            // Compute the length of the two parts to write
+            // - The sequences that looks like this: ".." or "../.."  or ...
+            var dotDotCountSequenceLength = dotDotCount == 0 ? 0 : dotDotCount * 2 + dotDotCount - 1;
+
+            // - The remaining from the 'path' not yet added (skip the starting directory separator if any)
+            var remainingStartPosition = commonPartLength < pathLength && path[commonPartLength] == Path.DirectorySeparatorChar ? commonPartLength + 1 : commonPartLength;
+            var remainingLength = pathLength - remainingStartPosition;
+
+            // This 'if' deviate from the standard .net behavior and is here to keep legacy Sharpmake behavior
+            // Trim last directory separator if any
+            if (remainingLength > 0 && path[^1] == Path.DirectorySeparatorChar)
+                --remainingLength;
+
+            // - The directory separator between the two parts (in case there is both dotDots and remains)
+            var needToInsertDirSepBeforeRemainingPart = dotDotCountSequenceLength > 0 && remainingLength > 0;
+
+            var finalLength =
+                  dotDotCountSequenceLength
+                + remainingLength
+                + (needToInsertDirSepBeforeRemainingPart ? 1 : 0);
+
+            // Allocate and write in the buffer
+            Span<char> arrayPtr = stackalloc char[finalLength];
+            int writePosition = 0;
+            if (dotDotCount > 0)
+            {
+                arrayPtr[writePosition++] = '.';
+                arrayPtr[writePosition++] = '.';
+                for (int i = 0; i < dotDotCount - 1; i++)
+                {
+                    arrayPtr[writePosition++] = Path.DirectorySeparatorChar;
+                    arrayPtr[writePosition++] = '.';
+                    arrayPtr[writePosition++] = '.';
+                }
+            }
+
+            if (needToInsertDirSepBeforeRemainingPart)
+                arrayPtr[writePosition++] = Path.DirectorySeparatorChar;
+
+            if (remainingLength > 0)
+            {
+                var remainAsSpan = path.AsSpan(remainingStartPosition, remainingLength);
+                remainAsSpan.CopyTo(arrayPtr.Slice(writePosition, remainingLength));
+            }
+
+            return new string(arrayPtr);
         }
-
 
         public static List<string> PathGetAbsolute(string sourceFullPath, Strings destFullPaths)
         {
@@ -479,7 +473,7 @@ namespace Sharpmake
             return result;
         }
 
-        private static ConcurrentDictionary<string, string> s_cachedCombinedToAbsolute = new ConcurrentDictionary<string, string>();
+        private static readonly ConcurrentDictionary<string, string> s_cachedCombinedToAbsolute = new ConcurrentDictionary<string, string>();
 
         public static string PathGetAbsolute(string absolutePath, string relativePath)
         {
@@ -491,14 +485,12 @@ namespace Sharpmake
                 return relativePath;
 
             string cleanRelative = SimplifyPath(relativePath);
-            if (Path.IsPathRooted(cleanRelative))
+            if (Path.IsPathFullyQualified(cleanRelative))
                 return cleanRelative;
 
             string resultPath = s_cachedCombinedToAbsolute.GetOrAdd(string.Format("{0}|{1}", absolutePath, relativePath), combined =>
             {
                 string firstPart = PathMakeStandard(absolutePath);
-                if (firstPart.Last() == Path.VolumeSeparatorChar)
-                    firstPart += Path.DirectorySeparatorChar;
 
                 string result = Path.Combine(firstPart, cleanRelative);
                 return Path.GetFullPath(result);
@@ -607,7 +599,7 @@ namespace Sharpmake
         internal static string ResolvePathAndFixCase(string root, string path)
         {
             string resolvedPath = ResolvePath(root, path);
-            return GetProperFilePathCapitalization(resolvedPath);
+            return GetCapitalizedPath(resolvedPath);
         }
 
 
@@ -648,20 +640,33 @@ namespace Sharpmake
             string properFileName = fileInfo.Name;
             if (dirInfo != null && dirInfo.Exists)
             {
-                foreach (var fsInfo in dirInfo.EnumerateFileSystemInfos())
+                // This search could fail on case sensitive filesystem. We will revert to a slower method if not found
+                bool foundFilename = false;
+                foreach (var fsInfo in dirInfo.EnumerateFiles(fileInfo.Name))
                 {
-                    if (((fsInfo.Attributes & FileAttributes.Directory) != FileAttributes.Directory)
-                        && string.Compare(fsInfo.Name, fileInfo.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                    properFileName = fsInfo.Name;
+                    foundFilename = true;
+                    break;
+                }
+
+                if (!foundFilename) 
+                {
+                    // Slow search - Normally shouldn't happen
+                    foreach (var fsInfo in dirInfo.EnumerateFileSystemInfos())
                     {
-                        properFileName = fsInfo.Name;
-                        break;
+                        if (((fsInfo.Attributes & FileAttributes.Directory) != FileAttributes.Directory)
+                            && string.Compare(fsInfo.Name, fileInfo.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                        {
+                            properFileName = fsInfo.Name;
+                            break;
+                        }
                     }
                 }
             }
             return Path.Combine(builder.ToString(), properFileName);
         }
 
-        private static ConcurrentDictionary<string, string> s_capitalizedPaths = new ConcurrentDictionary<string, string>();
+        private static readonly ConcurrentDictionary<string, string> s_capitalizedPaths = new ConcurrentDictionary<string, string>();
 
         private static void GetProperDirectoryCapitalization(DirectoryInfo dirInfo, DirectoryInfo childInfo, ref StringBuilder pathBuilder)
         {
@@ -759,6 +764,12 @@ namespace Sharpmake
             return capitalizedPath;
         }
 
+        internal static void RegisterCapitalizedPath(string physicalPath)
+        {
+            string pathLC = physicalPath.ToLower();
+            s_capitalizedPaths.TryAdd(pathLC, physicalPath);
+        }
+
         /// <summary>
         /// Returns path with drive letter in lower case.
         /// 
@@ -816,34 +827,155 @@ namespace Sharpmake
 
         public static string FindCommonRootPath(IEnumerable<string> paths)
         {
-            var pathsChunks = paths.Select(p => PathMakeStandard(p).Split(Util._pathSeparators, StringSplitOptions.RemoveEmptyEntries)).Where(p => p.Any());
+            paths = paths.Select(PathMakeStandard);
+            var pathsChunks = paths.Select(p => p.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries)).Where(p => p.Any());
+
             if (pathsChunks.Any())
             {
-                var firstPathChunks = pathsChunks.First();
-                bool foundSomeCommonChunks = false;
-                int commonPathIndex = 0;
-                do
+                var sb = new StringBuilder();
+                var isFirst = true;
+                var chunkStartIndex = 0;
+
+                // Handle fully qualified paths
+                // C#11 is currently disable until Sharpmake is fully ported to .net8
+                //var fullyQualifiedPath = paths.FirstOrDefault(p => p is ([UnixSeparator or WindowsSeparator, ..]) or ([_, ':', UnixSeparator or WindowsSeparator, ..]));
+                string fullyQualifiedPath = null;
+                foreach (var path in paths)
                 {
-                    if (firstPathChunks.Length > commonPathIndex)
+                    if (path[0] == UnixSeparator || path[0] == WindowsSeparator
+                        || (path.Length >= 3 && path[1] == ':' && (path[2] == UnixSeparator || path[2] == WindowsSeparator)))
                     {
-                        string reference = firstPathChunks[commonPathIndex];
-                        if (!pathsChunks.Any(p => !string.Equals(p.Length > commonPathIndex ? p[commonPathIndex] : string.Empty, reference, StringComparison.OrdinalIgnoreCase)))
-                        {
-                            ++commonPathIndex;
-                            foundSomeCommonChunks = true;
-                        }
-                        else
-                            break;
+                        fullyQualifiedPath = path;
+                        break;
+                    }
+                }
+
+                // If no fully qualified path is found, it remains null
+
+                if (fullyQualifiedPath is not null)
+                {
+                    if (fullyQualifiedPath[0] == Path.DirectorySeparatorChar)
+                    {
+                        sb.Append(Path.DirectorySeparatorChar);
                     }
                     else
-                        break;
-                }
-                while (true);
+                    {
+                        sb.Append(fullyQualifiedPath[0]);
+                        sb.Append(':');
+                        sb.Append(Path.DirectorySeparatorChar);
+                        chunkStartIndex++;
+                    }
 
+                    // All path should start with the same root path, else there is nothing in common
+                    var rootPath = sb.ToString();
+                    if (paths.Any(p => !p.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        return null;
+                    }
+                }
+
+                var referenceChunks = pathsChunks.First();
+                int smallestChunksCount = pathsChunks.Min(p => p.Length);
+                for (var i = chunkStartIndex; i < smallestChunksCount; ++i)
+                {
+                    var reference = referenceChunks[i];
+                    if (pathsChunks.All(p => string.Equals(p[i], reference, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        if (!isFirst)
+                            sb.Append(Path.DirectorySeparatorChar);
+                        isFirst = false;
+
+                        sb.Append(reference);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                var foundSomeCommonChunks = sb.Length != 0;
                 if (foundSomeCommonChunks)
-                    return string.Join(Path.DirectorySeparatorChar.ToString(), firstPathChunks.Take(commonPathIndex));
+                {
+                    return sb.ToString();
+                }
             }
+
             return null;
+        }
+
+        /// <summary>
+        /// Checks is pathToTest is a subfolder or file under the rootPath directory. 
+        /// </summary>
+        /// <param name="rootPath">An absolute path to a directory or a file considered as the root for the test and resolivng relative paths.
+        /// If a file path is used, the file's direct parent directory will be used.</param>
+        /// <param name="pathToTest">An absolute or relative path to a file or directory to be tested.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static bool PathIsUnderRoot(string rootPath, string pathToTest)
+        {
+            if (!Path.IsPathFullyQualified(rootPath))
+                throw new ArgumentException("rootPath needs to be absolute.", nameof(rootPath));
+
+            if (!Path.IsPathFullyQualified(pathToTest))
+                pathToTest = Path.GetFullPath(pathToTest, rootPath);
+
+            var intersection = GetPathIntersection(rootPath, pathToTest);
+
+            if (string.IsNullOrEmpty(intersection))
+                return false;
+
+            if (!Util.PathIsSame(intersection, rootPath))
+            {
+                if (rootPath.EndsWith(Path.DirectorySeparatorChar))
+                    return false;
+
+                // only way to make sure path point to file is to check on disk
+                // if file doesn't exist, treats this edge case as if path wasn't a file path
+                var fileInfo = new FileInfo(rootPath);
+                if (fileInfo.Exists && Util.PathIsSame(intersection, fileInfo.DirectoryName))
+                    return true;
+
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        ///     Removes every occurance of dotdot ("../") from the beginning of a relative path and returns it. 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string TrimAllLeadingDotDot(string path)
+        {
+            var spanStartIndex = 0;
+            ReadOnlySpan<char> trimmedSpan = path.AsSpan().Slice(start: spanStartIndex);
+            var platformSpecificDotDot = new List<string>();
+
+            foreach (var platformSeparator in _pathSeparators)
+            {
+                platformSpecificDotDot.Add(".." + platformSeparator);
+            }
+
+            var keepTrimming = true;
+            while (keepTrimming)
+            {
+                keepTrimming = false;
+
+                foreach (var dotdot in platformSpecificDotDot)
+                {
+                    if (trimmedSpan.StartsWith(dotdot))
+                    {
+                        spanStartIndex += dotdot.Length;
+                        trimmedSpan = path.AsSpan().Slice(start: spanStartIndex);
+
+                        keepTrimming = true;
+                        break;
+                    }
+                }
+            }
+
+            return trimmedSpan.ToString();
         }
     }
 }

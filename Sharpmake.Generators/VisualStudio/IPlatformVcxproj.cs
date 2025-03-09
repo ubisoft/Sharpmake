@@ -1,16 +1,5 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -65,6 +54,7 @@ namespace Sharpmake.Generators.VisualStudio
         IEnumerable<string> GetPlatformIncludePaths(IGenerationContext context);
         IEnumerable<IncludeWithPrefix> GetPlatformIncludePathsWithPrefix(IGenerationContext context);
         IEnumerable<string> GetResourceIncludePaths(IGenerationContext context);
+        IEnumerable<string> GetAssemblyIncludePaths(IGenerationContext context);
 
         IEnumerable<string> GetCxUsingPath(IGenerationContext context);
 
@@ -92,6 +82,7 @@ namespace Sharpmake.Generators.VisualStudio
         void GenerateProjectCompileVcxproj(IVcxprojGenerationContext context, IFileGenerator generator);
         void GenerateProjectLinkVcxproj(IVcxprojGenerationContext context, IFileGenerator generator);
         void GenerateProjectMasmVcxproj(IVcxprojGenerationContext context, IFileGenerator generator);
+        void GenerateProjectNasmVcxproj(IVcxprojGenerationContext context, IFileGenerator generator);
         void GenerateUserConfigurationFile(Project.Configuration conf, IFileGenerator generator); // Should take IVcxprojGenerationContext but this is called by BaseUserFile which should not know that interface.
         void GenerateRunFromPcDeployment(IVcxprojGenerationContext context, IFileGenerator generator);
 
@@ -110,6 +101,6 @@ namespace Sharpmake.Generators.VisualStudio
         IEnumerable<Tuple<string, List<Vcxproj.ProjectFile>>> GetPlatformFileLists(IVcxprojGenerationContext context);
 
         // TODO: Refactor this.
-        void SetupPlatformLibraryOptions(ref string platformLibExtension, ref string platformOutputLibExtension, ref string platformPrefixExtension);
+        void SetupPlatformLibraryOptions(out string platformLibExtension, out string platformOutputLibExtension, out string platformPrefixExtension, out string platformLibPrefix);
     }
 }
