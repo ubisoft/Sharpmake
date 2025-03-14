@@ -1227,22 +1227,33 @@ namespace Sharpmake
             // We expect folder lib/clang to contain only one subfolder which name is the clang version
             // However in some cases like MacOS, there can be both "16" and "16.0.0", the latter being a symlink.
             // In that case return the shorter one, which matches what we find on other platforms.
-            var versionFolder = DirectoryGetDirectories(libDir)
+            var versionFolders = DirectoryGetDirectories(libDir)
                                 .Select(s => Path.GetFileName(s))
                                 .Where(s => Regex.IsMatch(s, @"^\d+?(\.\d+?\.\d+?)?$", RegexOptions.Singleline | RegexOptions.CultureInvariant))
                                 .OrderBy(s => s.Length)
                                 .ToList();
 
-            if (!versionFolder.Any())
+            if (!versionFolders.Any())
                 throw new Error($"Couldn't find a version number folder for clang in {llvmInstallDir}");
 
-            if (versionFolder.Count > 1 && versionFolder[1].StartsWith(versionFolder[0] + "."))
-                versionFolder.RemoveAt(1);
+            // Consider only short version folders if any, else use longer version folders.
+            // VS2019 uses long version like "12.0.0" while VS2022 uses short version like "19".
+            // Also since VS2022 version 17.13, its possible to have more than one version in the lib/clang folder.
+            // Depending on installed VS components. Return the highest version number found.
+            var shortVersionFolders = versionFolders.Where(s => !s.Contains('.')).ToList();
+            string version;
+            if (shortVersionFolders.Any())
+            {
+                // Can't use System.Version for major version only.
+                version = shortVersionFolders.Max(v => int.Parse(v)).ToString();
+            }
+            else
+            {
+                // Use System.Version comparer to get the highest version.
+                version = versionFolders.Select(v => Version.Parse(v)).Max().ToString();
+            }
 
-            if (versionFolder.Count != 1)
-                throw new NotImplementedException($"More than one version folder found in {llvmInstallDir}, the code doesn't handle that (yet).");
-
-            return versionFolder[0];
+            return version;
         }
 
         public class VsInstallation
