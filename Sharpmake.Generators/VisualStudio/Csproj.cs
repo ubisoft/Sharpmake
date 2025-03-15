@@ -1321,6 +1321,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             GeneratedAssemblyConfigTemplate generatedAssemblyConfigTemplate = new GeneratedAssemblyConfigTemplate(project.GeneratedAssemblyConfig, isNetCoreProjectSchema, RemoveLineTag);
 
+            Write(VsProjCommon.Template.PropertyGroupStart, writer, resolver);
             using (resolver.NewScopedParameter("project", project))
             using (resolver.NewScopedParameter("guid", projectPropertyGuid))
             using (resolver.NewScopedParameter("options", options[_projectConfigurationList[0]]))
@@ -1338,6 +1339,31 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 Write(Template.Project.ProjectDescription, writer, resolver);
             }
+
+            Write(Template.Project.ConfigurationsItemBegin, writer, resolver);
+            foreach (Project.Configuration conf in _projectConfigurationList)
+            {
+                using (resolver.NewScopedParameter("conf", conf))
+                {
+                    Write(Template.Project.ConfigurationsItemEntry, writer, resolver);
+                }
+            }
+            Write(Template.Project.ConfigurationsItemEnd, writer, resolver);
+
+            Write(Template.Project.PlatformsItemBegin, writer, resolver);
+            HashSet<string> addedPlatform = new HashSet<string>();
+            foreach (Project.Configuration conf in _projectConfigurationList)
+            {
+                if (addedPlatform.Add(Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
+                {
+                    using (resolver.NewScopedParameter("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
+                    {
+                        Write(Template.Project.PlatformsItemEntry, writer, resolver);
+                    }
+                }
+            }
+            Write(Template.Project.PlatformsItemEnd, writer, resolver);
+            Write(VsProjCommon.Template.PropertyGroupEnd, writer, resolver);
 
             if (!string.IsNullOrEmpty(project.ApplicationIcon))
             {
