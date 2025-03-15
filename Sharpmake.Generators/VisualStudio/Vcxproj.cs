@@ -1058,7 +1058,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             if (context.Builder.Diagnostics
                 && context.Project.AllowInconsistentDependencies == false
-                && context.ProjectConfigurations.Any(c => ConfigurationNeedReferences(c)))
+                && (context.ProjectConfigurations.Any(c => ConfigurationNeedReferences(c)) || context.Project.ForceReferencesExport))
             {
                 CheckReferenceDependenciesConsistency(context);
             }
@@ -1067,7 +1067,7 @@ namespace Sharpmake.Generators.VisualStudio
                 ? context.ProjectConfigurations.Any(c => ConfigurationNeedReferences(c))
                 : ConfigurationNeedReferences(firstConf);
 
-            if (addDependencies)
+            if (addDependencies || context.Project.ForceReferencesExport)
             {
                 var dependencies = new UniqueList<ProjectDependencyInfo>();
                 foreach (var configuration in context.ProjectConfigurations)
