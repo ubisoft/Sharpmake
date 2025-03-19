@@ -339,6 +339,8 @@ namespace Sharpmake.Generators.Apple
             options["CustomDirectory"] = Options.PathOption.Get<Options.XCode.Scheme.CustomWorkingDirectory>(activeConfiguration);
             var useCustomDirectory = options["CustomDirectory"] != RemoveLineTag ? "YES" : "NO";
 
+            options["CustomLLDBInitFile"] = Options.PathOption.Get<Options.XCode.Scheme.CustomLLDBInitFile>(activeConfiguration);
+
             string targetName = $"&quot;{activeConfiguration.Target.Name}&quot;";
             string buildImplicitDependencies = activeConfiguration.IsFastBuild ? "NO" : "YES";
             bool useBuildableProductRunnableSection = true;

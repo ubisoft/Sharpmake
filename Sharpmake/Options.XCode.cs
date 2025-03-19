@@ -1265,6 +1265,15 @@ namespace Sharpmake
                     }
                 }
 
+                /// <summary>
+                /// This option can be used to set a custom working directory
+                /// </summary>
+                public class CustomLLDBInitFile : PathOption
+                {
+                    public CustomLLDBInitFile(string path) : base(path)
+                    {
+                    }
+                }
             }
         }
     }
