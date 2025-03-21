@@ -40,7 +40,6 @@ namespace Sharpmake.Application
 
         #region Log
 
-        private static DateTime s_startTime = DateTime.Now;
         public static bool DebugEnable = false;
         private static int s_errorCount = 0;
         private static int s_warningCount = 0;
@@ -56,7 +55,7 @@ namespace Sharpmake.Application
 
             if (DebugEnable)
             {
-                TimeSpan span = DateTime.Now - s_startTime;
+                TimeSpan span = DateTime.Now - Util.ProgramStartTime;
                 prefix = string.Format("[{0:00}:{1:00}] ", span.Minutes, span.Seconds);
                 message = prefix + message;
             }
@@ -492,7 +491,7 @@ namespace Sharpmake.Application
                 }
             }
 
-            LogWriteLine("  time: {0:0.00} sec.", (DateTime.Now - s_startTime).TotalSeconds);
+            LogWriteLine("  time: {0:0.00} sec.", (DateTime.Now - Util.ProgramStartTime).TotalSeconds);
             LogWriteLine("  completed on {0}.", DateTime.Now);
 
             if (generateDebugSolution)
