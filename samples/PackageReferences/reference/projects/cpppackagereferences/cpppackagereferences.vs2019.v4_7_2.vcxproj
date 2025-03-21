@@ -233,10 +233,10 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="$(SolutionDir)\packages\gtest-vc140-static-64.1.1.0\build\gtest-vc140-static-64.targets" Condition="Exists('$(SolutionDir)\packages\gtest-vc140-static-64.1.1.0\build\gtest-vc140-static-64.targets')" />
     <Import Project="$(SolutionDir)\packages\gtest-vc140-static-64.1.1.0\build\native\gtest-vc140-static-64.targets" Condition="Exists('$(SolutionDir)\packages\gtest-vc140-static-64.1.1.0\build\native\gtest-vc140-static-64.targets')" />
+    <Import Project="$(SolutionDir)\packages\gtest-vc140-static-64.1.1.0\build\gtest-vc140-static-64.targets" Condition="!Exists('$(SolutionDir)\packages\gtest-vc140-static-64.1.1.0\build\native\gtest-vc140-static-64.targets') and Exists('$(SolutionDir)\packages\gtest-vc140-static-64.1.1.0\build\gtest-vc140-static-64.targets')" />
   </ImportGroup>
-  <Target Name="name" BeforeTargets="PrepareForBuild">
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
   <PropertyGroup>
     <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
   </PropertyGroup>

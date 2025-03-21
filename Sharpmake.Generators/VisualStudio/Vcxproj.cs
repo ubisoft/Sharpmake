@@ -370,6 +370,10 @@ namespace Sharpmake.Generators.VisualStudio
                 fileGenerator.Write(Template.Project.ProjectBegin);
             }
 
+            var firstConf = context.ProjectConfigurations.First();
+
+            NuGet nuGet = new NuGet(context.Project.NuGetReferenceType);
+
             VsProjCommon.WriteCustomProperties(context.Project.CustomProperties, fileGenerator);
 
             foreach (var platformVcxproj in context.PresentPlatforms.Values)
@@ -387,7 +391,7 @@ namespace Sharpmake.Generators.VisualStudio
                     hasNonFastBuildConfig = true;
             }
 
-            var firstConf = context.ProjectConfigurations.First();
+       
 
             //checking only the first one, having one with CLR support and others without would be an error
             bool clrSupport = Util.IsDotNet(firstConf);
@@ -642,7 +646,7 @@ namespace Sharpmake.Generators.VisualStudio
             else if (hasFastBuildConfig)
                 GenerateBffFilesSection(context, fileGenerator);
 
-            // Generate and add reference to packages.config file for project
+            // Generate and add reference to packages.config file for project (if using packages.config mode)
             if (firstConf.ReferencesByNuGetPackage.Count > 0)
             {
                 if (hasFastBuildConfig)
@@ -650,15 +654,7 @@ namespace Sharpmake.Generators.VisualStudio
                     throw new NotImplementedException("Nuget packages in c++ is not currently supported by FastBuild");
                 }
 
-                var packagesConfig = new PackagesConfig();
-                packagesConfig.Generate(context.Builder, firstConf, "native", context.ProjectDirectory, generatedFiles, skipFiles);
-                if (packagesConfig.IsGenerated)
-                {
-                    fileGenerator.Write(Template.Project.ProjectFilesBegin);
-                    using (fileGenerator.Declare("file", new ProjectFile(context, Util.SimplifyPath(packagesConfig.PackagesConfigPath))))
-                        fileGenerator.Write(Template.Project.ProjectFilesNone);
-                    fileGenerator.Write(Template.Project.ProjectFilesEnd);
-                }
+                nuGet.TryGeneratePackagesConfig(firstConf, context, fileGenerator, generatedFiles, skipFiles);
             }
 
             // Import platform makefiles.
@@ -666,84 +662,73 @@ namespace Sharpmake.Generators.VisualStudio
                 platform.GenerateMakefileConfigurationVcxproj(context, fileGenerator);
 
             // .targets files
-            fileGenerator.Write(Template.Project.ProjectTargetsBegin);
-            if (context.Project.ContainsASM)
             {
-                fileGenerator.Write(Template.Project.ProjectMasmTargetsItem);
-            }
-            if (context.Project.ContainsNASM)
-            {
-                if (context.Project.NasmExePath.Length == 0)
+                fileGenerator.Write(Template.Project.ProjectTargetsBegin);
+                if (context.Project.ContainsASM)
                 {
-                    throw new ArgumentNullException("NasmExePath not set and needed for NASM assembly files.");
+                    fileGenerator.Write(Template.Project.ProjectMasmTargetsItem);
                 }
-                using (fileGenerator.Declare("importedNasmTargetsFile", context.Project.NasmTargetsFile))
+                if (context.Project.ContainsNASM)
                 {
-                    fileGenerator.Write(Template.Project.ProjectNasmTargetsItem);
-                }
-            }
-
-            foreach (string targetsFiles in context.Project.CustomTargetsFiles)
-            {
-                string capitalizedFile = Project.GetCapitalizedFile(targetsFiles) ?? targetsFiles;
-
-                string relativeFile = Util.PathGetRelative(context.ProjectDirectoryCapitalized, capitalizedFile);
-                using (fileGenerator.Declare("importedTargetsFile", relativeFile))
-                {
-                    fileGenerator.Write(Template.Project.ProjectTargetsItem);
-                }
-            }
-
-            // configuration .targets files
-            foreach (Project.Configuration conf in context.ProjectConfigurations)
-            {
-                using (fileGenerator.Declare("platformName", Util.GetToolchainPlatformString(conf.Platform, conf.Project, conf.Target)))
-                using (fileGenerator.Declare("conf", conf))
-                {
-                    foreach (string targetsFile in conf.CustomTargetsFiles)
+                    if (context.Project.NasmExePath.Length == 0)
                     {
-                        string capitalizedFile = Project.GetCapitalizedFile(targetsFile) ?? targetsFile;
+                        throw new ArgumentNullException("NasmExePath not set and needed for NASM assembly files.");
+                    }
+                    using (fileGenerator.Declare("importedNasmTargetsFile", context.Project.NasmTargetsFile))
+                    {
+                        fileGenerator.Write(Template.Project.ProjectNasmTargetsItem);
+                    }
+                }
 
-                        string relativeFile = Util.PathGetRelative(context.ProjectDirectoryCapitalized, capitalizedFile);
-                        using (fileGenerator.Declare("importedTargetsFile", relativeFile))
+                foreach (string targetsFiles in context.Project.CustomTargetsFiles)
+                {
+                    string capitalizedFile = Project.GetCapitalizedFile(targetsFiles) ?? targetsFiles;
+
+                    string relativeFile = Util.PathGetRelative(context.ProjectDirectoryCapitalized, capitalizedFile);
+                    using (fileGenerator.Declare("importedTargetsFile", relativeFile))
+                    {
+                        fileGenerator.Write(Template.Project.ProjectTargetsItem);
+                    }
+                }
+
+                // configuration .targets files
+                foreach (Project.Configuration conf in context.ProjectConfigurations)
+                {
+                    using (fileGenerator.Declare("platformName", Util.GetToolchainPlatformString(conf.Platform, conf.Project, conf.Target)))
+                    using (fileGenerator.Declare("conf", conf))
+                    {
+                        foreach (string targetsFile in conf.CustomTargetsFiles)
                         {
-                            fileGenerator.Write(Template.Project.ProjectConfigurationImportedTargets);
+                            string capitalizedFile = Project.GetCapitalizedFile(targetsFile) ?? targetsFile;
+
+                            string relativeFile = Util.PathGetRelative(context.ProjectDirectoryCapitalized, capitalizedFile);
+                            using (fileGenerator.Declare("importedTargetsFile", relativeFile))
+                            {
+                                fileGenerator.Write(Template.Project.ProjectConfigurationImportedTargets);
+                            }
                         }
                     }
                 }
-            }
 
-            // add imports to nuget packages
-            foreach (var package in firstConf.ReferencesByNuGetPackage)
-            {
-                fileGenerator.WriteVerbatim(package.Resolve(fileGenerator.Resolver, Template.Project.ProjectTargetsNugetReferenceImport));
-            }
-            fileGenerator.Write(Template.Project.ProjectTargetsEnd);
+                // add .targets files imported from nuget packages (if using packages.config mode)
+                nuGet.TryGenerateImport(NuGet.ImportFileExtension.Targets, firstConf, fileGenerator);
 
-            // add error checks for nuget package targets files
+                fileGenerator.Write(Template.Project.ProjectTargetsEnd);
+            } // .targets files done
+
+            // add error checks for nuget package targets files (if using packages.config mode)
             if (firstConf.ReferencesByNuGetPackage.Count > 0)
             {
-                using (fileGenerator.Declare("targetName", "EnsureNuGetPackageBuildImports"))
-                using (fileGenerator.Declare("beforeTargets", "PrepareForBuild"))
-                {
-                    fileGenerator.Write(Template.Project.ProjectCustomTargetsBegin);
-                }
-
-                fileGenerator.Write(Template.Project.PropertyGroupStart);
-                using (fileGenerator.Declare("custompropertyname", "ErrorText"))
-                using (fileGenerator.Declare("custompropertyvalue", "This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}."))
-                {
-                    fileGenerator.Write(Template.Project.CustomProperty);
-                }
-                fileGenerator.Write(Template.Project.PropertyGroupEnd);
-
-                foreach (var package in firstConf.ReferencesByNuGetPackage)
-                {
-                    fileGenerator.WriteVerbatim(package.Resolve(fileGenerator.Resolver, Template.Project.ProjectTargetsNugetReferenceError));
-                }
-
-                fileGenerator.Write(Template.Project.ProjectCustomTargetsEnd);
+                nuGet.TryGenerateImportErrorCheck(NuGet.ImportFileExtension.Targets, firstConf, fileGenerator);
             }
+
+
+            // Instead trying add nuget package reference in modern way (if using PackageReference mode)
+            if (firstConf.ReferencesByNuGetPackage.Count > 0)
+            {
+                nuGet.TryGeneratePackageReferences(firstConf, fileGenerator);
+            }
+
 
             // in case we are using fast build we do not want to write most dependencies
             // in the vcxproj because they are handled internally in the bff.
@@ -2037,6 +2022,141 @@ namespace Sharpmake.Generators.VisualStudio
                     skipFiles.Add(copyDependenciesFileInfo.FullName);
             }
         }
+
+
+        private class NuGet
+        {
+            public enum ImportFileExtension
+            {
+                Targets,
+                Props,
+            }
+
+            private static string ToString(ImportFileExtension fileExt) => fileExt switch
+            {
+                ImportFileExtension.Targets => "targets",
+                ImportFileExtension.Props   => "props",
+                _ => throw new ArgumentOutOfRangeException(nameof(fileExt), fileExt, null)
+            };
+
+            private Project.NuGetPackageMode NuGetReferenceType { get; set; }
+
+            // VersionDefault fallback to packages,config (for now)
+            private bool shouldUsePackagesConfig => NuGetReferenceType == Project.NuGetPackageMode.PackageConfig
+                                                 || (NuGetReferenceType == Project.NuGetPackageMode.VersionDefault);
+
+            public NuGet(Project.NuGetPackageMode mode = Project.NuGetPackageMode.VersionDefault)
+            {
+                if (NuGetReferenceType == Project.NuGetPackageMode.ProjectJson)
+                {
+                    throw new NotImplementedException($"NuGet Package reference by {NuGetReferenceType.ToString()} files is not implemented for vcxproj");
+                }
+
+                NuGetReferenceType = mode;
+            }
+
+            #region For packages.config
+
+            // packages.config: old default implementation for vcxproj
+            // (yet it's still a broken implementation as it only handles .target files, and
+            //  TODO: 1. .props files are not considered (and they must be put at the beginning of vcxproj)
+            //  TODO: 2. other than build/ and build/native folder, irregular paths to .targets and .props files could not be access correctly
+            // )
+            public void TryGeneratePackagesConfig(
+                Project.Configuration firstConfiguration,
+                IVcxprojGenerationContext context,
+                IFileGenerator fileGenerator,
+                IList<string> generatedFiles,
+                IList<string> skipFiles)
+            {
+                if (!shouldUsePackagesConfig)
+                    return;
+
+                var packagesConfig = new PackagesConfig();
+                packagesConfig.Generate(context.Builder, firstConfiguration, "native", context.ProjectDirectory, generatedFiles, skipFiles);
+                if (packagesConfig.IsGenerated)
+                {
+                    fileGenerator.Write(Template.Project.ProjectFilesBegin);
+                    using (fileGenerator.Declare("file", new ProjectFile(context, Util.SimplifyPath(packagesConfig.PackagesConfigPath))))
+                        fileGenerator.Write(Template.Project.ProjectFilesNone);
+                    fileGenerator.Write(Template.Project.ProjectFilesEnd);
+                }
+            }
+
+            public void TryGenerateImport(ImportFileExtension fileExtension, Project.Configuration firstConfiguration, IFileGenerator fileGenerator)
+            {
+                if (!shouldUsePackagesConfig)
+                    return;
+
+                foreach (var package in firstConfiguration.ReferencesByNuGetPackage)
+                {
+                    using (fileGenerator.Declare("fileExtension", ToString(fileExtension)))
+                    {
+                        fileGenerator.WriteVerbatim(package.Resolve(fileGenerator.Resolver, Template.Project.ProjectNugetReferenceImport));
+                    }
+                }
+            }
+
+            public void TryGenerateImportErrorCheck(ImportFileExtension fileExtension, Project.Configuration firstConfiguration, IFileGenerator fileGenerator)
+            {
+                if (!shouldUsePackagesConfig)
+                    return;
+
+                using (fileGenerator.Declare("targetName", "EnsureNuGetPackageBuildImports"))
+                using (fileGenerator.Declare("beforeTargets", "PrepareForBuild"))
+                {
+                    fileGenerator.Write(Template.Project.ProjectCustomTargetsBegin);
+                }
+
+                fileGenerator.Write(Template.Project.PropertyGroupStart);
+                using (fileGenerator.Declare("custompropertyname", "ErrorText"))
+                using (fileGenerator.Declare("custompropertyvalue", "This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}."))
+                {
+                    fileGenerator.Write(Template.Project.CustomProperty);
+                }
+                fileGenerator.Write(Template.Project.PropertyGroupEnd);
+
+                foreach (var package in firstConfiguration.ReferencesByNuGetPackage)
+                {
+                    using (fileGenerator.Declare("fileExtension", ToString(fileExtension)))
+                    {
+                        fileGenerator.WriteVerbatim(package.Resolve(fileGenerator.Resolver, Template.Project.ProjectNugetReferenceError));
+                    }
+                }
+
+                fileGenerator.Write(Template.Project.ProjectCustomTargetsEnd);
+            }
+            #endregion
+
+            #region For PackageReference
+            public void TryGeneratePackageReferences( 
+                Project.Configuration firstConfiguration, 
+                IFileGenerator fileGenerator)
+            {
+                var devenv = firstConfiguration.Target.GetFragment<DevEnv>();
+
+                // package reference: by hacking in vs2017+
+                // only if manually chosen (for now)
+                if (NuGetReferenceType == Project.NuGetPackageMode.PackageReference && devenv >= DevEnv.vs2017)
+                {
+                    if (devenv < DevEnv.vs2017)
+                        throw new Error("Package references are not supported on Visual Studio versions below vs2017");
+
+                    var resolver = new Resolver();
+                    fileGenerator.Write(Template.Project.ItemGroupBegin);
+                    foreach (var package in firstConfiguration.ReferencesByNuGetPackage)
+                    {
+                        fileGenerator.WriteVerbatim(package.Resolve(resolver));
+                    }
+                    fileGenerator.Write(Template.Project.ItemGroupEnd);
+
+                    // TODO: remove packages.config file if existed ?
+                }
+            }
+            #endregion
+
+        }
+
 
         public class ProjectFile
         {
