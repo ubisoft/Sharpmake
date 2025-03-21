@@ -25,6 +25,8 @@ namespace Sharpmake
 {
     public static partial class Util
     {
+        public static DateTime ProgramStartTime { get; } = DateTime.Now;
+
         public const string DoubleQuotes = @"""";
         public const string EscapedDoubleQuotes = @"\""";
 
@@ -518,6 +520,18 @@ namespace Sharpmake
                         {
                             if (!FilesToBeExplicitlyRemovedFromDB.Contains(filenameDate.Key))
                             {
+                                // Exclude files that were modified since the beginning of the current Sharpmake run.
+                                // This should avoid regressions when a generated file is not added to cleanup database anymore.
+                                // Example: replacing a call to Util.FileWriteIfDifferent() with File.WriteAll()
+                                // From the previous run, Util.FileWriteIfDifferent() added the file in the cleanup database.
+                                // In the new run, File.WriteAll() wrote the file, but the cleanup system would want to delete it.
+                                if (File.GetLastWriteTime(filenameDate.Key) >= ProgramStartTime)
+                                {
+                                    LogWrite(@"Skip deleting old file (updated during this run): {0}", filenameDate.Key);
+                                    newDbFiles.Add(filenameDate.Key, filenameDate.Value);
+                                    continue;
+                                }
+
                                 LogWrite(@"Deleting old file: {0}", filenameDate.Key);
                                 if (!TryDeleteFile(filenameDate.Key))
                                 {
