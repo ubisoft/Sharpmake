@@ -569,7 +569,7 @@ namespace Sharpmake.Generators.VisualStudio
                         category = solutionConfiguration.PlatformName;
                     }
 
-                    if (containsMultiDotNetFramework && includedProject.Project is CSharpProject)
+                    if (containsMultiDotNetFramework && includedProject?.Project is CSharpProject)
                     {
                         if (multiDotNetFrameworkConfigurationNames.Contains(configurationName))
                             continue;
