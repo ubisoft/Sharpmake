@@ -966,8 +966,10 @@ namespace Sharpmake
                 Options.Option(Options.XCode.Compiler.LibraryStandard.LibCxx, () => { options["StdLib"] = "libc++"; cmdLineOptions["StdLib"] = "-stdlib=libc++"; })
             );
 
-            var frameworkPaths = conf.XcodeSystemFrameworkPaths;
+            OrderableStrings frameworkPaths = new OrderableStrings(conf.XcodeSystemFrameworkPaths);
+            frameworkPaths.AddRange(conf.XcodeDependenciesSystemFrameworkPaths);
             frameworkPaths.AddRange(conf.XcodeFrameworkPaths);
+            frameworkPaths.AddRange(conf.XcodeDependenciesFrameworkPaths);
             XCodeUtil.ResolveProjectPaths(project, frameworkPaths);
             options["FrameworkPaths"] = XCodeUtil.XCodeFormatList(frameworkPaths, 4);
 
