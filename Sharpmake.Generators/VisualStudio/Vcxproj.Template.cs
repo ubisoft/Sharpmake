@@ -253,31 +253,31 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
                 public static string ProjectFilesHeader =
-                @"    <ClInclude Include=""[file.FileNameProjectRelative]"" />
+                @"    <ClInclude Include=""[file.FilePath]"" />
 ";
 
                 public static string ProjectFilesNatvis =
-                @"    <Natvis Include=""[file.FileNameProjectRelative]"" />
+                @"    <Natvis Include=""[file.FilePath]"" />
 ";
 
                 public static string ProjectFilesSourceBegin =
-                @"    <ClCompile Include=""[file.FileNameProjectRelative]""";
+                @"    <ClCompile Include=""[file.FilePath]""";
 
                 public static string ProjectFilesResourceBegin =
-                @"    <ResourceCompile Include=""[file.FileNameProjectRelative]""";
+                @"    <ResourceCompile Include=""[file.FilePath]""";
 
                 public static string ProjectFilesPRIResources =
-                @"    <PRIResource Include=""[file.FileNameProjectRelative]"">
+                @"    <PRIResource Include=""[file.FilePath]"">
       <FileType>Document</FileType>
     </PRIResource>
 ";
 
                 public static string ProjectFilesNone =
-                @"    <None Include=""[file.FileNameProjectRelative]"" />
+                @"    <None Include=""[file.FilePath]"" />
 ";
 
                 public static string ProjectFilesCustomSourceBegin =
-                @"    <[type] Include=""[file.FileNameProjectRelative]""";
+                @"    <[type] Include=""[file.FilePath]""";
 
 
                 public static string ProjectFilesResourceEnd =
@@ -465,11 +465,11 @@ namespace Sharpmake.Generators.VisualStudio
 @"</Project>";
 
                     public static string FileNoFilter =
-@"    <[type] Include=""[file.FileNameProjectRelative]"" />
+@"    <[type] Include=""[file.FilePath]"" />
 ";
 
                     public static string FileWithFilter =
-@"    <[type] Include=""[file.FileNameProjectRelative]"">
+@"    <[type] Include=""[file.FilePath]"">
       <Filter>[file.FilterPath]</Filter>
     </[type]>
 ";
