@@ -2161,6 +2161,7 @@ namespace Sharpmake.Generators.VisualStudio
         public class ProjectFile
         {
             public string FileName;
+            public string FilePath;
             public string FileNameSourceRelative;
             public string FileNameProjectRelative;
             public string FileNameWithoutExtension;
@@ -2173,6 +2174,8 @@ namespace Sharpmake.Generators.VisualStudio
 
                 FileNameProjectRelative = Util.PathGetRelative(context.ProjectDirectoryCapitalized, FileName, true);
                 FileNameSourceRelative = Util.PathGetRelative(context.ProjectSourceCapitalized, FileName, true);
+
+                FilePath = context.Configuration?.PreferRelativePaths == false ? Path.GetFullPath(fileName) : FileNameProjectRelative;
 
                 FileExtension = Path.GetExtension(FileName);
                 FileNameWithoutExtension = Path.GetFileNameWithoutExtension(FileName);
