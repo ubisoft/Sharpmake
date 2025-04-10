@@ -3367,7 +3367,7 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.CSharp.DebugType.Pdbonly, () => { options["DebugType"] = "pdbonly"; }),
             Options.Option(Options.CSharp.DebugType.Portable, () => { options["DebugType"] = "portable"; }),
             Options.Option(Options.CSharp.DebugType.Embedded, () => { options["DebugType"] = "embedded"; }),
-            Options.Option(Options.CSharp.DebugType.None, () => { options["DebugType"] = RemoveLineTag; })
+            Options.Option(Options.CSharp.DebugType.None, () => { options["DebugType"] = "none"; })
             );
 
             SelectOption
