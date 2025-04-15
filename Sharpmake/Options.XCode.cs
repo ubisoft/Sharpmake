@@ -846,6 +846,13 @@ namespace Sharpmake
                     [Default]
                     Enable
                 }
+
+                public enum UseHeaderMap
+                {
+                    [Default]
+                    Disable,
+                    Enable
+                }
             }
 
             /// <summary>
