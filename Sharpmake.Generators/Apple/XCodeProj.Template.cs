@@ -477,6 +477,7 @@ namespace Sharpmake.Generators.Apple
 				SDKROOT = ""[item.Options.SDKRoot]"";
 				TARGETED_DEVICE_FAMILY = ""[item.Options.TargetedDeviceFamily]"";
 				SWIFT_VERSION = [item.Options.SwiftVersion];
+				USE_HEADERMAP = [item.Options.UseHeaderMap];
 			};
 			name = [item.Options.TargetName];
 		};

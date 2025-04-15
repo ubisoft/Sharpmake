@@ -1218,6 +1218,11 @@ namespace Sharpmake
                 Options.Option(Options.XCode.Compiler.MetalFastMath.Enable, () => options["MetalFastMath"] = "YES")
             );
 
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.UseHeaderMap.Disable, () => options["UseHeaderMap"] = "NO"),
+                Options.Option(Options.XCode.Compiler.UseHeaderMap.Enable, () => options["UseHeaderMap"] = "YES")
+            );
+
             #region infoplist keys
             /// common keys
             options["CFBundleSpokenName"] = Options.StringOption.Get<Options.XCode.InfoPlist.CFBundleSpokenName>(conf);
