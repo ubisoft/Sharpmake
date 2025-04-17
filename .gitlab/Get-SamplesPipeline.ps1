@@ -93,6 +93,9 @@ foreach ($sample in $samplesDef.Samples)
 
                     # Merge sample properties into a single hash table.
                     $sampleJob = $osProperties + @{
+                        rules = @(
+                            @{ if = '$CI_PIPELINE_SOURCE == "parent_pipeline"' }
+                        )
                         artifacts = [PSCustomObject]@{
                             when = 'on_failure'
                             untracked = $true
