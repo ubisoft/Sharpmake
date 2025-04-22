@@ -71,11 +71,13 @@ Settings
 @"    #import TMP
     #import TEMP
     #import USERPROFILE
+    #import COMSPEC
     .Environment =
     {
         ""TMP=$TMP$"",
         ""TEMP=$TEMP$"",
         ""USERPROFILE=$USERPROFILE$"",
+        ""COMSPEC=$COMSPEC$"",
         ""SystemRoot=[fastBuildSystemRoot]""
         ""PATH=[fastBuildPATH]""
 [envAdditionalVariables]
