@@ -40,16 +40,19 @@ namespace Sharpmake
 
                 string sharpmakeDllPath;
                 string sharpmakeGeneratorDllPath;
-                GetSharpmakeLocalDlls(out sharpmakeDllPath, out sharpmakeGeneratorDllPath);
+                string sharpmakeCommonPlatformsDllPath;
+                GetSharpmakeLocalDlls(out sharpmakeDllPath, out sharpmakeGeneratorDllPath, out sharpmakeCommonPlatformsDllPath);
 
                 conf.ReferencesByPath.Add(sharpmakeDllPath);
                 conf.ReferencesByPath.Add(sharpmakeGeneratorDllPath);
+                conf.ReferencesByPath.Add(sharpmakeCommonPlatformsDllPath);
             }
 
-            protected static void GetSharpmakeLocalDlls(out string sharpmakeDllPath, out string sharpmakeGeneratorDllPath)
+            protected static void GetSharpmakeLocalDlls(out string sharpmakeDllPath, out string sharpmakeGeneratorDllPath, out string sharpmakeCommonPlatformsDllPath)
             {
                 sharpmakeDllPath = Assembly.GetExecutingAssembly().Location;
                 sharpmakeGeneratorDllPath = Assembly.Load("Sharpmake.Generators")?.Location;
+                sharpmakeCommonPlatformsDllPath = Assembly.Load("Sharpmake.CommonPlatforms")?.Location;
             }
 
             public virtual void AddReferences(Project.Configuration conf, IEnumerable<string> additionalReferences = null)
