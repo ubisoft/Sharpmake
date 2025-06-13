@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 
 namespace Sharpmake
 {
@@ -18,17 +19,19 @@ namespace Sharpmake
         [DebuggerDisplay("{Name} {Version}")]
         public class PackageReference : IResolverHelper, IComparable<PackageReference>
         {
-            internal PackageReference(string name, string version, string dotNetHint, AssetsDependency privateAssets, string referenceType)
+            internal PackageReference(string name, string version, string dotNetHint, AssetsDependency includeAssets, AssetsDependency excludeAssets, AssetsDependency privateAssets, string referenceType)
             {
                 Name = name;
                 Version = version;
                 DotNetHint = dotNetHint;
+                IncludeAssets = includeAssets;
+                ExcludeAssets = excludeAssets;
                 PrivateAssets = privateAssets;
                 ReferenceType = referenceType;
             }
 
-            internal PackageReference(string name, string version, string dotNetHint, AssetsDependency privateAssets)
-                : this(name, version, dotNetHint, privateAssets, null)
+            internal PackageReference(string name, string version, string dotNetHint, AssetsDependency includeAssets, AssetsDependency excludeAssets, AssetsDependency privateAssets)
+                : this(name, version, dotNetHint, includeAssets, excludeAssets, privateAssets, null)
             {
             }
 
@@ -37,6 +40,10 @@ namespace Sharpmake
             public string DotNetHint { get; internal set; }
             public string ReferenceType { get; internal set; }
 
+            public AssetsDependency IncludeAssets { get; internal set; }
+
+            public AssetsDependency ExcludeAssets { get; internal set; }
+
             public AssetsDependency PrivateAssets { get; internal set; }
 
             public string Resolve(Resolver resolver)
@@ -44,14 +51,34 @@ namespace Sharpmake
                 using (resolver.NewScopedParameter("packageName", Name))
                 using (resolver.NewScopedParameter("packageVersion", Version))
                 {
-                    if (PrivateAssets == DefaultPrivateAssets)
+                    if (IncludeAssets == DefaultIncludeAssets && ExcludeAssets == DefaultExcludeAssets && PrivateAssets == DefaultPrivateAssets)
                     {
                         return resolver.Resolve($"{TemplateBeginPackageReference} />\n");
                     }
                     else
                     {
-                        using (resolver.NewScopedParameter("privateAssets", string.Join(";", GetFormatedAssetsDependency(PrivateAssets))))
-                            return resolver.Resolve($"{TemplateBeginPackageReference}>\n{TemplatePackagePrivateAssets}{TemplateEndPackageReference}");
+                        var resolvedPackageReference = new StringBuilder();
+                        resolvedPackageReference.AppendLine(resolver.Resolve($"{TemplateBeginPackageReference}>"));
+                        if (IncludeAssets != DefaultIncludeAssets)
+                        {
+                            using (resolver.NewScopedParameter("includeAssets", string.Join(";", GetFormatedAssetsDependency(IncludeAssets))))
+                                resolvedPackageReference.Append(resolver.Resolve(TemplatePackageIncludeAssets));
+                        }
+
+                        if (ExcludeAssets != DefaultExcludeAssets)
+                        {
+                            using (resolver.NewScopedParameter("excludeAssets", string.Join(";", GetFormatedAssetsDependency(ExcludeAssets))))
+                                resolvedPackageReference.Append(resolver.Resolve(TemplatePackageExcludeAssets));
+                        }
+
+                        if (PrivateAssets != DefaultPrivateAssets)
+                        {
+                            using (resolver.NewScopedParameter("privateAssets", string.Join(";", GetFormatedAssetsDependency(PrivateAssets))))
+                                resolvedPackageReference.Append(resolver.Resolve(TemplatePackagePrivateAssets));
+                        }
+
+                        resolvedPackageReference.Append(resolver.Resolve(TemplateEndPackageReference));
+                        return resolvedPackageReference.ToString();
                     }
                 }
             }
@@ -80,6 +107,12 @@ namespace Sharpmake
                 var referenceTypeComparison = string.Compare(ReferenceType, other.ReferenceType, StringComparison.OrdinalIgnoreCase);
                 if (referenceTypeComparison != 0)
                     return referenceTypeComparison;
+                var includeAssetsComparison = string.Compare(string.Join(",", GetFormatedAssetsDependency(IncludeAssets)), string.Join(",", GetFormatedAssetsDependency(other.IncludeAssets)), StringComparison.OrdinalIgnoreCase);
+                if (includeAssetsComparison != 0)
+                    return includeAssetsComparison;
+                var excludeAssetsComparison = string.Compare(string.Join(",", GetFormatedAssetsDependency(ExcludeAssets)), string.Join(",", GetFormatedAssetsDependency(other.ExcludeAssets)), StringComparison.OrdinalIgnoreCase);
+                if (excludeAssetsComparison != 0)
+                    return excludeAssetsComparison;
                 return string.Compare(string.Join(",", GetFormatedAssetsDependency(PrivateAssets)), string.Join(",", GetFormatedAssetsDependency(other.PrivateAssets)), StringComparison.OrdinalIgnoreCase);
             }
 
@@ -143,11 +176,16 @@ namespace Sharpmake
 
         public void Add(string packageName, string version, string dotNetHint = null, AssetsDependency privateAssets = DefaultPrivateAssets, string referenceType = null)
         {
+            Add(packageName, version, dotNetHint, DefaultIncludeAssets, DefaultExcludeAssets, privateAssets, referenceType);
+        }
+
+        public void Add(string packageName, string version, string dotNetHint, AssetsDependency includeAssets, AssetsDependency excludeAssets, AssetsDependency privateAssets, string referenceType = null)
+        {
             // check package unicity
             var existingPackage = _packageReferences.FirstOrDefault(pr => pr.Name == packageName);
             if (existingPackage == null)
             {
-                _packageReferences.Add(new PackageReference(packageName, version, null, privateAssets, referenceType));
+                _packageReferences.Add(new PackageReference(packageName, version, null, includeAssets, excludeAssets, privateAssets, referenceType));
                 return;
             }
 
@@ -155,6 +193,18 @@ namespace Sharpmake
             {
                 Builder.Instance.LogWarningLine($"Package {packageName} was added twice with versions {version} and {existingPackage.Version}. Version {version} will be used.");
                 existingPackage.Version = version;
+            }
+
+            if (includeAssets != existingPackage.IncludeAssets)
+            {
+                existingPackage.IncludeAssets &= includeAssets;
+                Builder.Instance.LogWarningLine($"Package {packageName} was added twice with different include assets. Kept assets are {string.Join(",", PackageReference.GetFormatedAssetsDependency(existingPackage.IncludeAssets))}.");
+            }
+
+            if (excludeAssets != existingPackage.ExcludeAssets)
+            {
+                existingPackage.ExcludeAssets &= excludeAssets;
+                Builder.Instance.LogWarningLine($"Package {packageName} was added twice with different exclude assets. Kept assets are {string.Join(",", PackageReference.GetFormatedAssetsDependency(existingPackage.ExcludeAssets))}.");
             }
 
             if (privateAssets != existingPackage.PrivateAssets)
@@ -166,7 +216,7 @@ namespace Sharpmake
 
         public void Add(string packageName, string version, string dotNetHint, AssetsDependency privateAssets)
         {
-            Add(packageName, version, dotNetHint, privateAssets, null);
+            Add(packageName, version, dotNetHint, privateAssets: privateAssets, referenceType: null);
         }
 
         public int Count => _packageReferences.Count;
@@ -199,5 +249,9 @@ namespace Sharpmake
 
         internal const AssetsDependency DefaultPrivateAssets =
             AssetsDependency.ContentFiles | AssetsDependency.Analyzers | AssetsDependency.Build;
+
+        internal const AssetsDependency DefaultIncludeAssets = AssetsDependency.All;
+
+        internal const AssetsDependency DefaultExcludeAssets = AssetsDependency.None;
     }
 }
