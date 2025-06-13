@@ -18,6 +18,7 @@ namespace Sharpmake
         public abstract string GetTargetIdentifier(Sharpmake.Project.Configuration conf);
         public abstract string GetExecutablePath(Sharpmake.Project.Configuration conf);
         public abstract string GetArguments(BuildType buildType, Sharpmake.Project.Configuration conf, string fastbuildArguments);
+        public virtual string GetWorkingDirectory(Sharpmake.Project.Configuration conf) => "$(SolutionDir)";
     }
 
 

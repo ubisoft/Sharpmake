@@ -539,7 +539,7 @@ namespace Sharpmake.Generators.VisualStudio
                             commandLine += " -config $(SolutionName)" + FastBuildSettings.FastBuildConfigFileExtension;
 
                             string makeExecutable = context.FastBuildMakeCommandGenerator.GetExecutablePath(conf);
-                            using (fileGenerator.Declare("relativeMasterBffPath", "$(SolutionDir)"))
+                            using (fileGenerator.Declare("fastBuildWorkingDirectory", context.FastBuildMakeCommandGenerator.GetWorkingDirectory(conf)))
                             using (fileGenerator.Declare("fastBuildMakeCommandBuild", $"{makeExecutable} {context.FastBuildMakeCommandGenerator.GetArguments(FastBuildMakeCommandGenerator.BuildType.Build, conf, commandLine)}"))
                             using (fileGenerator.Declare("fastBuildMakeCommandRebuild", $"{makeExecutable} {context.FastBuildMakeCommandGenerator.GetArguments(FastBuildMakeCommandGenerator.BuildType.Rebuild, conf, commandLine)}"))
                             using (fileGenerator.Declare("fastBuildMakeCommandCompileFile", $"{makeExecutable} {context.FastBuildMakeCommandGenerator.GetArguments(FastBuildMakeCommandGenerator.BuildType.CompileFile, conf, commandLine)}"))
