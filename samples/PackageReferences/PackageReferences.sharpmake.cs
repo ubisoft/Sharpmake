@@ -3,6 +3,7 @@
 
 using System;
 using Sharpmake;
+using static Sharpmake.PackageReferences;
 
 namespace PackageReference
 {
@@ -46,8 +47,17 @@ namespace PackageReference
 
             conf.ReferencesByNuGetPackage.Add("NUnit", "3.6.0");
             conf.ReferencesByNuGetPackage.Add("Newtonsoft.Json", "13.0.1");
-            conf.ReferencesByNuGetPackage.Add("Mono.Cecil", "0.9.6.4", privateAssets: Sharpmake.PackageReferences.AssetsDependency.All);
-            conf.ReferencesByNuGetPackage.Add("MySql.Data", "6.10.6", privateAssets: Sharpmake.PackageReferences.AssetsDependency.Build | Sharpmake.PackageReferences.AssetsDependency.Compile);
+            conf.ReferencesByNuGetPackage.Add("Mono.Cecil", "0.9.6.4", privateAssets: AssetsDependency.All);
+            conf.ReferencesByNuGetPackage.Add("MySql.Data", "6.10.6", privateAssets: AssetsDependency.Build | AssetsDependency.Compile);
+
+            conf.ReferencesByNuGetPackage.Add("Microsoft.Extensions.Configuration.Abstractions", "9.0.5", dotNetHint: null, includeAssets: AssetsDependency.All, excludeAssets: AssetsDependency.None, privateAssets: AssetsDependency.ContentFiles | AssetsDependency.Analyzers | AssetsDependency.Build);
+            conf.ReferencesByNuGetPackage.Add("Microsoft.Extensions.Configuration", "9.0.5", dotNetHint: null, includeAssets: AssetsDependency.Analyzers, excludeAssets: AssetsDependency.None, privateAssets: AssetsDependency.ContentFiles | AssetsDependency.Analyzers | AssetsDependency.Build);
+            conf.ReferencesByNuGetPackage.Add("Microsoft.Extensions.Configuration.Binder", "9.0.5", dotNetHint: null, includeAssets: AssetsDependency.All, excludeAssets: AssetsDependency.Compile, privateAssets: AssetsDependency.ContentFiles | AssetsDependency.Analyzers | AssetsDependency.Build);
+            conf.ReferencesByNuGetPackage.Add("Microsoft.Extensions.Configuration.FileExtensions ", "9.0.5", dotNetHint: null, includeAssets: AssetsDependency.All, excludeAssets: AssetsDependency.None, privateAssets: AssetsDependency.All);
+            conf.ReferencesByNuGetPackage.Add("Microsoft.Extensions.Configuration.Json", "9.0.5", dotNetHint: null, includeAssets: AssetsDependency.Analyzers, excludeAssets: AssetsDependency.Compile, privateAssets: AssetsDependency.ContentFiles | AssetsDependency.Analyzers | AssetsDependency.Build);
+            conf.ReferencesByNuGetPackage.Add("Microsoft.Extensions.Configuration.EnvironmentVariables", "9.0.5", dotNetHint: null, includeAssets: AssetsDependency.All, excludeAssets: AssetsDependency.Compile, privateAssets: AssetsDependency.All);
+            conf.ReferencesByNuGetPackage.Add("Microsoft.Extensions.Configuration.UserSecrets", "9.0.5", dotNetHint: null, includeAssets: AssetsDependency.Analyzers, excludeAssets: AssetsDependency.None, privateAssets: AssetsDependency.All);
+            conf.ReferencesByNuGetPackage.Add("Microsoft.Extensions.Configuration.CommandLine", "9.0.5", dotNetHint: null, includeAssets: AssetsDependency.Analyzers, excludeAssets: AssetsDependency.Compile, privateAssets: AssetsDependency.All);
         }
     }
 
