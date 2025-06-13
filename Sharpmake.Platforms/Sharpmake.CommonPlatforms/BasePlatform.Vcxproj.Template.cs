@@ -254,10 +254,10 @@ namespace Sharpmake
             @"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
     <OutDir>[options.OutputDirectory]\</OutDir>
     <IntDir>[options.IntermediateDirectory]\</IntDir>
-    <NMakeBuildCommandLine>cd [relativeMasterBffPath]
+    <NMakeBuildCommandLine>cd [fastBuildWorkingDirectory]
 [conf.FastBuildCustomActionsBeforeBuildCommand]
 [fastBuildMakeCommandBuild] </NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine>cd [relativeMasterBffPath]
+    <NMakeReBuildCommandLine>cd [fastBuildWorkingDirectory]
 [conf.FastBuildCustomActionsBeforeBuildCommand]
 [fastBuildMakeCommandRebuild] </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>del ""[options.IntermediateDirectory]\*unity*.cpp"" &gt;NUL 2&gt;NUL
@@ -278,7 +278,7 @@ del ""[options.OutputDirectory]\[conf.TargetFileFullName].pdb"" &gt;NUL 2&gt;NUL
   </PropertyGroup>
   <ItemDefinitionGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
     <NMakeCompile>
-      <NMakeCompileFileCommandLine>cd [relativeMasterBffPath]
+      <NMakeCompileFileCommandLine>cd [fastBuildWorkingDirectory]
 [conf.FastBuildCustomActionsBeforeBuildCommand]
 [fastBuildMakeCommandCompileFile] </NMakeCompileFileCommandLine>
     </NMakeCompile>

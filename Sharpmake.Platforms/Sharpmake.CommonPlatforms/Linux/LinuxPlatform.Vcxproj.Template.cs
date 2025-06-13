@@ -124,10 +124,10 @@ namespace Sharpmake
     <RemoteBuildOutputs>[options.RemoteBuildOutputs]</RemoteBuildOutputs>
     <OutDir>[options.OutputDirectoryRemote]</OutDir>
     <IntDir>[options.IntermediateDirectoryRemote]</IntDir>
-    <BuildCommandLine>cd [relativeMasterBffPath]
+    <BuildCommandLine>cd [fastBuildWorkingDirectory]
 [conf.FastBuildCustomActionsBeforeBuildCommand]
 [fastBuildMakeCommandBuild]</BuildCommandLine>
-    <ReBuildCommandLine>cd [relativeMasterBffPath]
+    <ReBuildCommandLine>cd [fastBuildWorkingDirectory]
 [conf.FastBuildCustomActionsBeforeBuildCommand]
 [fastBuildMakeCommandRebuild]</ReBuildCommandLine>
     <LocalRemoteCopySources>[options.CopySources]</LocalRemoteCopySources>
