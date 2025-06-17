@@ -771,6 +771,9 @@ namespace Sharpmake.Generators.VisualStudio
             var platformIncludePaths = platformVcxproj.GetPlatformIncludePaths(context);
             context.Options["AdditionalPlatformIncludeDirectories"] = platformIncludePaths.Any() ? Util.PathGetRelative(context.ProjectDirectory, platformIncludePaths).JoinStrings(";") : FileGeneratorUtilities.RemoveLineTag;
 
+            var nmakeIncludeSearchPath = includePaths.Concat(platformIncludePaths);
+            context.Options["NMakeIncludeSearchPath"] = nmakeIncludeSearchPath.Any() ? Util.PathGetRelative(context.ProjectDirectory, nmakeIncludeSearchPath).JoinStrings(";") : FileGeneratorUtilities.RemoveLineTag;
+
             // Fill resource include dirs
             var resourceIncludePaths = platformVcxproj.GetResourceIncludePaths(context);
             context.Options["AdditionalResourceIncludeDirectories"] = resourceIncludePaths.Any() ? Util.PathGetRelative(context.ProjectDirectory, resourceIncludePaths).JoinStrings(";") : FileGeneratorUtilities.RemoveLineTag;
