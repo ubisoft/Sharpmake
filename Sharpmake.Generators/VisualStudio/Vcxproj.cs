@@ -960,20 +960,27 @@ namespace Sharpmake.Generators.VisualStudio
 
             if (!fastbuildOnly)
             {
-                string externalReferencesCopyLocal = (firstConf.Project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ExternalReferences)
-                                           ? "true"
-                                           : FileGeneratorUtilities.RemoveLineTag);
-
-                foreach (var reference in firstConf.ReferencesByPath)
+                foreach( var conf in context.ProjectConfigurations)
                 {
-                    string nameWithExtension = reference.Split(Util.WindowsSeparator).Last();
-                    string name = nameWithExtension.Substring(0, nameWithExtension.LastIndexOf('.'));
-
-                    using (projectFilesWriter.Declare("include", name))
-                    using (projectFilesWriter.Declare("hintPath", reference))
-                    using (projectFilesWriter.Declare("private", externalReferencesCopyLocal))
+                    string externalReferencesCopyLocal = conf.Project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ExternalReferences)
+                        ? "true"
+                        : FileGeneratorUtilities.RemoveLineTag;
+                    
+                    using (projectFilesWriter.Declare("platformName", Util.GetToolchainPlatformString(conf.Platform, conf.Project, conf.Target)))
+                    using (projectFilesWriter.Declare("conf", conf))
                     {
-                        projectFilesWriter.Write(Template.Project.ReferenceByPath);
+                        foreach (var reference in conf.ReferencesByPath)
+                        {
+                            string nameWithExtension = reference.Split(Util.WindowsSeparator).Last();
+                            string name = nameWithExtension.Substring(0, nameWithExtension.LastIndexOf('.'));
+                        
+                            using (projectFilesWriter.Declare("include", name))
+                            using (projectFilesWriter.Declare("hintPath", reference))
+                            using (projectFilesWriter.Declare("private", externalReferencesCopyLocal))
+                            {
+                                projectFilesWriter.Write(Template.Project.ReferenceByPath);
+                            }
+                        }
                     }
                 }
             }
