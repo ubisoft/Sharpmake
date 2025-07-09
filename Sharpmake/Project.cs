@@ -234,8 +234,27 @@ namespace Sharpmake
 
         public XResourcesImgContainer XResourcesImg = new XResourcesImgContainer();
 
+        [Resolver.Resolvable]
+        public class CustomTargetElement
+        {
+            public string Name = "";
+            public string TargetParameters = "";
+            public string CustomTasks = "";
+
+            public CustomTargetElement()
+            { }
+
+            public CustomTargetElement(string name, string targetParameters, string customTasks)
+            {
+                Name = name;
+                TargetParameters = targetParameters;
+                CustomTasks = customTasks;
+            }
+        }
+
         public Strings CustomPropsFiles = new Strings();  // vs2010+ .props files
         public Strings CustomTargetsFiles = new Strings();  // vs2010+ .targets files
+        public List<CustomTargetElement> CustomTargets = new List<CustomTargetElement>();
 
         public string NasmPropsFile = "";
         public string NasmTargetsFile = "";
@@ -2240,7 +2259,7 @@ namespace Sharpmake
 
             aspNetProject.NoneExtensions.Add(".pubxml");
 
-            aspNetProject.CustomTargets.Add(new CSharpProject.CustomTargetElement()
+            aspNetProject.CustomTargets.Add(new Project.CustomTargetElement()
             {
                 Name = "MvcBuildViews",
                 TargetParameters = @"AfterTargets=""AfterBuild"" Condition=""'$(MvcBuildViews)' == 'true'""",
@@ -2392,7 +2411,6 @@ namespace Sharpmake
         public List<ComReference> ComReferences = new List<ComReference>();
         public List<ImportProject> PreImportProjects = new List<ImportProject>();
         public List<ImportProject> ImportProjects = new List<ImportProject>();
-        public List<CustomTargetElement> CustomTargets = new List<CustomTargetElement>();
         public List<UsingTask> UsingTasks = new List<UsingTask>();
 
         public bool? WcfAutoStart; // Wcf Auto-Start service when debugging
@@ -2413,24 +2431,6 @@ namespace Sharpmake
         /// Generate a file containing API documentation.
         /// </summary>
         public bool GenerateDocumentationFile = false;
-
-        [Resolver.Resolvable]
-        public class CustomTargetElement
-        {
-            public string Name;
-            public string TargetParameters;
-            public string CustomTasks;
-
-            public CustomTargetElement()
-            { }
-
-            public CustomTargetElement(string name, string targetParameters, string customTasks)
-            {
-                Name = name;
-                TargetParameters = targetParameters;
-                CustomTasks = customTasks;
-            }
-        }
 
         [Resolver.Resolvable]
         public class UsingTask
