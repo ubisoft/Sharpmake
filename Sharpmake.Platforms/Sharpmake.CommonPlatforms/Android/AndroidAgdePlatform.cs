@@ -622,7 +622,25 @@ namespace Sharpmake
 
             protected override IEnumerable<string> GetIncludePathsImpl(IGenerationContext context)
             {
-                return base.GetIncludePathsImpl(context);
+                var includePaths = new OrderableStrings();
+                includePaths.AddRange(context.Configuration.IncludePrivatePaths);
+                includePaths.AddRange(context.Configuration.IncludePaths);
+                includePaths.AddRange(context.Configuration.DependenciesIncludePaths);
+
+                includePaths.Sort();
+                return includePaths;
+            }
+
+            protected override IEnumerable<IncludeWithPrefix> GetPlatformIncludePathsWithPrefixImpl(IGenerationContext context)
+            {
+                var systemIncludes = new OrderableStrings();
+                systemIncludes.AddRange(context.Configuration.DependenciesIncludeSystemPaths);
+                systemIncludes.AddRange(context.Configuration.IncludeSystemPaths);
+
+                systemIncludes.Sort();
+
+                const string cmdLineIncludePrefix = "-isystem";
+                return systemIncludes.Select(path => new IncludeWithPrefix(cmdLineIncludePrefix, path));
             }
 
             public override IEnumerable<string> GetLibraryPaths(IGenerationContext context)
