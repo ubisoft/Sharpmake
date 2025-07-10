@@ -1134,6 +1134,9 @@ popd";
         {
             var includePaths = new OrderableStrings(platformVcxproj.GetIncludePaths(context));
             context.Options["IncludePaths"] = XCodeUtil.XCodeFormatList(includePaths, 4);
+            
+            var includeSystemPaths = new OrderableStrings(platformVcxproj.GetPlatformIncludePaths(context));
+            context.Options["IncludeSystemPaths"] = XCodeUtil.XCodeFormatList(includeSystemPaths, 4);
         }
 
         private static void FillCompilerOptions(IGenerationContext context, IPlatformVcxproj platformVcxproj)

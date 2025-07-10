@@ -286,6 +286,7 @@ namespace Sharpmake.Generators.Apple
 				GCC_MODEL_TUNING = [item.Options.ModelTuning];
 				GCC_SYMBOLS_PRIVATE_EXTERN = [item.Options.PrivateSymbols];
 				HEADER_SEARCH_PATHS = [item.Options.IncludePaths];
+				SYSTEM_HEADER_SEARCH_PATHS = [item.Options.IncludeSystemPaths];
 				INFOPLIST_FILE = ""[item.Options.InfoPListFile]"";
 				INSTALL_PATH = ""[item.Options.ProductInstallPath]"";
 				IPHONEOS_DEPLOYMENT_TARGET = ""[item.Options.IPhoneOSDeploymentTarget]"";

@@ -1590,8 +1590,6 @@ namespace Sharpmake
             includePaths.AddRange(conf.IncludePrivatePaths);
             includePaths.AddRange(conf.IncludePaths);
             includePaths.AddRange(conf.DependenciesIncludePaths);
-            includePaths.AddRange(conf.IncludeSystemPaths);
-            includePaths.AddRange(conf.DependenciesIncludeSystemPaths);
 
             includePaths.Sort();
             return includePaths;
@@ -1599,8 +1597,16 @@ namespace Sharpmake
 
         private IEnumerable<IncludeWithPrefix> GetPlatformIncludePathsWithPrefixImpl(IGenerationContext context)
         {
-            const string cmdLineIncludePrefix = "-isystem";
-            return context.Configuration.DependenciesIncludeSystemPaths.Select(includePath => new IncludeWithPrefix(cmdLineIncludePrefix, includePath));
+            var conf = context.Configuration;
+
+            var systemIncludes = new OrderableStrings();
+            systemIncludes.AddRange(conf.DependenciesIncludeSystemPaths);
+            systemIncludes.AddRange(conf.IncludeSystemPaths);
+
+            systemIncludes.Sort();
+
+            const string cmdLineIncludePrefix = "-isystem ";
+            return systemIncludes.Select(path => new IncludeWithPrefix(cmdLineIncludePrefix, path));
         }
 
         private IEnumerable<string> GetResourceIncludePathsImpl(IGenerationContext context)
