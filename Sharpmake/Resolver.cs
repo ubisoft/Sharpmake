@@ -812,6 +812,24 @@ namespace Sharpmake
                             SetResolved(memberPath);
                         }
                     }
+                    else if (fieldValue is OrderableStrings)
+                    {
+                        if (CanWriteFieldValue(fieldInfo))
+                        {
+                            SetResolving(memberPath);
+                            OrderableStrings values = fieldValue as OrderableStrings;
+
+                            for (int i = 0; i < values.Count; ++i)
+                            {
+                                bool wasChanged;
+                                string value = Resolve(values[i], fallbackValue, out wasChanged);
+                                if (wasChanged)
+                                    i = values.SetOrRemoveAtIndex(i, value);
+                            }
+
+                            SetResolved(memberPath);
+                        }
+                    }
                     else if (fieldValue is IList<string>)
                     {
                         if (CanWriteFieldValue(fieldInfo))
