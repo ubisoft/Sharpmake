@@ -96,7 +96,7 @@ namespace SharpmakeGen.FunctionalTests
             var targets = new List<ITarget> {
                 new Target(
                     Platform.win64,
-                    DevEnv.vs2019,
+                    DevEnv.vs2022,
                     Optimization.Debug | Optimization.Release,
                     Blob.NoBlob,
                     BuildSystem.MSBuild
@@ -236,7 +236,7 @@ namespace SharpmakeGen.FunctionalTests
             FastBuildSettings.FastBuildWait = true;
             FastBuildSettings.WriteAllConfigsSection = true;
 
-            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2019, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.Latest);
+            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2022, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.Latest);
 
             Bff.UnityResolver = new Bff.FragmentUnityResolver();
 
