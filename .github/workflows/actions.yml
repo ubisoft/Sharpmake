@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2019] # only windows for now, but ideally should be all. TODO: add windows-2022
+        os: [windows-2022]
         framework: [net6.0]
 
     steps:
