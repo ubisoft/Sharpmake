@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <PlatformTarget Condition=" '$(Platform)' == '' ">x86</PlatformTarget>
-    <ProjectGuid>{8E3BF86E-9B9B-F4D1-16B3-47F6070A6D5C}</ProjectGuid>
+    <ProjectGuid>{FCE70296-BFEE-87F2-6BB4-6EDA713DA129}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OtherCSharpProj</RootNamespace>
-    <AssemblyName>OtherCSharpProj</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <RootNamespace>CSharpProjBuildOrderDependency</RootNamespace>
+    <AssemblyName>CSharpProjBuildOrderDependency</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
@@ -17,8 +17,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>output\vs2017\v4_6_2\debug</OutputPath>
-    <IntermediateOutputPath>temp\othercsharpproj\vs2017\v4_6_2\debug</IntermediateOutputPath>
+    <OutputPath>output\vs2022\v4_7_2\debug</OutputPath>
+    <IntermediateOutputPath>temp\csharpprojbuildorderdependency\vs2022\v4_7_2\debug</IntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE;WIN32</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -29,18 +29,18 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>output\vs2017\v4_6_2\release</OutputPath>
-    <IntermediateOutputPath>temp\othercsharpproj\vs2017\v4_6_2\release</IntermediateOutputPath>
+    <OutputPath>output\vs2022\v4_7_2\release</OutputPath>
+    <IntermediateOutputPath>temp\csharpprojbuildorderdependency\vs2022\v4_7_2\release</IntermediateOutputPath>
     <DefineConstants>TRACE;WIN32</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\codebase\OtherCSharpProj\Class1.cs">
+    <Compile Include="..\codebase\CSharpProjBuildOrderDependency\Class1.cs">
       <Link>Class1.cs</Link>
     </Compile>
-    <Compile Include="..\codebase\OtherCSharpProj\Properties\AssemblyInfo.cs">
+    <Compile Include="..\codebase\CSharpProjBuildOrderDependency\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
   </ItemGroup>

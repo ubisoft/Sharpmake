@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <PlatformTarget Condition=" '$(Platform)' == '' ">x86</PlatformTarget>
-    <ProjectGuid>{CABE51EB-3AED-01E0-3DDB-A72DFBA0ECE5}</ProjectGuid>
+    <ProjectGuid>{20203136-87D4-8326-EEDC-676EFF6A2BE4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CSharpProjBuildOrderDependency</RootNamespace>
@@ -17,8 +17,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>output\vs2017\v4_6_2\debug</OutputPath>
-    <IntermediateOutputPath>temp\csharpprojbuildorderdependency\vs2017\v4_6_2\debug</IntermediateOutputPath>
+    <OutputPath>output\vs2019\v4_6_2\debug</OutputPath>
+    <IntermediateOutputPath>temp\csharpprojbuildorderdependency\vs2019\v4_6_2\debug</IntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE;WIN32</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -29,8 +29,8 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>output\vs2017\v4_6_2\release</OutputPath>
-    <IntermediateOutputPath>temp\csharpprojbuildorderdependency\vs2017\v4_6_2\release</IntermediateOutputPath>
+    <OutputPath>output\vs2019\v4_6_2\release</OutputPath>
+    <IntermediateOutputPath>temp\csharpprojbuildorderdependency\vs2019\v4_6_2\release</IntermediateOutputPath>
     <DefineConstants>TRACE;WIN32</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
