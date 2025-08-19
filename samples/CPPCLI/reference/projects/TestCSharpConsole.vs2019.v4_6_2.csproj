@@ -4,12 +4,12 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <PlatformTarget Condition=" '$(Platform)' == '' ">x86</PlatformTarget>
-    <ProjectGuid>{1CC6264B-284A-CC77-18FC-6FCF78DC9E4E}</ProjectGuid>
+    <ProjectGuid>{A6E0417E-7427-282B-F8CB-9F2A4882543D}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TestCSharpConsole</RootNamespace>
     <AssemblyName>TestCSharpConsole</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
@@ -17,8 +17,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>output\vs2019\v4_7_2\debug</OutputPath>
-    <IntermediateOutputPath>temp\testcsharpconsole\vs2019\v4_7_2\debug</IntermediateOutputPath>
+    <OutputPath>output\vs2019\v4_6_2\debug</OutputPath>
+    <IntermediateOutputPath>temp\testcsharpconsole\vs2019\v4_6_2\debug</IntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE;WIN32</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -29,8 +29,8 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>output\vs2019\v4_7_2\release</OutputPath>
-    <IntermediateOutputPath>temp\testcsharpconsole\vs2019\v4_7_2\release</IntermediateOutputPath>
+    <OutputPath>output\vs2019\v4_6_2\release</OutputPath>
+    <IntermediateOutputPath>temp\testcsharpconsole\vs2019\v4_6_2\release</IntermediateOutputPath>
     <DefineConstants>TRACE;WIN32</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -45,8 +45,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="clrcppproj.vs2019.v4_7_2.vcxproj">
-      <Project>{3eb6f23b-6af0-875b-6f8e-d1449d6b0280}</Project>
+    <ProjectReference Include="clrcppproj.vs2019.v4_6_2.vcxproj">
+      <Project>{050ef902-0303-39d4-1b02-2e62de68f501}</Project>
       <Name>CLRCPPProj</Name>
     </ProjectReference>
   </ItemGroup>

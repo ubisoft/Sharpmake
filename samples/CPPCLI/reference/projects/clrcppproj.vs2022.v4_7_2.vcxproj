@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -11,15 +11,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{C0644B52-BB9C-2014-B639-85C0C52355DE}</ProjectGuid>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <ProjectGuid>{8D02FD8F-4FAD-DA3A-F993-716DF68A16CA}</ProjectGuid>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <Keyword>ManagedCProj</Keyword>
     <DefaultLanguage>en-US</DefaultLanguage>
     <RootNamespace>CLRCPPProj</RootNamespace>
     <ProjectName>CLRCPPProj</ProjectName>
   </PropertyGroup>
   <PropertyGroup Label="Globals">
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -27,7 +27,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CLRSupport>true</CLRSupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -35,7 +35,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CLRSupport>true</CLRSupport>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -48,7 +48,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>clrcppproj</TargetName>
     <OutDir>output\win32\debug\</OutDir>
-    <IntDir>temp\clrcppproj\vs2017\v4_6_2\debug\</IntDir>
+    <IntDir>temp\clrcppproj\vs2022\v4_7_2\debug\</IntDir>
     <TargetExt>.dll</TargetExt>
     <GenerateManifest>true</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
@@ -58,7 +58,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetName>clrcppproj</TargetName>
     <OutDir>output\win32\release\</OutDir>
-    <IntDir>temp\clrcppproj\vs2017\v4_6_2\release\</IntDir>
+    <IntDir>temp\clrcppproj\vs2022\v4_7_2\release\</IntDir>
     <TargetExt>.dll</TargetExt>
     <GenerateManifest>true</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
@@ -111,7 +111,7 @@
       <CallingConvention>Cdecl</CallingConvention>
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
-      <ProgramDatabaseFileName>temp\clrcppproj\vs2017\v4_6_2\debug\clrcppproj_compiler.pdb</ProgramDatabaseFileName>
+      <ProgramDatabaseFileName>temp\clrcppproj\vs2022\v4_7_2\debug\clrcppproj_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -195,7 +195,7 @@
       <CallingConvention>Cdecl</CallingConvention>
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
-      <ProgramDatabaseFileName>temp\clrcppproj\vs2017\v4_6_2\release\clrcppproj_compiler.pdb</ProgramDatabaseFileName>
+      <ProgramDatabaseFileName>temp\clrcppproj\vs2022\v4_7_2\release\clrcppproj_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -249,20 +249,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="CSharpProjBuildOrderDependency.vs2017.v4_6_2.csproj">
-      <Project>{CABE51EB-3AED-01E0-3DDB-A72DFBA0ECE5}</Project>
+    <ProjectReference Include="CSharpProjBuildOrderDependency.vs2022.v4_7_2.csproj">
+      <Project>{FCE70296-BFEE-87F2-6BB4-6EDA713DA129}</Project>
       <Name>CSharpProjBuildOrderDependency</Name>
       <Private>true</Private>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
-    <ProjectReference Include="OtherCSharpProj.vs2017.v4_6_2.csproj">
-      <Project>{8E3BF86E-9B9B-F4D1-16B3-47F6070A6D5C}</Project>
+    <ProjectReference Include="OtherCSharpProj.vs2022.v4_7_2.csproj">
+      <Project>{C67510CE-FE51-F409-686E-F1DFBD047DAA}</Project>
       <Name>OtherCSharpProj</Name>
       <Private>true</Private>
     </ProjectReference>
-    <ProjectReference Include="theemptycppproject.vs2017.v4_6_2.vcxproj">
-      <Project>{CE7B50A6-EFE2-4A32-3204-AD7714A268F7}</Project>
+    <ProjectReference Include="theemptycppproject.vs2022.v4_7_2.vcxproj">
+      <Project>{73752EE3-3CA0-703C-E295-427A8187946C}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
