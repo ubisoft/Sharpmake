@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <PlatformTarget Condition=" '$(Platform)' == '' ">x86</PlatformTarget>
-    <ProjectGuid>{81B57E84-A2EB-53E8-8AAC-3847232697E6}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{7C9A849E-6A2B-0A6D-6CF5-333857D222A6}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OtherCSharpProj</RootNamespace>
-    <AssemblyName>OtherCSharpProj</AssemblyName>
+    <RootNamespace>TestCSharpConsole</RootNamespace>
+    <AssemblyName>TestCSharpConsole</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -17,8 +17,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>output\vs2019\v4_7_2\debug</OutputPath>
-    <IntermediateOutputPath>temp\othercsharpproj\vs2019\v4_7_2\debug</IntermediateOutputPath>
+    <OutputPath>output\vs2022\v4_7_2\debug</OutputPath>
+    <IntermediateOutputPath>temp\testcsharpconsole\vs2022\v4_7_2\debug</IntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE;WIN32</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -29,20 +29,26 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>output\vs2019\v4_7_2\release</OutputPath>
-    <IntermediateOutputPath>temp\othercsharpproj\vs2019\v4_7_2\release</IntermediateOutputPath>
+    <OutputPath>output\vs2022\v4_7_2\release</OutputPath>
+    <IntermediateOutputPath>temp\testcsharpconsole\vs2022\v4_7_2\release</IntermediateOutputPath>
     <DefineConstants>TRACE;WIN32</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\codebase\OtherCSharpProj\Class1.cs">
-      <Link>Class1.cs</Link>
+    <Compile Include="..\codebase\TestCSharpConsole\Program.cs">
+      <Link>Program.cs</Link>
     </Compile>
-    <Compile Include="..\codebase\OtherCSharpProj\Properties\AssemblyInfo.cs">
+    <Compile Include="..\codebase\TestCSharpConsole\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="clrcppproj.vs2022.v4_7_2.vcxproj">
+      <Project>{8d02fd8f-4fad-da3a-f993-716df68a16ca}</Project>
+      <Name>CLRCPPProj</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

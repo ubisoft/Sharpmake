@@ -16,7 +16,7 @@ namespace CLR_SharpmakeTest
         public static Target[] CommonTarget = {
             new Target(
                 Platform.win32,
-                DevEnv.vs2017,
+                DevEnv.vs2019,
                 Optimization.Debug | Optimization.Release,
                 OutputType.Dll,
                 Blob.NoBlob,
@@ -25,7 +25,7 @@ namespace CLR_SharpmakeTest
             ),
             new Target(
                 Platform.win32,
-                DevEnv.vs2019,
+                DevEnv.vs2022,
                 Optimization.Debug | Optimization.Release,
                 OutputType.Dll,
                 Blob.NoBlob,
@@ -62,8 +62,8 @@ namespace CLR_SharpmakeTest
         [Sharpmake.Main]
         public static void SharpmakeMain(Sharpmake.Arguments arguments)
         {
-            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2017, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17763_0);
             KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2019, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_19041_0);
+            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2022, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_22621_0);
 
             arguments.Generate<TheSolution>();
         }

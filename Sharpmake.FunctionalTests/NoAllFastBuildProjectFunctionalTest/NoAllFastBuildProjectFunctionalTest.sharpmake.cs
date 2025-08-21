@@ -24,7 +24,7 @@ namespace SharpmakeGen.FunctionalTests
         {
             return new Target(
                 Platform.win64,
-                DevEnv.vs2019,
+                DevEnv.vs2022,
                 Optimization.Debug | Optimization.Release
             );
         }
@@ -194,7 +194,7 @@ namespace SharpmakeGen.FunctionalTests
             FastBuildSettings.FastBuildWait = true;
             FastBuildSettings.WriteAllConfigsSection = true;
 
-            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2019, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_19041_0);
+            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2022, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_19041_0);
 
             Bff.UnityResolver = new Bff.FragmentUnityResolver();
 

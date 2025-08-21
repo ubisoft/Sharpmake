@@ -20,13 +20,16 @@ $matrixInclude = foreach ($sample in $samplesDef.Samples)
     {
         foreach ($os in $sample.OSs)
         {
+            # Skip if windows-2019. This image is no longer available.
+            if ($os -eq 'windows-2019') { continue }
+
             foreach ($framework in $sample.Frameworks)
             {
                 # Map os to GitLab runner label
                 $runsOn = switch ( $os )
                 {
                     'linux' { 'ubuntu-latest' }
-                    'macos' { 'macos-latest' }
+                    'macos' { 'macos-14' }
                     default { $os }
                 }
 
