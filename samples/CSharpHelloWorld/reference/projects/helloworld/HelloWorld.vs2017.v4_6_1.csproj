@@ -46,5 +46,12 @@
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\helloworldreference\HelloWorldReference.vs2017.v4_6_1.csproj">
+      <Project>{74d7adae-d7b8-8401-a017-c88c6b875720}</Project>
+      <Name>HelloWorldReference</Name>
+      <Private>false</Private>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

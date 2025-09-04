@@ -70,13 +70,24 @@ namespace Sharpmake
         NoProjectReference = 1 << 8,
 
         /// <summary>
+        /// Indicates if the reference dll should be copied to the output folder. Represents the Private option of project reference.
+        /// Valid only for C# projects.
+        /// </summary>
+        /// <remarks>
+        /// Private: Specifies whether the reference should be copied to the output folder. 
+        /// This attribute matches the Copy Local property of the reference that's in the Visual Studio IDE.
+        /// </remarks>
+        CopyLocal = 1 << 9,
+
+        /// <summary>
         /// Specifies that the dependent project inherits the dependency's library files, library
         /// paths, include paths and defined symbols.
         /// </summary>
         Default = LibraryFiles |
                   LibraryPaths |
                   IncludePaths |
-                  Defines,
+                  Defines |
+                  CopyLocal,
 
         /// <summary>
         /// Specifies that the dependent project inherits the dependency's include paths and
@@ -89,6 +100,12 @@ namespace Sharpmake
         DefaultForceUsing = ForceUsingAssembly
                               | IncludePaths
                               | Defines,
+
+        /// <summary>
+        /// Indicates that the dependency use the default setting while not copying the dll 
+        /// to the current project output path (Private = false). Only use with C# dependency.
+        /// </summary>
+        DefaultWithoutCopy = Default & ~CopyLocal
     }
 
     /// <summary>
@@ -3875,7 +3892,8 @@ namespace Sharpmake
                                 var dotNetDependency = new DotNetDependency(dependency)
                                 {
                                     ReferenceOutputAssembly = referenceOutputAssembly,
-                                    ReferenceSwappedWithOutputAssembly = isDotnetReferenceSwappedWithOutputAssembly
+                                    ReferenceSwappedWithOutputAssembly = isDotnetReferenceSwappedWithOutputAssembly,
+                                    CopyLocal = visitedNode._dependencySetting.HasFlag(DependencySetting.CopyLocal)
                                 };
                                 
                                 if (isDotnetReferenceSwappedWithOutputAssembly)

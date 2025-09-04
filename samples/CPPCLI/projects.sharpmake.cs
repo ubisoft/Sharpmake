@@ -77,6 +77,12 @@ namespace CLR_SharpmakeTest
     public class OtherCSharpProj : CommonCSharpProject
     {
         public OtherCSharpProj() { }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+            conf.Output = Configuration.OutputType.DotNetClassLibrary;
+        }
     }
 
     [Sharpmake.Generate]
@@ -103,7 +109,7 @@ namespace CLR_SharpmakeTest
                 "System.Xml"
             );
 
-            conf.AddPrivateDependency<OtherCSharpProj>(target);
+            conf.AddPrivateDependency<OtherCSharpProj>(target, DependencySetting.DefaultWithoutCopy);
             conf.AddPrivateDependency<CSharpProjBuildOrderDependency>(target, DependencySetting.OnlyBuildOrder);
             conf.AddPrivateDependency<TheEmptyCPPProject>(target);
 

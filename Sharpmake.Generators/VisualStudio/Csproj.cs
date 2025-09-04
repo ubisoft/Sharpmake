@@ -1486,7 +1486,7 @@ namespace Sharpmake.Generators.VisualStudio
                             // FIXME : MsBuild does not seem to properly detect ReferenceOutputAssembly setting. 
                             // It may try to recompile the project if the output file of the dependency is missing. 
                             // To counter this, the CopyLocal field is forced to false for build-only dependencies. 
-                            bool isPrivate = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ProjectReferences) && dependency.ReferenceOutputAssembly != false;
+                            bool isPrivate = dependency.CopyLocal && project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ProjectReferences) && dependency.ReferenceOutputAssembly != false;
 
                             string includeOutputGroupsInVsix = null;
                             if (isPrivate && project.ProjectTypeGuids == CSharpProjectType.Vsix)
@@ -1547,7 +1547,7 @@ namespace Sharpmake.Generators.VisualStudio
                             Include = $"{dependency.Configuration.AssemblyName}{(isMultiFramework ? "-" + GetTargetFrameworksString(targetFramework) : "")}",
                             SpecificVersion = false,
                             HintPath = Util.PathGetRelative(_projectPathCapitalized, dllPath),
-                            Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ExternalReferences),
+                            Private = dependency.CopyLocal && project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ExternalReferences),
                         };
                         itemGroups.AddReference(targetFramework, referencesByPath);
                     }

@@ -2,6 +2,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorld", "helloworld\HelloWorld.vs2022.net6_0.csproj", "{1BBCE62D-4AD6-FCA3-CE7F-24AC0932F30C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorldReference", "helloworldreference\HelloWorldReference.vs2022.net6_0.csproj", "{16F27FE3-40BF-573E-D03D-BFA4B73C534F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,6 +14,10 @@ Global
 		{1BBCE62D-4AD6-FCA3-CE7F-24AC0932F30C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1BBCE62D-4AD6-FCA3-CE7F-24AC0932F30C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1BBCE62D-4AD6-FCA3-CE7F-24AC0932F30C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16F27FE3-40BF-573E-D03D-BFA4B73C534F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16F27FE3-40BF-573E-D03D-BFA4B73C534F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16F27FE3-40BF-573E-D03D-BFA4B73C534F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16F27FE3-40BF-573E-D03D-BFA4B73C534F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

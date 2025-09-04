@@ -988,7 +988,7 @@ namespace Sharpmake.Generators.VisualStudio
             // Write dotNet dependencies references
             {
                 // The behavior should be the same than for csproj...
-                string projectDependenciesCopyLocal = firstConf.Project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ProjectReferences).ToString().ToLower();
+                bool isDependenciesProjectReferences = firstConf.Project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ProjectReferences);
 
                 Options.ExplicitOptions options = new Options.ExplicitOptions();
                 options["CopyLocalSatelliteAssemblies"] = FileGeneratorUtilities.RemoveLineTag;
@@ -1040,7 +1040,7 @@ namespace Sharpmake.Generators.VisualStudio
                         using (projectFilesWriter.Declare("include", include))
                         using (projectFilesWriter.Declare("projectGUID", dependency.ProjectGuid ?? FileGeneratorUtilities.RemoveLineTag))
                         using (projectFilesWriter.Declare("projectRefName", dependency.ProjectName))
-                        using (projectFilesWriter.Declare("private", projectDependenciesCopyLocal))
+                        using (projectFilesWriter.Declare("private", (dotNetDependency.CopyLocal && isDependenciesProjectReferences).ToString().ToLower()))
                         using (projectFilesWriter.Declare("options", options))
                         {
                             projectFilesWriter.Write(Template.Project.ProjectReference);
