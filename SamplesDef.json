@@ -538,8 +538,9 @@
             "Commands":
             [
                 "xcodebuild -version",
+                "Measure-Command { xcodebuild -downloadPlatform iOS }",
                 "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"HelloIOS.Main.sharpmake.cs\" -framework {framework}",
-                "xcodebuild build-for-testing CODE_SIGNING_ALLOWED=NO -workspace {testFolder}/codebase/temp/solutions/HelloIOS_iOS.xcworkspace -configuration {configuration} -scheme exe_iOS -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 14 Pro' test -derivedDataPath {testFolder}/test"
+                "xcodebuild build-for-testing CODE_SIGNING_ALLOWED=NO -workspace {testFolder}/codebase/temp/solutions/HelloIOS_iOS.xcworkspace -configuration {configuration} -scheme exe_iOS -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16 Pro' test -derivedDataPath {testFolder}/test"
             ]
         },
         {

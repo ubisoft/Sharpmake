@@ -4,7 +4,9 @@ include:
   - template: 'Workflows/Branch-Pipelines.gitlab-ci.yml'
   - project: 'Sharpmake/SharpmakeExtended'
     file: 'build/sharpmake-ci.yml'
-
+  - project: 'Square/Runners/ci/templates/square-runners-mac-ci-template'
+    file: 'square_mac_runner.yml'
+    ref: '6.0.0'
 stages:
   - build
   - test
@@ -38,8 +40,11 @@ compilation:windows:
   extends: .compilation:base
 
 compilation:mac:
-  extends: .compilation:base
-  tags: [square_mac]
+  extends: 
+    - .compilation:base
+    - .square_mac_arm_macos15
+  
+  tags: [square_mac_arm]
 
 compilation:linux:
   extends: .compilation:base
