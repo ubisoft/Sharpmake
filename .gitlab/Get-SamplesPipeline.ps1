@@ -14,7 +14,14 @@ System.String
 $samplesDef = Get-Content -Raw -Path 'SamplesDef.json' | ConvertFrom-Json
 
 # Transform into a hash table with an entry for each samples.
-$samplesPipeline = @{}
+$samplesPipeline = @{
+    include = @{
+        project = "Square/Runners/ci/templates/square-runners-mac-ci-template"
+        ref = "6.0.0"
+        file = "square_mac_runner.yml"
+    }
+}
+
 foreach ($sample in $samplesDef.Samples)
 {
     if ($sample.CIs.Contains('gitlab'))
@@ -59,7 +66,7 @@ foreach ($sample in $samplesDef.Samples)
                         'macos'
                         {
                             $osProperties = @{
-                                tags = @( 'square_mac' )
+                                extends = @( '.square_mac_arm_xcode16' )
                             }
                             $osCompilationName = 'mac'
                         }
