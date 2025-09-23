@@ -81,6 +81,7 @@ namespace Sharpmake
       <Optimization>[options.Optimization]</Optimization>
       <PreprocessorDefinitions>[EscapeXML:options.PreprocessorDefinitions];%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>[options.AdditionalIncludeDirectories];%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ISystem>[options.AdditionalPlatformIncludeDirectories]</ISystem>
       <ClangDebugInformationFormat>[options.ClangDebugInformationFormat]</ClangDebugInformationFormat>
       <LimitDebugInfo>[options.LimitDebugInfo]</LimitDebugInfo>
       <FloatABI>[options.FloatABI]</FloatABI>
