@@ -31,6 +31,26 @@ namespace CSharpHelloWorld
     }
 
     [Sharpmake.Generate]
+    public class HelloWorldReference : CSharpProject
+    {
+        public HelloWorldReference()
+        {
+            AddTargets(TargetTypes.GetDefaultTargets());
+            RootPath = @"[project.SharpmakeCsPath]\projects\[project.Name]";
+            SourceRootPath = @"[project.SharpmakeCsPath]\codebase\[project.Name]";
+        }
+
+        [Configure()]
+        public virtual void ConfigureAll(Configuration conf, Target target)
+        {
+            conf.ProjectFileName = "[project.Name].[target.DevEnv].[target.Framework]";
+            conf.ProjectPath = @"[project.RootPath]";
+            conf.Options.Add(Sharpmake.Options.CSharp.TreatWarningsAsErrors.Enabled);
+            conf.Output = Configuration.OutputType.DotNetClassLibrary;
+        }
+    }
+
+    [Sharpmake.Generate]
     public class HelloWorld : CSharpProject
     {
         public HelloWorld()
@@ -53,6 +73,7 @@ namespace CSharpHelloWorld
             conf.CustomProperties.Add("CustomOptimizationProperty", $"Custom-{target.Optimization}");
 
             conf.Options.Add(Sharpmake.Options.CSharp.TreatWarningsAsErrors.Enabled);
+            conf.AddPublicDependency<HelloWorldReference>(target, DependencySetting.DefaultWithoutCopy);
         }
     }
 

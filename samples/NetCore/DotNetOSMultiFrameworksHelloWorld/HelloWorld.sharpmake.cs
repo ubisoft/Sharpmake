@@ -216,7 +216,7 @@ namespace NetCore.DotNetOSMultiFrameworksHelloWorld
             base.ConfigureAll(conf, target);
             conf.Output = Configuration.OutputType.DotNetConsoleApp;
             conf.AddPrivateDependency<HelloWorldLib>(target.ToDefaultDotNetOSTarget());
-            conf.AddPrivateDependency<HelloWorldSwappedLib>(target, DependencySetting.DependOnAssemblyOutput);
+            conf.AddPrivateDependency<HelloWorldSwappedLib>(target, DependencySetting.Default | DependencySetting.DependOnAssemblyOutput);
 
             if (target.DotNetFramework.IsDotNetCore())
             {

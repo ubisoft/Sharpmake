@@ -538,7 +538,7 @@ namespace Sharpmake.UnitTests
             [Configure()]
             public void ConfigureAll(Configuration conf, Target target)
             {
-                conf.AddPublicDependency<CSharpInheritOnePublicDependencyProject>(target, DependencySetting.DependOnAssemblyOutput);
+                conf.AddPublicDependency<CSharpInheritOnePublicDependencyProject>(target, DependencySetting.Default | DependencySetting.DependOnAssemblyOutput);
                 conf.AddPublicDependency<CSharpProjectB>(target);
             }
         }

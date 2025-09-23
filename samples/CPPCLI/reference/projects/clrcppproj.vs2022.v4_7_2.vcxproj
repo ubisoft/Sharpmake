@@ -252,14 +252,14 @@
     <ProjectReference Include="CSharpProjBuildOrderDependency.vs2022.v4_7_2.csproj">
       <Project>{FCE70296-BFEE-87F2-6BB4-6EDA713DA129}</Project>
       <Name>CSharpProjBuildOrderDependency</Name>
-      <Private>true</Private>
+      <Private>false</Private>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <ProjectReference Include="OtherCSharpProj.vs2022.v4_7_2.csproj">
       <Project>{C67510CE-FE51-F409-686E-F1DFBD047DAA}</Project>
       <Name>OtherCSharpProj</Name>
-      <Private>true</Private>
+      <Private>false</Private>
     </ProjectReference>
     <ProjectReference Include="theemptycppproject.vs2022.v4_7_2.vcxproj">
       <Project>{73752EE3-3CA0-703C-E295-427A8187946C}</Project>

@@ -1,16 +1,16 @@
-﻿<Project>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <PlatformTarget Condition=" '$(Platform)' == '' ">AnyCPU</PlatformTarget>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{74D7ADAE-D7B8-8401-A017-C88C6B875720}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HelloWorld</RootNamespace>
-    <AssemblyName>the other name</AssemblyName>
-    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>HelloWorldReference</RootNamespace>
+    <AssemblyName>HelloWorldReference</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <EnableDefaultItems>false</EnableDefaultItems>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -23,7 +23,6 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
-    <CustomOptimizationProperty>Custom-Debug</CustomOptimizationProperty>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -36,23 +35,11 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
-    <CustomOptimizationProperty>Custom-Release</CustomOptimizationProperty>
   </PropertyGroup>
-  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
   <ItemGroup>
-    <Compile Include="..\..\codebase\HelloWorld\Program.cs">
-      <Link>Program.cs</Link>
-    </Compile>
-    <Compile Include="..\..\codebase\HelloWorld\Properties\AssemblyInfo.cs">
-      <Link>Properties\AssemblyInfo.cs</Link>
+    <Compile Include="..\..\codebase\HelloWorldReference\HelloWorldReference.cs">
+      <Link>HelloWorldReference.cs</Link>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\helloworldreference\HelloWorldReference.vs2022.net6_0.csproj">
-      <Project>{16f27fe3-40bf-573e-d03d-bfa4b73c534f}</Project>
-      <Name>HelloWorldReference</Name>
-      <Private>false</Private>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

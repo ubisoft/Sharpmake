@@ -8,6 +8,7 @@ namespace Sharpmake
         public Project.Configuration Configuration { get; }
         public bool? ReferenceOutputAssembly { get; set; }
         public bool ReferenceSwappedWithOutputAssembly { get; set; } = false;
+        public bool CopyLocal { get; set; } = true;
 
         public DotNetDependency(Project.Configuration configuration)
         {
