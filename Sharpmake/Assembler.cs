@@ -359,16 +359,24 @@ namespace Sharpmake
                 _builderContext = builderContext;
                 AllParsers = assembler.ComputeParsers();
                 AllParsingFlowParsers = assembler.ComputeParsingFlowParsers();
-                _assemblyInfo._sourceFiles.AddRange(sources);
-                _visiting = new Strings(new FileSystemStringComparer(), sources);
+                //Make sure to use clean files path
+                var cleanSourceFiles = sources?.Select(s => Path.GetFullPath(s));
+                _assemblyInfo._sourceFiles.AddRange(cleanSourceFiles);
+                _visiting = new Strings(new FileSystemStringComparer(), cleanSourceFiles);
             }
 
             public void AddSourceFile(string file)
             {
-                if (!_visiting.Contains(file))
+                //Make sure to use clean file path
+                //To avoid ambiguity for example, consider these 2 file paths
+                //F:\my_workspace\git\XXX\.\XXX.sharpmake.cs
+                //F:\my_workspace\git\XXX\XXX.sharpmake.cs
+                var cleanFilePath = Path.GetFullPath(file);
+
+                if (!_visiting.Contains(cleanFilePath))
                 {
-                    _assemblyInfo._sourceFiles.Add(file);
-                    _visiting.Add(file);
+                    _assemblyInfo._sourceFiles.Add(cleanFilePath);
+                    _visiting.Add(cleanFilePath);
                 }
             }
 
