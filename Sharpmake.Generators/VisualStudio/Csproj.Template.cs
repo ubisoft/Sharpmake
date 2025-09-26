@@ -25,9 +25,9 @@ namespace Sharpmake.Generators.VisualStudio
                 public static string ProjectEnd =
 @"</Project>";
 
+
                 public static string ProjectDescription =
-@"  <PropertyGroup>
-    <Configuration Condition="" '$(Configuration)' == '' "">[options.DefaultConfiguration]</Configuration>
+@"  <Configuration Condition="" '$(Configuration)' == '' "">[options.DefaultConfiguration]</Configuration>
     <Platform Condition="" '$(Platform)' == '' "">[defaultPlatform]</Platform>
     <PlatformTarget Condition="" '$(Platform)' == '' "">[defaultPlatform]</PlatformTarget>
     <ProjectGuid>{[guid]}</ProjectGuid>
@@ -112,7 +112,6 @@ namespace Sharpmake.Generators.VisualStudio
     <UseWindowsForms>[options.UseWindowsForms]</UseWindowsForms>
     <Nullable>[options.Nullable]</Nullable>
     <PublishAot>[options.PublishAot]</PublishAot>
-  </PropertyGroup>
 ";
 
                 public const string DefaultProjectConfigurationCondition = "'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'";
@@ -146,6 +145,21 @@ namespace Sharpmake.Generators.VisualStudio
     <CopyVsixExtensionFiles>[options.CopyVsixExtensionFiles]</CopyVsixExtensionFiles>
     <CopyVsixExtensionLocation>[options.CopyVsixExtensionLocation]</CopyVsixExtensionLocation>
     <ProduceReferenceAssembly>[options.ProduceReferenceAssembly]</ProduceReferenceAssembly>
+";
+                public static string ConfigurationsItemBegin =
+@"<Configurations>";
+                public static string ConfigurationsItemEntry =
+@"[conf.Name];";
+                public static string ConfigurationsItemEnd =
+@"</Configurations>
+";
+
+                public static string PlatformsItemBegin =
+@"<Platforms>";
+                public static string PlatformsItemEntry =
+@"[platformName];";
+                public static string PlatformsItemEnd =
+@"</Platforms>
 ";
 
                 public static string ImportProjectItemSimple =
