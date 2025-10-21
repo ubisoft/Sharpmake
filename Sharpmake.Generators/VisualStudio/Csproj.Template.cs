@@ -38,6 +38,7 @@ namespace Sharpmake.Generators.VisualStudio
     <SignAssembly>[options.SignAssembly]</SignAssembly>
     <AssemblyOriginatorKeyFile>[options.AssemblyOriginatorKeyFile]</AssemblyOriginatorKeyFile>
     <[targetFrameworkVersionString]>[targetFramework]</[targetFrameworkVersionString]>
+    <RollForward>[options.RollForward]</RollForward>
     <FileAlignment>[options.FileAlignment]</FileAlignment>
     <IsWebBootstrapper>[options.IsWebBootstrapper]</IsWebBootstrapper>
     <ProjectTypeGuids>[projectTypeGuids]</ProjectTypeGuids>

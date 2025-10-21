@@ -3586,6 +3586,16 @@ namespace Sharpmake.Generators.VisualStudio
 
             SelectOption
             (
+            Options.Option(Options.CSharp.RollForward.Minor, () => { options["RollForward"] = RemoveLineTag; }),
+            Options.Option(Options.CSharp.RollForward.Major, () => { options["RollForward"] = "Major"; }),
+            Options.Option(Options.CSharp.RollForward.LatestPatch, () => { options["RollForward"] = "LatestPatch"; }),
+            Options.Option(Options.CSharp.RollForward.LatestMinor, () => { options["RollForward"] = "LatestMinor"; }),
+            Options.Option(Options.CSharp.RollForward.LatestMajor, () => { options["RollForward"] = "LatestMajor"; }),
+            Options.Option(Options.CSharp.RollForward.Disable, () => { options["RollForward"] = "Disable"; })
+            );
+
+            SelectOption
+            (
             Options.Option(Options.CSharp.RegisterOutputPackage.Enabled, () => { options["RegisterOutputPackage"] = "True"; }),
             Options.Option(Options.CSharp.RegisterOutputPackage.Disabled, () => { options["RegisterOutputPackage"] = RemoveLineTag; })
             );
