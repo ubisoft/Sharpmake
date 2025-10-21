@@ -29,6 +29,17 @@ namespace Sharpmake
                 Value8192,
             }
 
+            public enum RollForward
+            {
+                [Default]
+                Minor,
+                Major,
+                LatestPatch,
+                LatestMinor,
+                LatestMajor,
+                Disable,
+            }
+
             public enum CreateVsixContainer
             {
                 Enabled,
