@@ -558,7 +558,7 @@ namespace Sharpmake.Generators.FastBuild
                         {
                             if (isLastSubConfig) // post-build steps on the last subconfig
                             {
-                                if (isOutputTypeExe || isOutputTypeAppleApp || conf.ExecuteTargetCopy)
+                                if (isOutputTypeExeOrDllOrAppleApp || conf.ExecuteTargetCopy)
                                 {
                                     if (conf.CopyDependenciesBuildStep != null)
                                         throw new NotImplementedException("CopyDependenciesBuildStep are not supported with FastBuild");
