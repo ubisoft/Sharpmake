@@ -52,7 +52,7 @@ jobs:
 
       - name: Store MSBuild binary logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: sharpmake-msbuild-logs-${{ inputs.framework }}-${{ runner.os }}-${{ github.sha }}-${{ inputs.configuration }}
           path: Sharpmake_${{ inputs.configuration }}.binlog
@@ -67,7 +67,7 @@ jobs:
 
       - name: Upload sharpmake ${{ inputs.framework }} ${{ runner.os }}-release binaries
         if: inputs.configuration == 'release'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: 'Sharpmake-${{ inputs.framework }}-${{ runner.os }}-${{ github.sha }}'
           path: Sharpmake.Application/bin/Release/${{ inputs.framework }}
