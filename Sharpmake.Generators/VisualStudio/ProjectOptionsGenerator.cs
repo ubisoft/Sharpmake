@@ -408,6 +408,50 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.General.WholeProgramOptimization.Update, () => { context.Options["WholeProgramOptimization"] = "PGUpdate"; context.Options["CompilerWholeProgramOptimization"] = "true"; context.CommandLineOptions["CompilerWholeProgramOptimization"] = "/GL"; })
             );
 
+            // Options.Clang.Compiler.ProfileGuidedOptimization.Use
+            string usePGODataCompilerOption = FileGeneratorUtilities.RemoveLineTag;
+            string usePGODataPath = Options.PathOption.Get<Options.Clang.Compiler.ProfileGuidedOptimization.Use>(context.Configuration, FileGeneratorUtilities.RemoveLineTag, context.ProjectDirectoryCapitalized);
+            if (usePGODataPath != FileGeneratorUtilities.RemoveLineTag)
+            {
+                string formattedPath = FormatCommandLineOptionPath(context, usePGODataPath);
+                usePGODataCompilerOption = $"-fprofile-use={formattedPath}";
+                context.Configuration.AdditionalCompilerOptions.Add("-Wno-backend-plugin");
+            }
+            context.CommandLineOptions["UseProfileGuidedOptimizationData"] = usePGODataCompilerOption;
+
+            // Options.Clang.Compiler.ProfileGuidedOptimization.Generate
+            // Options.Clang.Compiler.ProfileGuidedOptimization.GenerateCS
+            string generatePGODataCompilerOption = FileGeneratorUtilities.RemoveLineTag;
+            string generatePGODataPath = Options.PathOption.Get<Options.Clang.Compiler.ProfileGuidedOptimization.Generate>(context.Configuration, FileGeneratorUtilities.RemoveLineTag, context.ProjectDirectoryCapitalized);
+            string generateCSPGODataPath = Options.PathOption.Get<Options.Clang.Compiler.ProfileGuidedOptimization.GenerateCS>(context.Configuration, FileGeneratorUtilities.RemoveLineTag, context.ProjectDirectoryCapitalized); 
+            if (generatePGODataPath != FileGeneratorUtilities.RemoveLineTag && generateCSPGODataPath != FileGeneratorUtilities.RemoveLineTag)
+            {
+                string generatePGODataOptionName = typeof(Options.Clang.Compiler.ProfileGuidedOptimization.Generate).FullName.Replace("+", ".");
+                string generateCSPGODataOptionName = typeof(Options.Clang.Compiler.ProfileGuidedOptimization.GenerateCS).FullName.Replace("+", ".");
+                throw new Error($"Error in the configuration of {context.Configuration.ProjectName}: {generatePGODataOptionName} and {generateCSPGODataOptionName} cannot be used together.");
+            }
+            else if (generatePGODataPath != FileGeneratorUtilities.RemoveLineTag)
+            {
+                string generatePGODataCompilerOptionPrefix = "-fprofile-generate";
+                generatePGODataCompilerOption = generatePGODataCompilerOptionPrefix;
+                if (generatePGODataPath != null)
+                {
+                    string formattedPath = FormatCommandLineOptionPath(context, generatePGODataPath);
+                    generatePGODataCompilerOption = $"{generatePGODataCompilerOptionPrefix}={formattedPath}";
+                }
+            }
+            else if (generateCSPGODataPath != FileGeneratorUtilities.RemoveLineTag)
+            {
+                string generateCSPGODataCompilerOptionPrefix = "-fcs-profile-generate";
+                generatePGODataCompilerOption = generateCSPGODataCompilerOptionPrefix;
+                if (generateCSPGODataPath != null)
+                {
+                    string formattedPath = FormatCommandLineOptionPath(context, generateCSPGODataPath);
+                    generatePGODataCompilerOption = $"{generateCSPGODataCompilerOptionPrefix}={formattedPath}";
+                }
+            }
+            context.CommandLineOptions["GenerateProfileGuidedOptimizationData"] = generatePGODataCompilerOption;
+
             optionsContext.PlatformVcxproj.SelectApplicationFormatOptions(context);
             optionsContext.PlatformVcxproj.SelectBuildType(context);
 
@@ -1118,6 +1162,13 @@ namespace Sharpmake.Generators.VisualStudio
             // UndefineAllPreprocessorDefinitions
             context.CommandLineOptions["UndefineAllPreprocessorDefinitions"] = FileGeneratorUtilities.RemoveLineTag;
 
+            // Options.Clang.Compiler.ValueProfileCountersPerSite
+            string valueProfileCountersPerSite = Options.IntOption.Get<Options.Clang.Compiler.ValueProfileCountersPerSite>(context.Configuration);
+            if (valueProfileCountersPerSite != FileGeneratorUtilities.RemoveLineTag)
+            {
+                context.Configuration.AdditionalCompilerOptions.Add($"-Xclang -mllvm -Xclang -vp-counters-per-site={valueProfileCountersPerSite}");
+            }
+
             optionsContext.PlatformVcxproj.SelectPrecompiledHeaderOptions(context);
 
             // Default defines...
@@ -1157,7 +1208,9 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             // We need to merge together AdditionalCompilerOptions and AdditionalCompilerOptimizeOptions for writing them on a single line in vcxproj files.
-            string[] allAdditionalOptions = new string[] { optionResults[0], optionResults[1] };
+            // WORKAROUND: we also add the Clang profile-guided-optimization options if they have been provided.
+            // This is needed because vcxproj does not directly support those options and adding the options in Project.Configuration.AdditionalCompilerOptions ends up duplicating them in the BFF.
+            string[] allAdditionalOptions = new string[] { optionResults[0], optionResults[1], context.CommandLineOptions["UseProfileGuidedOptimizationData"], context.CommandLineOptions["GenerateProfileGuidedOptimizationData"] };
             var nonEmptyOptions = allAdditionalOptions.Where(a => a != FileGeneratorUtilities.RemoveLineTag);
             if (nonEmptyOptions.Any())
             {
@@ -1871,6 +1924,17 @@ namespace Sharpmake.Generators.VisualStudio
                 if (linkerAdditionalOptions.Length > 0)
                     linkerAdditionalOptions += " ";
                 linkerAdditionalOptions += ignoredLinkerWarnings;
+            }
+
+            // Treat Options.Clang.Linker.ExtTspBlockPlacement here because
+            // it does not have a specific line in the vcxproj
+            Options.Clang.Linker.ExtTspBlockPlacement extTSPBlockPlacement = Options.GetObject<Options.Clang.Linker.ExtTspBlockPlacement>(context.Configuration);
+            if (extTSPBlockPlacement == Options.Clang.Linker.ExtTspBlockPlacement.Enable)
+            {
+                if (linkerAdditionalOptions.Length > 0)
+                    linkerAdditionalOptions += " ";
+                string mllvmLinkerPrefix = context.Configuration.Platform.IsMicrosoft() ? "-mllvm:" : "-Wl,-mllvm,";
+                linkerAdditionalOptions += $"{mllvmLinkerPrefix}-enable-ext-tsp-block-placement=1";
             }
 
             context.Options["AdditionalLibrarianOptions"] = additionalLibrarianOptions.Length > 0 ? additionalLibrarianOptions : FileGeneratorUtilities.RemoveLineTag;

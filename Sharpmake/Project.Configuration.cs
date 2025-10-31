@@ -3018,7 +3018,10 @@ namespace Sharpmake
                     if (pathOption != null)
                     {
                         pathOption.Path = resolver.Resolve(pathOption.Path);
-                        Util.ResolvePath(Project.SourceRootPath, ref pathOption.Path);
+                        if (pathOption.Path != null)
+                        {
+                            Util.ResolvePath(Project.SourceRootPath, ref pathOption.Path);
+                        }
                     }
                 }
 
