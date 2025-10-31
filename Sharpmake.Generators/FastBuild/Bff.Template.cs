@@ -443,6 +443,8 @@ Compiler( '[fastBuildNasmCompilerName]' )
             + ' [cmdLineOptions.OmitFramePointers]'
             + ' [cmdLineOptions.EnableFiberSafeOptimizations]'
             + ' [cmdLineOptions.CompilerWholeProgramOptimization]'
+            + ' [cmdLineOptions.GenerateProfileGuidedOptimizationData]'
+            + ' [cmdLineOptions.UseProfileGuidedOptimizationData]'
             + ' [options.AdditionalCompilerOptimizeOptions]'
 ";
 

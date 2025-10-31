@@ -98,6 +98,52 @@ namespace Sharpmake
                     ForSize
                 }
 
+                public static class ProfileGuidedOptimization
+                {
+                    /// <summary>
+                    /// Use profile data for profile-guided optimization.
+                    /// </summary>
+                    /// <remarks>
+                    /// Note that Sharpmake's usual placeholder strings can be used in path.
+                    /// For more information, see https://clang.llvm.org/docs/UsersManual.html#cmdoption-fprofile-use
+                    /// </remarks>
+                    public class Use : PathOption
+                    {
+                        public Use(string path) : base(path) { }
+                    }
+
+                    /// <summary>
+                    /// Generate instrumented code to collect raw profile data in the directory specified as directoryPath.
+                    /// </summary>
+                    /// <remarks>
+                    /// This option cannot be used at the same time as the GenerateCS option.
+                    /// Note that Sharpmake's usual placeholder strings can be used in directoryPath.
+                    /// For more information, see https://clang.llvm.org/docs/UsersManual.html#cmdoption-fprofile-generate
+                    /// </remarks>
+                    public class Generate : PathOption
+                    {
+                        public Generate(string directoryPath = null) : base(directoryPath) { }
+                    }
+
+                    /// <summary>
+                    /// Generate context-sensitive (i.e. post-inlining) instrumented code to collect raw profile data in the directory specified as directoryPath.
+                    /// </summary>
+                    /// <remarks>
+                    /// This option cannot be used at the same time as the Generate option.
+                    /// Note that Sharpmake's usual placeholder strings can be used in directoryPath.
+                    /// For more information, see https://clang.llvm.org/docs/UsersManual.html#cmdoption-fcs-profile-generate
+                    /// </remarks>
+                    public class GenerateCS: PathOption
+                    {
+                        public GenerateCS(string directoryPath = null) : base(directoryPath) { }
+                    }
+                }
+
+                public class ValueProfileCountersPerSite : IntOption
+                {
+                    public ValueProfileCountersPerSite(int counter) : base(counter) { }
+                }
+
                 public enum Rtti
                 {
                     [Default]
@@ -133,6 +179,16 @@ namespace Sharpmake
                 public class LLVMVcPlatformToolset : WithArgOption<Vc.General.PlatformToolset>
                 {
                     public LLVMVcPlatformToolset(Vc.General.PlatformToolset vcPlatformToolset) : base(vcPlatformToolset) { }
+                }
+            }
+
+            public static class Linker
+            {
+                public enum ExtTspBlockPlacement
+                {
+                    [Default]
+                    Disable,
+                    Enable
                 }
             }
         }

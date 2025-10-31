@@ -61,7 +61,7 @@ namespace Sharpmake
                 {
                     return fallback;
                 }
-                if (!string.IsNullOrEmpty(rootpath))
+                if (!string.IsNullOrEmpty(rootpath) && option.Path != null)
                 {
                     return Util.PathGetRelative(rootpath, option.Path, true);
                 }
