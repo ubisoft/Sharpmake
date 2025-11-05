@@ -1293,21 +1293,112 @@ namespace Sharpmake.UnitTests
         ///     <remark>Implementation of create symbolic links doesn't work on linux so this test is discard on Mono</remark>
         ///  </summary> 
         [Test]
-        [Ignore("Test Broken")]
         public void CreateSymbolicLinkOnDirectory()
         {
-            if (!Util.IsRunningInMono())
+            var tempBase = Path.Combine(Path.GetTempPath(), $"test-symlink-dir-{Guid.NewGuid():N}");
+            var tempSource = Path.Combine(tempBase, $"test-source");
+            var tempSourceRelative = Path.Combine(tempBase, $"..\\{new DirectoryInfo(tempBase).Name}\\test-source");
+            var tempSourceNonEmpty = Path.Combine(tempBase, $"test-source-nonempty");
+            var tempSourceNonEmptyFile = Path.Combine(tempSourceNonEmpty, $"test1.txt");
+            var tempDestination1 = Path.Combine(tempBase, $"test-destination1");
+            var tempDestination1File = Path.Combine(tempDestination1, $"test2.txt");
+            var tempDestination2 = Path.Combine(tempBase, $"test-destination2");
+
+            try
             {
-                var tempDirectory1 = Directory.CreateDirectory(Path.GetTempPath() + Path.DirectorySeparatorChar + "test-source");
-                var tempDirectory2 = Directory.CreateDirectory(Path.GetTempPath() + Path.DirectorySeparatorChar + "test-destination");
+                Directory.CreateDirectory(tempDestination1);
+                File.WriteAllText(tempDestination1File, "Some content");
+                Directory.CreateDirectory(tempDestination2);
 
-                Assert.False(Util.CreateSymbolicLink(Path.GetTempPath(), Path.GetTempPath(), true));
-                Assert.False(tempDirectory1.Attributes.HasFlag(FileAttributes.ReparsePoint));
-                Assert.True(Util.CreateSymbolicLink(tempDirectory1.FullName, tempDirectory2.FullName, true));
-                Assert.True(tempDirectory1.Attributes.HasFlag(FileAttributes.ReparsePoint));
+                // Invalid case: source and destination are the same
+                Assert.Throws<IOException>(() => Util.CreateOrUpdateSymbolicLink(Path.GetTempPath(), Path.GetTempPath(), true));
 
-                Directory.Delete(tempDirectory1.FullName);
-                Directory.Delete(tempDirectory2.FullName);
+                // Validate creation of a new symbolic link
+                Assert.That(Util.CreateOrUpdateSymbolicLink(tempSource, tempDestination1, true), Is.EqualTo(Util.CreateOrUpdateSymbolicLinkResult.Created));
+                Assert.True(new DirectoryInfo(tempSource).Attributes.HasFlag(FileAttributes.ReparsePoint));
+                Assert.That(Directory.ResolveLinkTarget(tempSource, false).FullName, Is.EqualTo(tempDestination1));
+
+                // Validate updating a symbolic
+                Assert.That(Util.CreateOrUpdateSymbolicLink(tempSource, tempDestination2, true), Is.EqualTo(Util.CreateOrUpdateSymbolicLinkResult.Updated));
+                Assert.True(new DirectoryInfo(tempSource).Attributes.HasFlag(FileAttributes.ReparsePoint));
+                Assert.That(Directory.ResolveLinkTarget(tempSource, false).FullName, Is.EqualTo(tempDestination2));
+                Assert.True(File.Exists(tempDestination1File)); // Verify that the content of the old symlink is still there
+
+                // Validate noop when the symbolic link is already up to date
+                Assert.That(Util.CreateOrUpdateSymbolicLink(tempSource, tempDestination2, true), Is.EqualTo(Util.CreateOrUpdateSymbolicLinkResult.AlreadyUpToDate));
+
+                // Validate with alt directory separator char
+                Assert.That(Util.CreateOrUpdateSymbolicLink(tempSource.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar), tempDestination2, true), Is.EqualTo(Util.CreateOrUpdateSymbolicLinkResult.AlreadyUpToDate));
+
+                // Validate with relative path
+                Assert.That(Util.CreateOrUpdateSymbolicLink(tempSourceRelative, tempDestination2, true), Is.EqualTo(Util.CreateOrUpdateSymbolicLinkResult.AlreadyUpToDate));
+
+                // Validate that creating a symbolic link on a non empty directory succeeds (deleting its content)
+                Directory.CreateDirectory(tempSourceNonEmpty);
+                File.WriteAllText(tempSourceNonEmptyFile, "Some content");
+                Assert.That(Util.CreateOrUpdateSymbolicLink(tempSourceNonEmpty, tempDestination1, true), Is.EqualTo(Util.CreateOrUpdateSymbolicLinkResult.Updated));
+                Assert.False(File.Exists(tempSourceNonEmptyFile)); // Should have been deleted when the symlink was created
+            }
+            finally
+            {
+                try { Directory.Delete(tempBase, true); } catch { }
+            }
+        }
+
+        /// <summary>
+        ///     <c>CreateSymbolicLinkOnFile</c> create a symbolic link for files
+        ///     The test cases are:
+        ///     <list type="number">
+        ///         <item><description>Testing that a symbolic link is not created on a file pointing itself</description></item>
+        ///         <item><description>Testing that a symbolic link is created on a file pointing to another file</description></item>
+        ///         <item><description>Testing updating a file symbolic link to point to a different target</description></item>
+        ///         <item><description>Testing that no operation occurs when file symbolic link is already up to date</description></item>
+        ///     </list>
+        ///     <remark>Implementation of create symbolic links doesn't work on linux so this test is discard on Mono</remark>
+        ///  </summary>
+        [Test]
+        public void CreateSymbolicLinkOnFile()
+        {
+            var tempBase = Path.Combine(Path.GetTempPath(), $"test-symlink-file-{Guid.NewGuid():N}");
+            var tempSource = Path.Combine(tempBase, $"test-file-source.txt");
+            var tempSourceRelative = Path.Combine(tempBase, $"..\\{new DirectoryInfo(tempBase).Name}\\test-file-source.txt");
+            var tempDestination1 = Path.Combine(tempBase, $"test-file-destination1.txt");
+            var tempDestination2 = Path.Combine(tempBase, $"test-file-destination2.txt");
+
+            try
+            {
+                // Create destination files with some content
+                Directory.CreateDirectory(tempBase);
+                File.WriteAllText(tempDestination1, "Destination 1 content");
+                File.WriteAllText(tempDestination2, "Destination 2 content");
+
+                // Invalid case: source and destination are the same
+                Assert.Throws<IOException>(() => Util.CreateOrUpdateSymbolicLink(tempDestination1, tempDestination1, false));
+
+                // Validate creation of a new symbolic link
+                Assert.That(Util.CreateOrUpdateSymbolicLink(tempSource, tempDestination1, false), Is.EqualTo(Util.CreateOrUpdateSymbolicLinkResult.Created));
+                Assert.True(new FileInfo(tempSource).Attributes.HasFlag(FileAttributes.ReparsePoint));
+                Assert.That(File.ResolveLinkTarget(tempSource, false).FullName, Is.EqualTo(tempDestination1));
+                Assert.True(Util.IsSymbolicLink(tempSource));
+
+                // Validate updating a symbolic link
+                Assert.That(Util.CreateOrUpdateSymbolicLink(tempSource, tempDestination2, false), Is.EqualTo(Util.CreateOrUpdateSymbolicLinkResult.Updated));
+                Assert.True(new FileInfo(tempSource).Attributes.HasFlag(FileAttributes.ReparsePoint));
+                Assert.That(File.ResolveLinkTarget(tempSource, false).FullName, Is.EqualTo(tempDestination2));
+                Assert.True(Util.IsSymbolicLink(tempSource));
+
+                // Validate noop when the symbolic link is already up to date
+                Assert.That(Util.CreateOrUpdateSymbolicLink(tempSource, tempDestination2, false), Is.EqualTo(Util.CreateOrUpdateSymbolicLinkResult.AlreadyUpToDate));
+
+                // Validate with alt directory separator char
+                Assert.That(Util.CreateOrUpdateSymbolicLink(tempSource.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar), tempDestination2, false), Is.EqualTo(Util.CreateOrUpdateSymbolicLinkResult.AlreadyUpToDate));
+
+                // Validate with relative path
+                Assert.That(Util.CreateOrUpdateSymbolicLink(tempSourceRelative, tempDestination2, false), Is.EqualTo(Util.CreateOrUpdateSymbolicLinkResult.AlreadyUpToDate));
+            }
+            finally
+            {
+                try { Directory.Delete(tempBase, true); } catch { }
             }
         }
 
@@ -1321,22 +1412,18 @@ namespace Sharpmake.UnitTests
         ///     <remark>Implementation of create symbolic links doesn't work on linux so this test is discard on Mono</remark>
         ///  </summary>
         [Test]
-        [Ignore("Test Broken")]
         public void IsSymbolicLink()
         {
-            if (!Util.IsRunningInMono())
-            {
-                var mockPath1 = Path.GetTempFileName();
-                var mockPath2 = Path.GetTempFileName();
+            var mockPath1 = Path.GetTempFileName();
+            var mockPath2 = Path.GetTempFileName();
 
-                Assert.False(Util.IsSymbolicLink(mockPath1));
+            Assert.False(Util.IsSymbolicLink(mockPath1));
 
-                Assert.True(Util.CreateSymbolicLink(mockPath1, mockPath2, false));
-                Assert.True(Util.IsSymbolicLink(mockPath1));
+            Assert.DoesNotThrow(() => Util.CreateOrUpdateSymbolicLink(mockPath1, mockPath2, false));
+            Assert.True(Util.IsSymbolicLink(mockPath1));
 
-                File.Delete(mockPath1);
-                File.Delete(mockPath2);
-            }
+            File.Delete(mockPath1);
+            File.Delete(mockPath2);
         }
     }
 
