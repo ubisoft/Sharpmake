@@ -30,7 +30,7 @@ namespace Common
                         OutputType.Dll,
                         Blob.NoBlob,
                         BuildSystem.MSBuild,
-                        DotNetFramework.v4_5_2),
+                        DotNetFramework.net8_0),
             new Target(
                         Platform.anycpu,
                         DevEnv.vs2017,
@@ -38,7 +38,7 @@ namespace Common
                         OutputType.Dll,
                         Blob.NoBlob,
                         BuildSystem.MSBuild,
-                        DotNetFramework.v4_6_1)
+                        DotNetFramework.net9_0)
             };
         }
     }

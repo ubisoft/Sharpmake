@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -11,32 +11,28 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{8D02FD8F-4FAD-DA3A-F993-716DF68A16CA}</ProjectGuid>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <Keyword>ManagedCProj</Keyword>
+    <ProjectGuid>{0B7B372C-D9BE-10C9-80D0-EB5C7ABCABAE}</ProjectGuid>
     <DefaultLanguage>en-US</DefaultLanguage>
-    <RootNamespace>CLRCPPProj</RootNamespace>
-    <ProjectName>CLRCPPProj</ProjectName>
+    <RootNamespace>theEmptyCPPProject</RootNamespace>
+    <ProjectName>theEmptyCPPProject</ProjectName>
   </PropertyGroup>
   <PropertyGroup Label="Globals">
-    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
-    <PlatformToolset>v143</PlatformToolset>
-    <CLRSupport>true</CLRSupport>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
-    <PlatformToolset>v143</PlatformToolset>
-    <CLRSupport>true</CLRSupport>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -46,23 +42,23 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <TargetName>clrcppproj</TargetName>
+    <TargetName>theemptycppproject</TargetName>
     <OutDir>output\win32\debug\</OutDir>
-    <IntDir>temp\clrcppproj\vs2022\v4_7_2\debug\</IntDir>
-    <TargetExt>.dll</TargetExt>
+    <IntDir>temp\theemptycppproject\vs2019\v4_7_2\debug\</IntDir>
+    <TargetExt>.lib</TargetExt>
     <GenerateManifest>true</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
-    <OutputFile>output\win32\debug\clrcppproj.dll</OutputFile>
+    <OutputFile>output\win32\debug\theemptycppproject.lib</OutputFile>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <TargetName>clrcppproj</TargetName>
+    <TargetName>theemptycppproject</TargetName>
     <OutDir>output\win32\release\</OutDir>
-    <IntDir>temp\clrcppproj\vs2022\v4_7_2\release\</IntDir>
-    <TargetExt>.dll</TargetExt>
+    <IntDir>temp\theemptycppproject\vs2019\v4_7_2\release\</IntDir>
+    <TargetExt>.lib</TargetExt>
     <GenerateManifest>true</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
-    <OutputFile>output\win32\release\clrcppproj.dll</OutputFile>
+    <OutputFile>output\win32\release\theemptycppproject.lib</OutputFile>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -70,9 +66,8 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <CompileAsManaged>true</CompileAsManaged>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TreatWarningAsError>false</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -89,7 +84,7 @@
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <PreprocessKeepComments>false</PreprocessKeepComments>
       <StringPooling>true</StringPooling>
-      <ExceptionHandling>false</ExceptionHandling>
+      <ExceptionHandling>Async</ExceptionHandling>
       <SmallerTypeCheck>false</SmallerTypeCheck>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -102,7 +97,7 @@
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <OpenMPSupport>false</OpenMPSupport>
       <ExpandAttributedSource>false</ExpandAttributedSource>
       <AssemblerOutput>NoListing</AssemblerOutput>
@@ -111,52 +106,28 @@
       <CallingConvention>Cdecl</CallingConvention>
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
-      <ProgramDatabaseFileName>temp\clrcppproj\vs2022\v4_7_2\debug\clrcppproj_compiler.pdb</ProgramDatabaseFileName>
+      <ProgramDatabaseFileName>temp\theemptycppproject\vs2019\v4_7_2\debug\theemptycppproject_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
-      <FullProgramDatabaseFile>true</FullProgramDatabaseFile>
-      <OutputFile>output\win32\debug\clrcppproj.dll</OutputFile>
-      <ShowProgress>NotSet</ShowProgress>
-      <AdditionalLibraryDirectories>output\win32\debug</AdditionalLibraryDirectories>
-      <ProgramDatabaseFile>output\win32\debug\clrcppproj.pdb</ProgramDatabaseFile>
-      <GenerateMapFile>true</GenerateMapFile>
-      <MapExports>false</MapExports>
-      <SwapRunFromCD>false</SwapRunFromCD>
-      <SwapRunFromNET>false</SwapRunFromNET>
-      <Driver>NotSet</Driver>
-      <OptimizeReferences>false</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
-      <ProfileGuidedDatabase>
-      </ProfileGuidedDatabase>
-      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
-      <IgnoreEmbeddedIDL>false</IgnoreEmbeddedIDL>
-      <TypeLibraryResourceID>1</TypeLibraryResourceID>
-      <NoEntryPoint>false</NoEntryPoint>
-      <SetChecksum>false</SetChecksum>
-      <TurnOffAssemblyGeneration>false</TurnOffAssemblyGeneration>
-      <TargetMachine>MachineX86</TargetMachine>
-      <Profile>false</Profile>
-      <CLRImageType>Default</CLRImageType>
-      <LinkErrorReporting>PromptImmediately</LinkErrorReporting>
-      <AdditionalDependencies>theemptycppproject.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
-      <LargeAddressAware>true</LargeAddressAware>
-      <MapFileName>output\win32\debug\clrcppproj.map</MapFileName>
+      <OptimizeReferences>false</OptimizeReferences>
     </Link>
+    <Lib>
+      <TargetMachine>MachineX86</TargetMachine>
+      <SubSystem/>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
+      <OutputFile>output\win32\debug\theemptycppproject.lib</OutputFile>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Full</Optimization>
-      <PreprocessorDefinitions>NDEBUG;WIN32;%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <CompileAsManaged>true</CompileAsManaged>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TreatWarningAsError>false</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -173,7 +144,7 @@
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <PreprocessKeepComments>false</PreprocessKeepComments>
       <StringPooling>true</StringPooling>
-      <ExceptionHandling>false</ExceptionHandling>
+      <ExceptionHandling>Async</ExceptionHandling>
       <SmallerTypeCheck>false</SmallerTypeCheck>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -186,7 +157,7 @@
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <OpenMPSupport>false</OpenMPSupport>
       <ExpandAttributedSource>false</ExpandAttributedSource>
       <AssemblerOutput>NoListing</AssemblerOutput>
@@ -195,76 +166,28 @@
       <CallingConvention>Cdecl</CallingConvention>
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
-      <ProgramDatabaseFileName>temp\clrcppproj\vs2022\v4_7_2\release\clrcppproj_compiler.pdb</ProgramDatabaseFileName>
+      <ProgramDatabaseFileName>temp\theemptycppproject\vs2019\v4_7_2\release\theemptycppproject_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
-      <FullProgramDatabaseFile>true</FullProgramDatabaseFile>
-      <OutputFile>output\win32\release\clrcppproj.dll</OutputFile>
-      <ShowProgress>NotSet</ShowProgress>
-      <AdditionalLibraryDirectories>output\win32\release</AdditionalLibraryDirectories>
-      <ProgramDatabaseFile>output\win32\release\clrcppproj.pdb</ProgramDatabaseFile>
-      <GenerateMapFile>true</GenerateMapFile>
-      <MapExports>false</MapExports>
-      <SwapRunFromCD>false</SwapRunFromCD>
-      <SwapRunFromNET>false</SwapRunFromNET>
-      <Driver>NotSet</Driver>
-      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <ProfileGuidedDatabase>
-      </ProfileGuidedDatabase>
-      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
-      <IgnoreEmbeddedIDL>false</IgnoreEmbeddedIDL>
-      <TypeLibraryResourceID>1</TypeLibraryResourceID>
-      <NoEntryPoint>false</NoEntryPoint>
-      <SetChecksum>false</SetChecksum>
-      <TurnOffAssemblyGeneration>false</TurnOffAssemblyGeneration>
-      <TargetMachine>MachineX86</TargetMachine>
-      <Profile>false</Profile>
-      <CLRImageType>Default</CLRImageType>
-      <LinkErrorReporting>PromptImmediately</LinkErrorReporting>
-      <AdditionalDependencies>theemptycppproject.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
-      <LargeAddressAware>true</LargeAddressAware>
-      <MapFileName>output\win32\release\clrcppproj.map</MapFileName>
+      <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <Lib>
+      <TargetMachine>MachineX86</TargetMachine>
+      <SubSystem/>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
+      <OutputFile>output\win32\release\theemptycppproject.lib</OutputFile>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\codebase\CLRCPPProj\CLRCPPProj.h" />
+    <ClInclude Include="..\codebase\theEmptyCPPProject\TestClass.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\codebase\CLRCPPProj\AssemblyInfo.cpp" />
-    <ClCompile Include="..\codebase\CLRCPPProj\CLRCPPProj.cpp" />
+    <ClCompile Include="..\codebase\theEmptyCPPProject\TestClass.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="CSharpProjBuildOrderDependency.vs2022.v4_7_2.csproj">
-      <Project>{FCE70296-BFEE-87F2-6BB4-6EDA713DA129}</Project>
-      <Name>CSharpProjBuildOrderDependency</Name>
-      <Private>false</Private>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
-    </ProjectReference>
-    <ProjectReference Include="OtherCSharpProj.vs2022.v4_7_2.csproj">
-      <Project>{C67510CE-FE51-F409-686E-F1DFBD047DAA}</Project>
-      <Name>OtherCSharpProj</Name>
-      <Private>false</Private>
-    </ProjectReference>
-    <ProjectReference Include="theemptycppproject.vs2022.v4_7_2.vcxproj">
-      <Project>{73752EE3-3CA0-703C-E295-427A8187946C}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
-    </ProjectReference>
-  </ItemGroup>
 </Project>

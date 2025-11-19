@@ -21,7 +21,7 @@ namespace CLR_SharpmakeTest
                 OutputType.Dll,
                 Blob.NoBlob,
                 BuildSystem.MSBuild,
-                DotNetFramework.v4_6_2
+                DotNetFramework.v4_7_2
             ),
             new Target(
                 Platform.win32,
@@ -30,7 +30,7 @@ namespace CLR_SharpmakeTest
                 OutputType.Dll,
                 Blob.NoBlob,
                 BuildSystem.MSBuild,
-                DotNetFramework.v4_7_2
+                DotNetFramework.v4_8
             )
         };
     }

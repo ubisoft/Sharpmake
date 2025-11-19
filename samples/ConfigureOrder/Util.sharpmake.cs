@@ -21,7 +21,7 @@ namespace ConfigureOrdering
                         OutputType.Lib,
                         Blob.NoBlob,
                         BuildSystem.MSBuild,
-                        DotNetFramework.v4_6_2
+                        DotNetFramework.net8_0
                     );
                 }
                 return s_defaultTarget;

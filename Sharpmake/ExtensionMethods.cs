@@ -44,18 +44,6 @@ namespace Sharpmake
         {
             switch (framework)
             {
-                case DotNetFramework.v3_5:
-                    return "3.5";
-                case DotNetFramework.v3_5clientprofile:
-                    return "3.5";
-                case DotNetFramework.v4_5_2:
-                    return "4.5.2";
-                case DotNetFramework.v4_6:
-                    return "4.6";
-                case DotNetFramework.v4_6_1:
-                    return "4.6.1";
-                case DotNetFramework.v4_6_2:
-                    return "4.6.2";
                 case DotNetFramework.v4_7:
                     return "4.7";
                 case DotNetFramework.v4_7_1:
@@ -106,6 +94,8 @@ namespace Sharpmake
                     return "net8.0";
                 case DotNetFramework.net9_0:
                     return "net9.0";
+                case DotNetFramework.net10_0:
+                    return "net10.0";
                 case DotNetFramework.all_netframework:
                 case DotNetFramework.all_netcore:
                 case DotNetFramework.all_netstandard:
@@ -119,16 +109,6 @@ namespace Sharpmake
             //https://docs.microsoft.com/en-us/dotnet/standard/frameworks
             switch (framework)
             {
-                case DotNetFramework.v3_5:
-                    return "net35";
-                case DotNetFramework.v4_5_2:
-                    return "net452";
-                case DotNetFramework.v4_6:
-                    return "net46";
-                case DotNetFramework.v4_6_1:
-                    return "net461";
-                case DotNetFramework.v4_6_2:
-                    return "net462";
                 case DotNetFramework.v4_7:
                     return "net47";
                 case DotNetFramework.v4_7_1:
@@ -161,6 +141,8 @@ namespace Sharpmake
                     return "net8.0";
                 case DotNetFramework.net9_0:
                     return "net9.0";
+                case DotNetFramework.net10_0:
+                    return "net10.0";
                 case DotNetFramework.netstandard1_0:
                     return "netstandard1.0";
                 case DotNetFramework.netstandard1_1:
@@ -680,7 +662,7 @@ namespace Sharpmake
                         string netFxPath = string.Empty;
                         if (dotNetFramework.HasValue && visualVersion >= DevEnv.vs2015)
                         {
-                            string netFXKitsDir = Util.EnsureTrailingSeparator(KitsRootPaths.GetNETFXKitsDir(dotNetFramework.Value < DotNetFramework.v4_6 ? DotNetFramework.v4_6 : dotNetFramework.Value));
+                            string netFXKitsDir = Util.EnsureTrailingSeparator(KitsRootPaths.GetNETFXKitsDir(dotNetFramework.Value));
                             netFxPath = Path.Combine(netFXKitsDir, "Lib", "um", targetPlatform);
                         }
 

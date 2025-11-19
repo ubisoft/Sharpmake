@@ -1,0 +1,25 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpWCF", "csharpwcf\CSharpWCF.vs2022.v4_7_2.csproj", "{52B9DE12-A43D-C710-375D-7319B1E6871F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpWCFApp", "csharpwcfapp\CSharpWCFApp.vs2022.v4_7_2.csproj", "{88F51FF4-3736-0636-1B9A-1A5D1AF30C8F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{52B9DE12-A43D-C710-375D-7319B1E6871F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52B9DE12-A43D-C710-375D-7319B1E6871F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52B9DE12-A43D-C710-375D-7319B1E6871F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52B9DE12-A43D-C710-375D-7319B1E6871F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88F51FF4-3736-0636-1B9A-1A5D1AF30C8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88F51FF4-3736-0636-1B9A-1A5D1AF30C8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88F51FF4-3736-0636-1B9A-1A5D1AF30C8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88F51FF4-3736-0636-1B9A-1A5D1AF30C8F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

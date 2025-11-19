@@ -141,7 +141,7 @@ namespace Sharpmake
             if (s_netFxKitsDir.TryGetValue(dotNetFramework, out netFxKitsDir))
                 return netFxKitsDir;
 
-            if (dotNetFramework >= DotNetFramework.v4_6)
+            if (dotNetFramework >= DotNetFramework.v4_7)
             {
                 var netFXSdkRegistryKeyString = string.Format(@"SOFTWARE{0}\Microsoft\Microsoft SDKs\NETFXSDK",
                     Environment.Is64BitProcess ? @"\Wow6432Node" : string.Empty);
@@ -165,26 +165,16 @@ namespace Sharpmake
             var microsoftSdksRegistryKeyString = string.Format(@"SOFTWARE{0}\Microsoft\Microsoft SDKs",
                 Environment.Is64BitProcess ? @"\Wow6432Node" : string.Empty);
 
-            if (dotNetFramework >= DotNetFramework.v4_6)
+            if ((dotNetFramework & DotNetFramework.all_netframework) == 0)
+            {
+                throw new Exception("dotNetFramework argument must be a .net framework");
+            }
+            if (dotNetFramework >= DotNetFramework.v4_7)
             {
                 netFxToolsDir = Util.GetRegistryLocalMachineSubKeyValue(
                     $@"{microsoftSdksRegistryKeyString}\NETFXSDK\{dotNetFramework.ToVersionString()}\WinSDK-NetFx40Tools-x86",
                     "InstallationFolder",
                     $@"C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX {dotNetFramework.ToVersionString()} Tools\");
-            }
-            else if (dotNetFramework >= DotNetFramework.v4_5_2) // Note: .Net 4.5.2 lacks a NETFX tools release, so we use the previous version
-            {
-                netFxToolsDir = Util.GetRegistryLocalMachineSubKeyValue(
-                    $@"{microsoftSdksRegistryKeyString}\Windows\v8.1A\WinSDK-NetFx40Tools-x86",
-                    "InstallationFolder",
-                    $@"C:\Program Files (x86)\Microsoft SDKs\Windows\v8.1A\bin\NETFX 4.5.1 Tools\");
-            }
-            else if (dotNetFramework >= DotNetFramework.v3_5)
-            {
-                netFxToolsDir = Util.GetRegistryLocalMachineSubKeyValue(
-                    $@"{microsoftSdksRegistryKeyString}\Windows\v8.0A\WinSDK-NetFx35Tools-x86",
-                    "InstallationFolder",
-                    $@"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\");
             }
             else
             {

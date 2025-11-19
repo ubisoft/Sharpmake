@@ -24,12 +24,12 @@ namespace CSharpWCF
             AddTargets(
                 new Target(
                     Platform.anycpu,
-                    DevEnv.vs2015,
+                    DevEnv.vs2022,
                     Optimization.Debug | Optimization.Release,
                     OutputType.Dll,
                     Blob.NoBlob,
                     BuildSystem.MSBuild,
-                    DotNetFramework.v4_5_2
+                    DotNetFramework.v4_7_2
                 )
             );
         }
@@ -74,12 +74,12 @@ namespace CSharpWCF
             AddTargets(
                 new Target(
                     Platform.anycpu,
-                    DevEnv.vs2015,
+                    DevEnv.vs2022,
                     Optimization.Debug | Optimization.Release,
                     OutputType.Dll,
                     Blob.NoBlob,
                     BuildSystem.MSBuild,
-                    DotNetFramework.v4_5_2
+                    DotNetFramework.v4_7_2
                 )
             );
         }
@@ -121,12 +121,12 @@ namespace CSharpWCF
         {
             AddTargets(new Target(
             Platform.anycpu,
-            DevEnv.vs2015,
+            DevEnv.vs2022,
             Optimization.Debug | Optimization.Release,
             OutputType.Dll,
             Blob.NoBlob,
             BuildSystem.MSBuild,
-            DotNetFramework.v4_5_2));
+            DotNetFramework.v4_7_2));
         }
 
         [Configure()]

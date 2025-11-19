@@ -4,12 +4,12 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <PlatformTarget Condition=" '$(Platform)' == '' ">AnyCPU</PlatformTarget>
-    <ProjectGuid>{74D7ADAE-D7B8-8401-A017-C88C6B875720}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{9A54C09B-B52A-201D-1867-EDC2AF0CD61C}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HelloWorldReference</RootNamespace>
-    <AssemblyName>HelloWorldReference</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <RootNamespace>HelloWorld</RootNamespace>
+    <AssemblyName>the other name</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -23,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
+    <CustomOptimizationProperty>Custom-Debug</CustomOptimizationProperty>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -35,11 +36,22 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
+    <CustomOptimizationProperty>Custom-Release</CustomOptimizationProperty>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\codebase\HelloWorldReference\HelloWorldReference.cs">
-      <Link>HelloWorldReference.cs</Link>
+    <Compile Include="..\..\codebase\HelloWorld\Program.cs">
+      <Link>Program.cs</Link>
     </Compile>
+    <Compile Include="..\..\codebase\HelloWorld\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\helloworldreference\HelloWorldReference.vs2017.v4_7_2.csproj">
+      <Project>{8d479eb4-c69c-7ea3-79e4-ca074005e93d}</Project>
+      <Name>HelloWorldReference</Name>
+      <Private>false</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

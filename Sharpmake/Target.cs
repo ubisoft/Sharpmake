@@ -209,12 +209,12 @@ namespace Sharpmake
     [Fragment, Flags]
     public enum DotNetFramework
     {
-        v3_5 = 1 << 0,
-        v3_5clientprofile = 1 << 1,
-        v4_5_2 = 1 << 2,
-        v4_6 = 1 << 3,
-        v4_6_1 = 1 << 4,
-        v4_6_2 = 1 << 5,
+        net10_0 = 1 << 0,
+        // UNUSED = 1 << 1,
+        // UNUSED = 1 << 2,
+        // UNUSED = 1 << 3,
+        // UNUSED = 1 << 4,
+        // UNUSED = 1 << 5,
         v4_7 = 1 << 6,
         v4_7_1 = 1 << 7,
         v4_7_2 = 1 << 8,
@@ -246,24 +246,37 @@ namespace Sharpmake
         net9_0 = 1 << 30,
 
         [CompositeFragment]
-        all_netframework = v3_5 | v3_5clientprofile | v4_5_2 | v4_6 | v4_6_1 | v4_6_2 | v4_7 | v4_7_1 | v4_7_2 | v4_8,
+        all_netframework = v4_7 | v4_7_1 | v4_7_2 | v4_8,
         [CompositeFragment]
-        all_netcore = netcore1_0 | netcore1_1 | netcore2_0 | netcore2_1 | netcore3_0 | netcore3_1 | net5_0 | net6_0 | net7_0 | net8_0 | net9_0,
+        all_netcore = netcore1_0 | netcore1_1 | netcore2_0 | netcore2_1 | netcore3_0 | netcore3_1 | net5_0 | net6_0 | net7_0 | net8_0 | net9_0 | net10_0,
         [CompositeFragment]
         all_netstandard = netstandard1_0 | netstandard1_1 | netstandard1_2 | netstandard1_3 | netstandard1_4 | netstandard1_5 | netstandard1_6 | netstandard2_0 | netstandard2_1,
 
-        [Obsolete("Please use at least .net framework 3.5.", error: true)]
+        [Obsolete("Please use at least .net framework 4.7", error: true)]
         v2,
-        [Obsolete("Please use at least .net framework 3.5.", error: true)]
+        [Obsolete("Please use at least .net framework 4.7", error: true)]
         v3,
-        [Obsolete("Please use at least .net framework 4.5.2.", error: true)]
+        [Obsolete("Please use at least .net framework 4.7", error: true)]
         v4_0,
-        [Obsolete("Please use at least .net framework 4.5.2.", error: true)]
+        [Obsolete("Please use at least .net framework 4.7", error: true)]
         v4_5,
-        [Obsolete("Please use at least .net framework 4.5.2.", error: true)]
+        [Obsolete("Please use at least .net framework 4.7", error: true)]
         v4_5clientprofile,
-        [Obsolete("Please use at least .net framework 4.5.2.", error: true)]
+        [Obsolete("Please use at least .net framework 4.7", error: true)]
         v4_5_1,
+        [Obsolete("Please use at least .net framework 4.7", error: true)]
+        v3_5,
+        [Obsolete("Please use at least .net framework 4.7", error: true)]
+        v3_5clientprofile,
+        [Obsolete("Please use at least .net framework 4.7", error: true)]
+        v4_5_2,
+        [Obsolete("Please use at least .net framework 4.7", error: true)]
+        v4_6,
+        [Obsolete("Please use at least .net framework 4.7", error: true)]
+        v4_6_1,
+        [Obsolete("Please use at least .net framework 4.7", error: true)]
+        v4_6_2,
+
     }
 
     // https://docs.microsoft.com/en-us/dotnet/standard/frameworks#net-5-os-specific-tfms
@@ -328,7 +341,7 @@ namespace Sharpmake
             OutputType outputType = OutputType.Lib,
             Blob blob = Blob.NoBlob,
             BuildSystem buildSystem = BuildSystem.MSBuild,
-            DotNetFramework framework = DotNetFramework.v3_5
+            DotNetFramework framework = DotNetFramework.v4_7_2
         )
         {
             Platform = platform;

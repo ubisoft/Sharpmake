@@ -19,7 +19,7 @@ namespace CSharpHelloWorld
                     OutputType.Dll,
                     Blob.NoBlob,
                     BuildSystem.MSBuild,
-                    DotNetFramework.v4_6_1),
+                    DotNetFramework.v4_7_2),
                 new Target(
                     Platform.anycpu,
                     DevEnv.vs2022,
