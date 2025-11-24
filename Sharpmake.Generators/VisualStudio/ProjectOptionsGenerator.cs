@@ -22,7 +22,7 @@ namespace Sharpmake.Generators.VisualStudio
         All,
     }
 
-    public class ProjectOptionsGenerator
+    public partial class ProjectOptionsGenerator
     {
         // Only MacOS have a subfolder, refer to https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/BundleTypes/BundleTypes.html
         private static readonly string AppleAppBinaryRootFolderForMac = "Contents" + XCodeProj.FolderSeparator + "MacOS" + XCodeProj.FolderSeparator;
@@ -1948,24 +1948,38 @@ namespace Sharpmake.Generators.VisualStudio
 
             Strings manifestInputs = new Strings();
 
-            string vsManifestFilesPath = Util.SimplifyPath(Path.Combine(context.DevelopmentEnvironment.GetVisualStudioVCRootPath(), "Include", "Manifest"));
+            bool generateManifestFile = false;
 
             //EnableDpiAwareness
+            // Yes and PerMonitor both map to the same value, since dpi scaling really doesn't work well in windows 10+ without PerMonitorV2 specified.
+            // This should be safe for older versions too, according to msdn documentation (see link below): "On older versions of Windows, the newer <dpiAwareness> tag will be ignored."
+            // https://learn.microsoft.com/en-us/windows/win32/hidpi/setting-the-default-dpi-awareness-for-a-process#setting-default-awareness-with-the-application-manifest
             context.SelectOption
             (
             Options.Option(Options.Vc.ManifestTool.EnableDpiAwareness.Default, () => { context.Options["EnableDpiAwareness"] = FileGeneratorUtilities.RemoveLineTag; }),
-            Options.Option(Options.Vc.ManifestTool.EnableDpiAwareness.Yes, () => { context.Options["EnableDpiAwareness"] = "true"; manifestInputs.Add(Path.Combine(vsManifestFilesPath, "dpiaware.manifest")); }),
-            Options.Option(Options.Vc.ManifestTool.EnableDpiAwareness.PerMonitor, () => { context.Options["EnableDpiAwareness"] = "PerMonitorHighDPIAware"; manifestInputs.Add(Path.Combine(vsManifestFilesPath, "PerMonitorHighDPIAware.manifest")); }),
+            Options.Option(Options.Vc.ManifestTool.EnableDpiAwareness.Yes, () => { context.Options["EnableDpiAwareness"] = "PerMonitorHighDPIAware"; generateManifestFile = true; }),
+            Options.Option(Options.Vc.ManifestTool.EnableDpiAwareness.PerMonitor, () => { context.Options["EnableDpiAwareness"] = "PerMonitorHighDPIAware"; generateManifestFile = true; }),
             Options.Option(Options.Vc.ManifestTool.EnableDpiAwareness.No, () => { context.Options["EnableDpiAwareness"] = "false"; })
             );
 
-            if (context.Configuration.AdditionalManifestFiles.Count > 0)
+            if (generateManifestFile)
             {
-                context.Options["AdditionalManifestFiles"] = string.Join(";", Util.PathGetRelative(context.ProjectDirectory, context.Configuration.AdditionalManifestFiles));
-                manifestInputs.AddRange(context.Configuration.AdditionalManifestFiles);
+                var fileGenerator = new XmlFileGenerator();
+                fileGenerator.Write(Template.Manifest.FileBegin);
+                fileGenerator.Write(Template.Manifest.DPIAwarenessSettings);
+                fileGenerator.Write(Template.Manifest.FileEnd);
+
+                string projFilePath = context.Configuration.ProjectFullFileName;
+                projFilePath = projFilePath.Replace('.', '_');
+
+                FileInfo projectFileInfo = new FileInfo(projFilePath + ".manifest");
+                context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectFileInfo, fileGenerator);
+               
+                manifestInputs.Add(projectFileInfo.FullName);
             }
-            else
-                context.Options["AdditionalManifestFiles"] = FileGeneratorUtilities.RemoveLineTag;
+
+            if (context.Configuration.AdditionalManifestFiles.Count > 0)
+                manifestInputs.AddRange(context.Configuration.AdditionalManifestFiles);
 
             if (manifestInputs.Count > 0)
             {
@@ -1973,12 +1987,25 @@ namespace Sharpmake.Generators.VisualStudio
                 if (embedManifest == Options.Vc.Linker.EmbedManifest.No)
                     throw new NotImplementedException("Sharpmake does not support manifestinputs without embedding the manifest!");
 
-                var cmdManifests = manifestInputs.Select(p => Bff.CmdLineConvertIncludePathsFunc(context, optionsContext.Resolver, p, "/manifestinput:"));
+                if (context.Configuration.IsFastBuild)
+                {
+                    var cmdManifests = manifestInputs.Select(p => Bff.CmdLineConvertIncludePathsFunc(context, optionsContext.Resolver, p, "/manifestinput:"));
 
-                context.CommandLineOptions["ManifestInputs"] = string.Join($"'{Environment.NewLine}                            + ' ", cmdManifests);
+                    // With fastbuild, manifest references are added to the .bff file via command line
+                    context.Options["AdditionalManifestFiles"] = FileGeneratorUtilities.RemoveLineTag;
+                    context.CommandLineOptions["ManifestInputs"] = string.Join($"'{Environment.NewLine}                            + ' ", cmdManifests);
+                }
+                else
+                {
+                    // With msbuild, manifest references are added to the .vcxproj file via the AdditionalManifestFiles field
+                    // See VcxProj.cs -> Template.Project.ProjectConfigurationsManifestTool use
+                    context.Options["AdditionalManifestFiles"] = string.Join(";", Util.PathGetRelative(context.ProjectDirectory, manifestInputs));
+                    context.CommandLineOptions["ManifestInputs"] = FileGeneratorUtilities.RemoveLineTag;
+                }
             }
             else
             {
+                context.Options["AdditionalManifestFiles"] = FileGeneratorUtilities.RemoveLineTag;
                 context.CommandLineOptions["ManifestInputs"] = FileGeneratorUtilities.RemoveLineTag;
             }
         }
