@@ -44,7 +44,6 @@ namespace Sharpmake
         /// </summary>
         vs2026 = 1 << 10,
 
-
         /// <summary>
         /// Xcode projects
         /// </summary>
