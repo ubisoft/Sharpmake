@@ -41,8 +41,8 @@
             "Commands":
             [
                 "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"CLRTest.sharpmake.cs\" -framework {framework}",
-                "./Compile.ps1 -slnOrPrjFile \"CPPCLI.{VsVersionSuffix}.v4_6_2.sln\" -configuration {configuration} -platform Win32 -WorkingDirectory \"{testFolder}/projects\" -VsVersion {os} -compiler MsBuild",
-                "./{testFolder}/projects/output/{VsVersionSuffix}/v4_6_2/{configuration}/TestCSharpConsole.exe"
+                "./Compile.ps1 -slnOrPrjFile \"CPPCLI.{VsVersionSuffix}.v4_7_2.sln\" -configuration {configuration} -platform Win32 -WorkingDirectory \"{testFolder}/projects\" -VsVersion {os} -compiler MsBuild",
+                "./{testFolder}/projects/output/{VsVersionSuffix}/v4_7_2/{configuration}/TestCSharpConsole.exe"
             ]
         },
         {
@@ -55,8 +55,8 @@
             "Commands":
             [
                 "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"CLRTest.sharpmake.cs\" -framework {framework}",
-                "./Compile.ps1 -slnOrPrjFile \"CPPCLI.{VsVersionSuffix}.v4_7_2.sln\" -configuration {configuration} -platform Win32 -WorkingDirectory \"{testFolder}/projects\" -VsVersion {os} -compiler MsBuild",
-                "./{testFolder}/projects/output/{VsVersionSuffix}/v4_7_2/{configuration}/TestCSharpConsole.exe"
+                "./Compile.ps1 -slnOrPrjFile \"CPPCLI.{VsVersionSuffix}.v4_8.sln\" -configuration {configuration} -platform Win32 -WorkingDirectory \"{testFolder}/projects\" -VsVersion {os} -compiler MsBuild",
+                "./{testFolder}/projects/output/{VsVersionSuffix}/v4_8/{configuration}/TestCSharpConsole.exe"
             ]
         },
         {
@@ -83,7 +83,7 @@
             "Commands":
             [
                 "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"HelloWorld.sharpmake.cs\" -framework {framework}",
-                "./Compile.ps1 -slnOrPrjFile \"HelloWorldSolution.vs2017.v4_6_1.sln\" -configuration {configuration} -platform \"Any CPU\" -WorkingDirectory \"{testFolder}/projects\" -VsVersion {os} -compiler MsBuild",
+                "./Compile.ps1 -slnOrPrjFile \"HelloWorldSolution.vs2017.v4_7_2.sln\" -configuration {configuration} -platform \"Any CPU\" -WorkingDirectory \"{testFolder}/projects\" -VsVersion {os} -compiler MsBuild",
                 "&'./{testFolder}/projects/helloworld/output/anycpu/{configuration}/the other name.exe'"
             ]
         },
@@ -145,14 +145,14 @@
         {
             "Name": "CSharpWCF",
             "CIs": [ "github", "gitlab" ],
-            "OSs": [ "windows-2019", "windows-2022" ],
+            "OSs": [ "windows-2022" ],
             "Frameworks": [ "net6.0" ],
             "Configurations": [ "debug", "release" ],
             "TestFolder": "samples/CSharpWCF",
             "Commands":
             [
                 "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"CSharpWCF.sharpmake.cs\" -framework {framework}",
-                "./Compile.ps1 -slnOrPrjFile \"CSharpWCFSolution.vs2015.v4_5_2.sln\" -configuration {configuration} -platform \"Any CPU\" -WorkingDirectory \"{testFolder}/projects\" -VsVersion {os} -compiler MsBuild"
+                "./Compile.ps1 -slnOrPrjFile \"CSharpWCFSolution.vs2022.v4_7_2.sln\" -configuration {configuration} -platform \"Any CPU\" -WorkingDirectory \"{testFolder}/projects\" -VsVersion {os} -compiler MsBuild"
             ]
         },
         {
@@ -293,9 +293,9 @@
             [
                 "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"HelloWorld.sharpmake.cs\" -framework {framework}",
                 "./Compile.ps1 -slnOrPrjFile \"HelloWorldMultiFrameworkSolution.vs2019.sln\" -configuration {configuration} -platform \"Any CPU\" -WorkingDirectory \"{testFolder}/projects\" -VsVersion {os} -compiler MsBuild",
-                "&'./{testFolder}/projects/helloworldmultiframework/output/anycpu/{configuration}/net461/the other name.exe'",
                 "&'./{testFolder}/projects/helloworldmultiframework/output/anycpu/{configuration}/net472/the other name.exe'",
-                "./Compile.ps1 -slnOrPrjFile \"HelloWorldSolution.vs2019.v4_7_2.sln\" -configuration {configuration} -platform \"Any CPU\" -WorkingDirectory \"{testFolder}/projects\" -VsVersion {os} -compiler MsBuild",
+                "&'./{testFolder}/projects/helloworldmultiframework/output/anycpu/{configuration}/net48/the other name.exe'",
+                "./Compile.ps1 -slnOrPrjFile \"HelloWorldSolution.vs2019.v4_8.sln\" -configuration {configuration} -platform \"Any CPU\" -WorkingDirectory \"{testFolder}/projects\" -VsVersion {os} -compiler MsBuild",
                 "&'./{testFolder}/projects/helloworld/output/vs2019/{configuration}/the other name.exe'"
             ]
         },
@@ -309,8 +309,8 @@
             "Commands":
             [
                 "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"HelloWorld.sharpmake.cs\" -framework {framework}",
-                "./Compile.ps1 -slnOrPrjFile \"HelloWorldSolution.vs2017.v4_6_1.sln\" -configuration {configuration} -platform \"Any CPU\" -WorkingDirectory \"{testFolder}/projects\" -VsVersion {os} -compiler MsBuild",
-                "&'./{testFolder}/projects/helloworld/output/vs2017/{configuration}/the other name.exe'"
+                "./Compile.ps1 -slnOrPrjFile \"HelloWorldSolution.vs2019.v4_7_2.sln\" -configuration {configuration} -platform \"Any CPU\" -WorkingDirectory \"{testFolder}/projects\" -VsVersion {os} -compiler MsBuild",
+                "&'./{testFolder}/projects/helloworld/output/vs2019/{configuration}/the other name.exe'"
             ]
         },
         {
@@ -325,7 +325,7 @@
                 "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"HelloWorld.sharpmake.cs\" -framework {framework}",
                 "./Compile.ps1 -slnOrPrjFile \"HelloWorldMultiFrameworksSolution.vs2019.sln\" -configuration {configuration} -platform \"Any CPU\" -WorkingDirectory \"{testFolder}/projects\" -VsVersion {os} -compiler MsBuild",
                 "./RunProcess.ps1 -exeToRun dotnet -workingDirectory \"{testFolder}/projects/helloworldmultiframeworks/output/anycpu/{configuration}/netcoreapp3.1\" -arguments \"HelloWorldMultiFrameworks.dll\"",
-                "&'./{testFolder}/projects/helloworldmultiframeworks/output/anycpu/{configuration}/net461/HelloWorldMultiFrameworks.exe'"
+                "&'./{testFolder}/projects/helloworldmultiframeworks/output/anycpu/{configuration}/net472/HelloWorldMultiFrameworks.exe'"
             ]
         },
         {

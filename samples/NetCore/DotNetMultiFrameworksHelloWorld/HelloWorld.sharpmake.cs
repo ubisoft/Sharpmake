@@ -18,7 +18,7 @@ namespace NetCore
                     OutputType.Dll,
                     Blob.NoBlob,
                     BuildSystem.MSBuild,
-                    DotNetFramework.v4_6_1 | DotNetFramework.v4_7_2 | DotNetFramework.netstandard2_0 | DotNetFramework.net5_0)
+                    DotNetFramework.v4_7_2 | DotNetFramework.v4_8 | DotNetFramework.netstandard2_0 | DotNetFramework.net5_0)
             };
 
             public HelloWorldLib()
@@ -69,7 +69,7 @@ namespace NetCore
                     OutputType.Dll,
                     Blob.NoBlob,
                     BuildSystem.MSBuild,
-                    DotNetFramework.v4_6_1 | DotNetFramework.v4_7_2 | DotNetFramework.netcore3_1)
+                    DotNetFramework.v4_7_2 | DotNetFramework.v4_8 | DotNetFramework.netcore3_1)
             };
 
             public HelloWorldMultiFrameworks()

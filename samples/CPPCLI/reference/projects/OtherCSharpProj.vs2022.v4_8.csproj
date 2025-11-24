@@ -4,12 +4,12 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <PlatformTarget Condition=" '$(Platform)' == '' ">x86</PlatformTarget>
-    <ProjectGuid>{C67510CE-FE51-F409-686E-F1DFBD047DAA}</ProjectGuid>
+    <ProjectGuid>{631D3CFB-7844-0AE8-383E-17E4576D8106}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>OtherCSharpProj</RootNamespace>
     <AssemblyName>OtherCSharpProj</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
@@ -17,8 +17,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>output\vs2022\v4_7_2\debug</OutputPath>
-    <IntermediateOutputPath>temp\othercsharpproj\vs2022\v4_7_2\debug</IntermediateOutputPath>
+    <OutputPath>output\vs2022\v4_8\debug</OutputPath>
+    <IntermediateOutputPath>temp\othercsharpproj\vs2022\v4_8\debug</IntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE;WIN32</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -29,8 +29,8 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>output\vs2022\v4_7_2\release</OutputPath>
-    <IntermediateOutputPath>temp\othercsharpproj\vs2022\v4_7_2\release</IntermediateOutputPath>
+    <OutputPath>output\vs2022\v4_8\release</OutputPath>
+    <IntermediateOutputPath>temp\othercsharpproj\vs2022\v4_8\release</IntermediateOutputPath>
     <DefineConstants>TRACE;WIN32</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
