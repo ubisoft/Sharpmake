@@ -38,6 +38,7 @@ namespace Sharpmake
             s_defaultKitsRootForDevEnv[DevEnv.vs2017] = Tuple.Create<KitsRootEnum, Options.Vc.General.WindowsTargetPlatformVersion?>(KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10586_0);
             s_defaultKitsRootForDevEnv[DevEnv.vs2019] = Tuple.Create<KitsRootEnum, Options.Vc.General.WindowsTargetPlatformVersion?>(KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_16299_0);
             s_defaultKitsRootForDevEnv[DevEnv.vs2022] = Tuple.Create<KitsRootEnum, Options.Vc.General.WindowsTargetPlatformVersion?>(KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_19041_0);
+            s_defaultKitsRootForDevEnv[DevEnv.vs2026] = Tuple.Create<KitsRootEnum, Options.Vc.General.WindowsTargetPlatformVersion?>(KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_26100_0);
         }
 
         public static string GetRoot(KitsRootEnum kitsRoot)
