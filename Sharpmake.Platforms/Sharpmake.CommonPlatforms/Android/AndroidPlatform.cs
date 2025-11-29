@@ -118,6 +118,7 @@ namespace Sharpmake
                         case DevEnv.vs2017:
                         case DevEnv.vs2019:
                         case DevEnv.vs2022:
+                        case DevEnv.vs2026:
                             {
                                 // _PlatformFolder override is not enough for android, we need to know the AdditionalVCTargetsPath
                                 // Note that AdditionalVCTargetsPath is not officially supported by vs2017, but we use the variable anyway for convenience and consistency

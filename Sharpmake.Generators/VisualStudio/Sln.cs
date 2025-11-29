@@ -296,6 +296,10 @@ namespace Sharpmake.Generators.VisualStudio
                 case DevEnv.vs2022:
                     fileGenerator.Write(Template.Solution.HeaderBeginVs2022);
                     break;
+                case DevEnv.vs2026:
+                    fileGenerator.Write(Template.Solution.HeaderBeginVs2026);
+                    break;
+
                 default:
                     throw new Error($"Unsupported DevEnv {devEnv} for solution {solution.Name}");
             }
