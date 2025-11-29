@@ -890,7 +890,7 @@ namespace Sharpmake
                 case DevEnv.vs2017:
                 case DevEnv.vs2019:
                 case DevEnv.vs2022:
-                case DevEnv.vs2026: // Todo: Actually check this?
+                case DevEnv.vs2026:
                     return true;
                 default:
                     return false;

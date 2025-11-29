@@ -1792,7 +1792,7 @@ namespace Sharpmake.Generators.FastBuild
                     case DevEnv.vs2022:
                         return "1930";
                     case DevEnv.vs2026:
-                        return "1950"; // version 19.50
+                        return "1950";
                     default:
                         throw new Error("Clang-cl used with unsupported DevEnv: " + devenv.ToString());
                 }
