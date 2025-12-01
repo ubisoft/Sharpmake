@@ -221,6 +221,7 @@ namespace Sharpmake.Generators.VisualStudio
                 case DevEnv.vs2017:
                 case DevEnv.vs2019:
                 case DevEnv.vs2022:
+                case DevEnv.vs2026:
                     return devEnv.GetVCTargetsPath();
                 default:
                     throw new NotImplementedException("VCTargetsPath redirection for " + devEnv);
@@ -234,6 +235,7 @@ namespace Sharpmake.Generators.VisualStudio
                 case DevEnv.vs2017:
                 case DevEnv.vs2019:
                 case DevEnv.vs2022:
+                case DevEnv.vs2026:
                     return Path.Combine(devEnv.GetVisualStudioDir(), @"MSBuild\");
                 default:
                     throw new NotImplementedException("MSBuildExtensionsPath redirection for " + devEnv);

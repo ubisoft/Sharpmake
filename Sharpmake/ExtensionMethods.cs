@@ -193,6 +193,8 @@ namespace Sharpmake
                     return "16.0";
                 case DevEnv.vs2022:
                     return "17.0";
+                case DevEnv.vs2026:
+                    return "18.0";
                 default:
                     throw new Error("DevEnv " + visualVersion + " not recognized!");
             }
@@ -210,6 +212,8 @@ namespace Sharpmake
                     return 16;
                 case DevEnv.vs2022:
                     return 17;
+                case DevEnv.vs2026:
+                    return 18;
                 default:
                     throw new NotImplementedException("DevEnv " + visualVersion + " not recognized!");
             }
@@ -232,6 +236,8 @@ namespace Sharpmake
                     return "v142";
                 case DevEnv.vs2022:
                     return "v143";
+                case DevEnv.vs2026:
+                    return "v145";
                 default:
                     throw new Error("DevEnv " + visualVersion + " not recognized!");
             }
@@ -249,6 +255,8 @@ namespace Sharpmake
                     return "2019";
                 case DevEnv.vs2022:
                     return "2022";
+                case DevEnv.vs2026:
+                    return "18"; // vs2026 installs as version 18 rather than the year
                 default:
                     throw new Error("DevEnv " + visualVersion + " not recognized!");
             }
@@ -326,6 +334,8 @@ namespace Sharpmake
                     return "14.20.27404";
                 case DevEnv.vs2022:
                     return "14.30.30423"; // from Preview3
+                case DevEnv.vs2026:
+                    return "14.50.35717"; // Using latest community version
                 default:
                     throw new Error("DevEnv " + visualVersion + " not recognized for default compiler version");
             }
@@ -409,6 +419,8 @@ namespace Sharpmake
                     return "v160";
                 case DevEnv.vs2022:
                     return "v170";
+                case DevEnv.vs2026:
+                    return "v180";
                 default:
                     throw new Error("DevEnv " + visualVersion + " not supported!");
             }
@@ -428,6 +440,7 @@ namespace Sharpmake
                     return Path.Combine(visualVersion.GetVisualStudioDir(), @"Common7\IDE\VC\VCTargets");
                 case DevEnv.vs2019:
                 case DevEnv.vs2022:
+                case DevEnv.vs2026:
                     return Path.Combine(visualVersion.GetVisualStudioDir(), @"MSBuild\Microsoft\VC\", visualVersion.GetMSBuildVCDirVersion());
                 default:
                     throw new ArgumentOutOfRangeException(nameof(visualVersion), visualVersion, null);
@@ -444,6 +457,8 @@ namespace Sharpmake
                     return "14.24.28127";
                 case DevEnv.vs2022:
                     return "14.30.30423"; // from Preview3
+                case DevEnv.vs2026:
+                    return "14.50.35717"; // Using latest community version
                 default:
                     throw new Error("DevEnv " + visualVersion + " not recognized for default compiler version");
             }
@@ -485,6 +500,7 @@ namespace Sharpmake
                 case DevEnv.vs2017:
                 case DevEnv.vs2019:
                 case DevEnv.vs2022:
+                case DevEnv.vs2026:
                     {
                         string targetPlatform = (platform == Platform.win32) ? "x86" : "x64";
                         string compilerHost = Environment.Is64BitOperatingSystem ? "HostX64" : "HostX86";
@@ -759,6 +775,8 @@ namespace Sharpmake
                     return visualVersion == DevEnv.vs2019;
                 case Options.Vc.General.PlatformToolset.v143:
                     return visualVersion == DevEnv.vs2022;
+                case Options.Vc.General.PlatformToolset.v145:
+                    return visualVersion == DevEnv.vs2026;
                 case Options.Vc.General.PlatformToolset.v140_xp:
                 case Options.Vc.General.PlatformToolset.v141_xp:
                 case Options.Vc.General.PlatformToolset.LLVM:
@@ -786,6 +804,8 @@ namespace Sharpmake
                     return DevEnv.vs2019;
                 case Options.Vc.General.PlatformToolset.v143:
                     return DevEnv.vs2022;
+                case Options.Vc.General.PlatformToolset.v145:
+                    return DevEnv.vs2026;
                 case Options.Vc.General.PlatformToolset.LLVM:
                 case Options.Vc.General.PlatformToolset.ClangCL:
                     return null;
@@ -813,6 +833,10 @@ namespace Sharpmake
                 case DevEnv.vs2022:
                     vcTargetsPathKey = "VCTargetsPath17";
                     vcRootPathKey = "VCInstallDir_170";
+                    break;
+                case DevEnv.vs2026:
+                    vcTargetsPathKey = "VCTargetsPath18";
+                    vcRootPathKey = "VCInstallDir_180";
                     break;
                 default:
                     throw new NotImplementedException("Please implement redirection of toolchain for " + devEnv);
@@ -848,6 +872,7 @@ namespace Sharpmake
                 case DevEnv.vs2017:
                 case DevEnv.vs2019:
                 case DevEnv.vs2022:
+                case DevEnv.vs2026:
                     return true;
                 default:
                     return false;

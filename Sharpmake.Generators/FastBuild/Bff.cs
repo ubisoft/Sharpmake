@@ -1775,6 +1775,8 @@ namespace Sharpmake.Generators.FastBuild
                         return "1920";
                     case Options.Vc.General.PlatformToolset.v143:
                         return "1930";
+                    case Options.Vc.General.PlatformToolset.v145:
+                        return "1950";
                     default:
                         throw new Error("LLVMVcPlatformToolset! Platform toolset override '{0}' not supported", overridenPlatformToolset);
                 }
@@ -1789,6 +1791,8 @@ namespace Sharpmake.Generators.FastBuild
                         return "1920";
                     case DevEnv.vs2022:
                         return "1930";
+                    case DevEnv.vs2026:
+                        return "1950";
                     default:
                         throw new Error("Clang-cl used with unsupported DevEnv: " + devenv.ToString());
                 }

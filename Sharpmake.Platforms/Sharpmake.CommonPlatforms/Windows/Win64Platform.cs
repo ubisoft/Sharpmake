@@ -449,6 +449,7 @@ namespace Sharpmake
                             break;
                         case DevEnv.vs2019:
                         case DevEnv.vs2022:
+                        case DevEnv.vs2026:
                             {
                                 // Note1: _PlatformFolder override is deprecated starting with vs2019, so we write AdditionalVCTargetsPath instead
                                 // Note2: MSBuildGlobalSettings.SetCppPlatformFolder for vs2019 and above is no more the valid way to handle it.

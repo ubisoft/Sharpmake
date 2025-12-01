@@ -46,6 +46,12 @@ namespace Sharpmake.UnitTests
         [TestCase(DevEnv.vs2022, Platform._reserved7, Options.Vc.General.PlatformToolset.Default)]
         [TestCase(DevEnv.vs2022, Platform._reserved7, Options.Vc.General.PlatformToolset.ClangCL)]
         [TestCase(DevEnv.vs2022, Platform._reserved7, Options.Vc.General.PlatformToolset.v143)]
+        [TestCase(DevEnv.vs2026, Platform.win64, Options.Vc.General.PlatformToolset.Default)]
+        [TestCase(DevEnv.vs2026, Platform.win64, Options.Vc.General.PlatformToolset.ClangCL)]
+        [TestCase(DevEnv.vs2026, Platform.win64, Options.Vc.General.PlatformToolset.v145)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7, Options.Vc.General.PlatformToolset.Default)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7, Options.Vc.General.PlatformToolset.ClangCL)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7, Options.Vc.General.PlatformToolset.v145)]
         public void DetectCompilerVersionForClangCl_FullVersionOverrideToolset(DevEnv devenv, Platform platform, Options.Vc.General.PlatformToolset overridenPlatformToolset)
         {
             if (!HasVSCompiler(devenv, platform))
@@ -66,6 +72,8 @@ namespace Sharpmake.UnitTests
             Assert.That(result, Is.EqualTo(expected));
         }
 
+        [TestCase(DevEnv.vs2026, Platform.win64)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7)]
         [TestCase(DevEnv.vs2022, Platform.win64)]
         [TestCase(DevEnv.vs2022, Platform._reserved7)]
         [TestCase(DevEnv.vs2019, Platform.win64)]
@@ -80,6 +88,8 @@ namespace Sharpmake.UnitTests
             var result = Assert.Throws<Error>(() => Bff.DetectCompilerVersionForClangCl(detectionType, overridenMscVer, overridenPlatformToolset, devenv, platform));
         }
 
+        [TestCase(DevEnv.vs2026, Platform.win64)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7)]
         [TestCase(DevEnv.vs2022, Platform.win64)]
         [TestCase(DevEnv.vs2022, Platform._reserved7)]
         [TestCase(DevEnv.vs2019, Platform.win64)]
@@ -98,6 +108,8 @@ namespace Sharpmake.UnitTests
         [TestCase(DevEnv.vs2019, Platform._reserved7)]
         [TestCase(DevEnv.vs2022, Platform.win64)]
         [TestCase(DevEnv.vs2022, Platform._reserved7)]
+        [TestCase(DevEnv.vs2026, Platform.win64)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7)]
         public void DetectCompilerVersionForClangCl_MajorVersionNoOverride(DevEnv devenv, Platform platform)
         {
             var detectionType = Project.Configuration.FastBuildClangMscVersionDetectionType.MajorVersion;
@@ -119,6 +131,10 @@ namespace Sharpmake.UnitTests
         [TestCase(DevEnv.vs2022, Platform.win64, Options.Vc.General.PlatformToolset.v143, "1930")]
         [TestCase(DevEnv.vs2022, Platform._reserved7, Options.Vc.General.PlatformToolset.v142, "1920")]
         [TestCase(DevEnv.vs2022, Platform._reserved7, Options.Vc.General.PlatformToolset.v143, "1930")]
+        [TestCase(DevEnv.vs2026, Platform.win64, Options.Vc.General.PlatformToolset.v143, "1930")]
+        [TestCase(DevEnv.vs2026, Platform.win64, Options.Vc.General.PlatformToolset.v145, "1950")]
+        [TestCase(DevEnv.vs2026, Platform._reserved7, Options.Vc.General.PlatformToolset.v143, "1930")]
+        [TestCase(DevEnv.vs2026, Platform._reserved7, Options.Vc.General.PlatformToolset.v145, "1950")]
         public void DetectCompilerVersionForClangCl_MajorVersionOverrideToolsetSupported(DevEnv devenv, Platform platform, Options.Vc.General.PlatformToolset overridenPlatformToolset, string exepctedVersion)
         {
             var detectionType = Project.Configuration.FastBuildClangMscVersionDetectionType.MajorVersion;
@@ -140,6 +156,10 @@ namespace Sharpmake.UnitTests
         [TestCase(DevEnv.vs2022, Platform.win64, Options.Vc.General.PlatformToolset.v140)]
         [TestCase(DevEnv.vs2022, Platform._reserved7, Options.Vc.General.PlatformToolset.ClangCL)]
         [TestCase(DevEnv.vs2022, Platform._reserved7, Options.Vc.General.PlatformToolset.v140)]
+        [TestCase(DevEnv.vs2026, Platform.win64, Options.Vc.General.PlatformToolset.ClangCL)]
+        [TestCase(DevEnv.vs2026, Platform.win64, Options.Vc.General.PlatformToolset.v140)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7, Options.Vc.General.PlatformToolset.ClangCL)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7, Options.Vc.General.PlatformToolset.v140)]
         public void DetectCompilerVersionForClangCl_MajorVersionOverrideToolsetNotSupported(DevEnv devenv, Platform platform, Options.Vc.General.PlatformToolset overridenPlatformToolset)
         {
             var detectionType = Project.Configuration.FastBuildClangMscVersionDetectionType.MajorVersion;
@@ -153,6 +173,8 @@ namespace Sharpmake.UnitTests
         [TestCase(DevEnv.vs2019, Platform._reserved7)]
         [TestCase(DevEnv.vs2022, Platform.win64)]
         [TestCase(DevEnv.vs2022, Platform._reserved7)]
+        [TestCase(DevEnv.vs2026, Platform.win64)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7)]
         public void DetectCompilerVersionForClangCl_MajorVersionOverrideMscVer(DevEnv devenv, Platform platform)
         {
             var detectionType = Project.Configuration.FastBuildClangMscVersionDetectionType.MajorVersion;
@@ -174,6 +196,10 @@ namespace Sharpmake.UnitTests
         [TestCase(DevEnv.vs2022, Platform.win64, Options.Vc.General.PlatformToolset.v143)]
         [TestCase(DevEnv.vs2022, Platform._reserved7, Options.Vc.General.PlatformToolset.v142)]
         [TestCase(DevEnv.vs2022, Platform._reserved7, Options.Vc.General.PlatformToolset.v143)]
+        [TestCase(DevEnv.vs2026, Platform.win64, Options.Vc.General.PlatformToolset.v143)]
+        [TestCase(DevEnv.vs2026, Platform.win64, Options.Vc.General.PlatformToolset.v145)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7, Options.Vc.General.PlatformToolset.v143)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7, Options.Vc.General.PlatformToolset.v145)]
         public void DetectCompilerVersionForClangCl_MajorVersionOverrideToolsetSupportedAndMscVer(DevEnv devenv, Platform platform, Options.Vc.General.PlatformToolset overridenPlatformToolset)
         {
             var detectionType = Project.Configuration.FastBuildClangMscVersionDetectionType.MajorVersion;
@@ -194,6 +220,10 @@ namespace Sharpmake.UnitTests
         [TestCase(DevEnv.vs2022, Platform.win64, Options.Vc.General.PlatformToolset.v140)]
         [TestCase(DevEnv.vs2022, Platform._reserved7, Options.Vc.General.PlatformToolset.ClangCL)]
         [TestCase(DevEnv.vs2022, Platform._reserved7, Options.Vc.General.PlatformToolset.v140)]
+        [TestCase(DevEnv.vs2026, Platform.win64, Options.Vc.General.PlatformToolset.ClangCL)]
+        [TestCase(DevEnv.vs2026, Platform.win64, Options.Vc.General.PlatformToolset.v145)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7, Options.Vc.General.PlatformToolset.ClangCL)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7, Options.Vc.General.PlatformToolset.v145)]
         public void DetectCompilerVersionForClangCl_MajorVersionOverrideToolsetNotSupportedAndMscVer(DevEnv devenv, Platform platform, Options.Vc.General.PlatformToolset overridenPlatformToolset)
         {
             var detectionType = Project.Configuration.FastBuildClangMscVersionDetectionType.MajorVersion;
@@ -210,6 +240,8 @@ namespace Sharpmake.UnitTests
         [TestCase(DevEnv.vs2019, Platform._reserved7)]
         [TestCase(DevEnv.vs2022, Platform.win64)]
         [TestCase(DevEnv.vs2022, Platform._reserved7)]
+        [TestCase(DevEnv.vs2026, Platform.win64)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7)]
         public void DetectCompilerVersionForClangCl_MajorVersionOverrideMscVerZero(DevEnv devenv, Platform platform)
         {
             var detectionType = Project.Configuration.FastBuildClangMscVersionDetectionType.MajorVersion;
@@ -231,6 +263,10 @@ namespace Sharpmake.UnitTests
         [TestCase(DevEnv.vs2022, Platform.win64, Options.Vc.General.PlatformToolset.v143)]
         [TestCase(DevEnv.vs2022, Platform._reserved7, Options.Vc.General.PlatformToolset.v142)]
         [TestCase(DevEnv.vs2022, Platform._reserved7, Options.Vc.General.PlatformToolset.v143)]
+        [TestCase(DevEnv.vs2026, Platform.win64, Options.Vc.General.PlatformToolset.v143)]
+        [TestCase(DevEnv.vs2026, Platform.win64, Options.Vc.General.PlatformToolset.v145)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7, Options.Vc.General.PlatformToolset.v143)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7, Options.Vc.General.PlatformToolset.v145)]
         public void DetectCompilerVersionForClangCl_MajorVersionOverrideToolsetSupportedAndMscVerZero(DevEnv devenv, Platform platform, Options.Vc.General.PlatformToolset overridenPlatformToolset)
         {
             var detectionType = Project.Configuration.FastBuildClangMscVersionDetectionType.MajorVersion;
@@ -251,6 +287,10 @@ namespace Sharpmake.UnitTests
         [TestCase(DevEnv.vs2022, Platform.win64, Options.Vc.General.PlatformToolset.v140)]
         [TestCase(DevEnv.vs2022, Platform._reserved7, Options.Vc.General.PlatformToolset.ClangCL)]
         [TestCase(DevEnv.vs2022, Platform._reserved7, Options.Vc.General.PlatformToolset.v140)]
+        [TestCase(DevEnv.vs2026, Platform.win64, Options.Vc.General.PlatformToolset.ClangCL)]
+        [TestCase(DevEnv.vs2026, Platform.win64, Options.Vc.General.PlatformToolset.v145)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7, Options.Vc.General.PlatformToolset.ClangCL)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7, Options.Vc.General.PlatformToolset.v145)]
         public void DetectCompilerVersionForClangCl_MajorVersionOverrideToolsetNotSupportedAndMscVerZero(DevEnv devenv, Platform platform, Options.Vc.General.PlatformToolset overridenPlatformToolset)
         {
             var detectionType = Project.Configuration.FastBuildClangMscVersionDetectionType.MajorVersion;
@@ -263,6 +303,8 @@ namespace Sharpmake.UnitTests
             Assert.That(result, Is.EqualTo(expected));
         }
 
+        [TestCase(DevEnv.vs2026, Platform.win64)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7)]
         [TestCase(DevEnv.vs2022, Platform.win64)]
         [TestCase(DevEnv.vs2022, Platform._reserved7)]
         [TestCase(DevEnv.vs2019, Platform.win64)]
@@ -292,6 +334,12 @@ namespace Sharpmake.UnitTests
         [TestCase(DevEnv.vs2022, Platform._reserved7, Options.Vc.General.PlatformToolset.Default)]
         [TestCase(DevEnv.vs2022, Platform._reserved7, Options.Vc.General.PlatformToolset.ClangCL)]
         [TestCase(DevEnv.vs2022, Platform._reserved7, Options.Vc.General.PlatformToolset.v143)]
+        [TestCase(DevEnv.vs2026, Platform.win64, Options.Vc.General.PlatformToolset.Default)]
+        [TestCase(DevEnv.vs2026, Platform.win64, Options.Vc.General.PlatformToolset.ClangCL)]
+        [TestCase(DevEnv.vs2026, Platform.win64, Options.Vc.General.PlatformToolset.v145)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7, Options.Vc.General.PlatformToolset.Default)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7, Options.Vc.General.PlatformToolset.ClangCL)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7, Options.Vc.General.PlatformToolset.v145)]
         public void DetectCompilerVersionForClangCl_DisabledOverrideMscVer(DevEnv devenv, Platform platform, Options.Vc.General.PlatformToolset overridenPlatformToolset)
         {
             var detectionType = Project.Configuration.FastBuildClangMscVersionDetectionType.Disabled;
@@ -316,6 +364,12 @@ namespace Sharpmake.UnitTests
         [TestCase(DevEnv.vs2022, Platform._reserved7, Options.Vc.General.PlatformToolset.Default)]
         [TestCase(DevEnv.vs2022, Platform._reserved7, Options.Vc.General.PlatformToolset.ClangCL)]
         [TestCase(DevEnv.vs2022, Platform._reserved7, Options.Vc.General.PlatformToolset.v143)]
+        [TestCase(DevEnv.vs2026, Platform.win64, Options.Vc.General.PlatformToolset.Default)]
+        [TestCase(DevEnv.vs2026, Platform.win64, Options.Vc.General.PlatformToolset.ClangCL)]
+        [TestCase(DevEnv.vs2026, Platform.win64, Options.Vc.General.PlatformToolset.v145)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7, Options.Vc.General.PlatformToolset.Default)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7, Options.Vc.General.PlatformToolset.ClangCL)]
+        [TestCase(DevEnv.vs2026, Platform._reserved7, Options.Vc.General.PlatformToolset.v145)]
         public void DetectCompilerVersionForClangCl_DisabledOverrideMscVerZero(DevEnv devenv, Platform platform, Options.Vc.General.PlatformToolset overridenPlatformToolset)
         {
             var detectionType = Project.Configuration.FastBuildClangMscVersionDetectionType.Disabled;

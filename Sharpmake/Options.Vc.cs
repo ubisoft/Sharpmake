@@ -33,6 +33,8 @@ namespace Sharpmake
                     v142, // Visual Studio 2019
                     [DevEnvVersion(minimum = DevEnv.vs2022)]
                     v143, // Visual Studio 2022
+                    [DevEnvVersion(minimum = DevEnv.vs2026)]
+                    v145, // Visual Studio 2026
                     [DevEnvVersion(minimum = DevEnv.vs2017)]
                     LLVM, // LLVM from Visual Studio 2017
                     [DevEnvVersion(minimum = DevEnv.vs2019)]
