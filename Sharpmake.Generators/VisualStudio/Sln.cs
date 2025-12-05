@@ -78,7 +78,7 @@ namespace Sharpmake.Generators.VisualStudio
         private Builder _builder;
 
         private static Regex s_projectGuidRegex = new Regex(
-            "(\\s*ProjectGUID=\"\\s*{(?<GUID>([0-9A-Fa-f\\-]+))}\\s*\")| " +
+            "(\\s*ProjectGUID=\"\\s*{(?<GUID>([0-9A-Fa-f\\-]+))}\\s*\")|" +
             "(\\s*<ProjectGuid>\\s*{(?<GUID>([0-9A-Fa-f\\-]+))}</ProjectGuid>)",
             RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.CultureInvariant);
 
