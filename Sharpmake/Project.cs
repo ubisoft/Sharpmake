@@ -900,8 +900,30 @@ namespace Sharpmake
                 NoneExtensions.RemoveAll(s => NoneExtensionsCopyIfNewer.Contains(s));
             }
 
+            var extensionContainers = new[]
+            {
+                SourceFilesExtensions,
+                ResourceFilesExtensions,
+                PRIFilesExtensions,
+                NatvisFilesExtensions,
+                NoneExtensions,
+                NoneExtensionsCopyIfNewer,
+                ProtoExtensions
+            };
+
+            // The code below does an expensive glob to get source files, which when generating the
+            // debug project will have to scan a potentially large depot tree and takes a long time
+            // Clear all extensions to not do the file scanning for the debug project.
+            if (this is DebugProject)
+            {
+                foreach (var container in extensionContainers)
+                {
+                    container.Clear();
+                }
+            }
+
             // Only scan directory for files if needed
-            if (SourceFilesExtensions.Count != 0 || ResourceFilesExtensions.Count != 0 || PRIFilesExtensions.Count != 0 || NoneExtensions.Count != 0 || NoneExtensionsCopyIfNewer.Count != 0)
+            if (extensionContainers.Any(container => container.Count != 0))
             {
                 string capitalizedSourceRootPath = Util.GetCapitalizedPath(SourceRootPath);
 
@@ -1912,6 +1934,13 @@ namespace Sharpmake
                 Util.ResolvePath(SourceRootPath, ref SourceFilesExclude);
                 Util.ResolvePath(SourceRootPath, ref SourceFilesBlobExclude);
                 Util.ResolvePath(SourceRootPath, ref SourceFilesBuildExclude);
+                Util.ResolvePath(SourceRootPath, ref PRIFiles);
+                Util.ResolvePath(SourceRootPath, ref ResourceFiles);
+                Util.ResolvePath(SourceRootPath, ref NatvisFiles);
+                Util.ResolvePath(SourceRootPath, ref NoneFiles);
+                Util.ResolvePath(SourceRootPath, ref NoneFilesCopyIfNewer);
+                Util.ResolvePath(SourceRootPath, ref ProtoFiles);
+
                 Util.ResolvePath(SharpmakeCsPath, ref _blobPath);
 
                 if (SourceFilesFilters != null)
@@ -2046,6 +2075,10 @@ namespace Sharpmake
             SourceFilesExtensions.Clear();
             ResourceFilesExtensions.Clear();
             PRIFilesExtensions.Clear();
+            NatvisFilesExtensions.Clear();
+            NoneExtensions.Clear();
+            NoneExtensionsCopyIfNewer.Clear();
+            ProtoExtensions.Clear();
         }
     }
 
