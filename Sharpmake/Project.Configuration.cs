@@ -2360,7 +2360,6 @@ namespace Sharpmake
                 public string OutputItemType = "";
 
                 /// <summary>
-                /// Not supported by FASTBuild.
                 /// Additional files that will cause a re-run of this custom build step can be be specified here.
                 /// </summary>
                 public Strings AdditionalInputs = new Strings();
