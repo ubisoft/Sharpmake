@@ -353,6 +353,7 @@ Compiler( '[fastBuildNasmCompilerName]' )
                 public static string LibrarianOptionsClang = @"
     .LibrarianOutput        = '[fastBuildOutputFile]'
     .LibrarianOptions       = 'rcs[cmdLineOptions.UseThinArchives] ""%2"" ""%1""'
+                            + ' [options.AdditionalLibrarianOptions]'
 
 ";
 
