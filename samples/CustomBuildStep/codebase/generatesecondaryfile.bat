@@ -1,15 +1,18 @@
 @echo off
 setlocal
 
-set OUTPUT=%~dp0secondaryfile.cpp
-echo Generating %OUTPUT%
+if "%~2"=="" goto :usage
 
-:: Note: ^ is used to escape < and >
-> "%OUTPUT%" echo #include ^<stdio.h^>
->>"%OUTPUT%" echo void PrintSecondaryFileContent()
->>"%OUTPUT%" echo {
->>"%OUTPUT%" echo     printf("This is secondary file\n");
->>"%OUTPUT%" echo }
+set OUTPUT=%~dp0\secondaryfile.cpp
 
-echo Done
+echo Concatenating "%~f1" + "%~f2" into "%OUTPUT%"
+>"%OUTPUT%" type "%~f1"
+>>"%OUTPUT%" type "%~f2"
+
+echo Done.
 goto :eof
+
+:usage
+echo Usage: %~n0 file1.cpp file2.cpp
+echo Concatenates file1.cpp and file2.cpp into %~dp0concatenated.cpp
+exit /b 1
