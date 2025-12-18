@@ -50,6 +50,7 @@ namespace Sharpmake.Application
             public bool Diagnostics = false;
             public bool WriteFiles = true;
             public bool DumpDependency = false;
+            public bool LogAllGeneratedSolutions = false;
             private bool _testOptionValid = true;
             internal TestOptions TestOption;
             internal bool RegressionDiff = true;
@@ -100,6 +101,12 @@ namespace Sharpmake.Application
             {
                 Tools.ProjectLogFiles(projectFile);
                 Exit = true;
+            }
+
+            [CommandLine.Option("logAllGeneratedSolutions", "Log all solution files considered and generated to the console: ex: /logAllGeneratedSolutions")]
+            public void CommandLineLogAllGeneratedSolutions()
+            {
+                LogAllGeneratedSolutions = true;
             }
 
             [CommandLine.Option("blobonly", @"Only generate blob and work blob files: ex: /blobonly")]
