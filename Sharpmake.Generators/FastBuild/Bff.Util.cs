@@ -879,6 +879,7 @@ namespace Sharpmake.Generators.FastBuild
         {
             using (bffGenerator.Resolver.NewScopedParameter("project", project))
             using (bffGenerator.Resolver.NewScopedParameter("config", config))
+            using (bffGenerator.Resolver.NewScopedParameter("conf", config))
             using (bffGenerator.Resolver.NewScopedParameter("target", config.Target))
             {
                 foreach (var customBuildStep in config.CustomFileBuildSteps)
