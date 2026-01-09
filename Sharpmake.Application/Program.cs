@@ -487,7 +487,7 @@ namespace Sharpmake.Application
                     if (parameters.DumpDependency)
                         DependencyTracker.Instance.DumpGraphs(outputs);
 
-                    LogWriteGenerateResults(outputs);
+                    LogWriteGenerateResults(outputs, parameters);
                 }
             }
 
@@ -555,7 +555,7 @@ namespace Sharpmake.Application
             return ExitCode.Success;
         }
 
-        public static void LogWriteGenerateResults(IDictionary<Type, GenerationOutput> outputs)
+        public static void LogWriteGenerateResults(IDictionary<Type, GenerationOutput> outputs, Argument parameters)
         {
             var projects = outputs.Where(o => typeof(Project).IsAssignableFrom(o.Key));
             var solutions = outputs.Where(o => typeof(Solution).IsAssignableFrom(o.Key));
@@ -616,6 +616,22 @@ namespace Sharpmake.Application
 
             if (generatedOtherFiles.Count > 0 || skippedOtherFiles.Count > 0)
                 LogWriteLine("    other files                      {0,5} generated, {1,5} up-to-date", generatedOtherFiles.Count, skippedOtherFiles.Count);
+
+            if (parameters.LogAllGeneratedSolutions && generatedSolutionFiles.Count + skippedSolutionFiles.Count > 0)
+            {
+                LogWriteLine("  All Generated Solutions:");
+                foreach (string solutionFile in generatedSolutionFiles)
+                {
+                    LogWriteLine("    " + solutionFile);
+                }
+                foreach (string solutionFile in skippedSolutionFiles)
+                {
+                    if (File.Exists(solutionFile)) // Some skipped files may end up being empty and then they aren't written to disk, check for that here
+                    {
+                        LogWriteLine("    " + solutionFile);
+                    }
+                }
+            }
         }
 
         public static Builder CreateBuilder(BuildContext.BaseBuildContext context, Argument parameters, bool allowCleanBlobs, bool generateDebugSolution = false)
