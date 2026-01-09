@@ -497,7 +497,10 @@ namespace Sharpmake.Application
             if (generateDebugSolution)
             {
                 // Execute cleanup for debug solution generation
-                Util.ExecuteFilesAutoCleanup(true);
+                if (parameters.OutputDirectory == null)
+                {
+                    Util.ExecuteFilesAutoCleanup(true);
+                }
 
                 // Restore original cleanup context
                 Util.FilesAutoCleanupDBSuffix = cleanupSuffixOldValue;
