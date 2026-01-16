@@ -330,48 +330,6 @@ namespace Sharpmake
 
         private static Dictionary<string, DateTime> ReadCleanupDatabase(string databaseFilename)
         {
-            // DEPRECATED CODE - TO BE REMOVED AFTER DEC 31TH 2024
-            string oldDatabaseFormatFilename = Path.ChangeExtension(databaseFilename, ".bin");
-            if (File.Exists(oldDatabaseFormatFilename))
-            {
-                try
-                {
-                    // Read database - This is simply a simple binary file containing the list of file and a version number.
-                    using (Stream readStream = new FileStream(oldDatabaseFormatFilename, FileMode.Open, FileAccess.Read, FileShare.None))
-                    using (BinaryReader binReader = new BinaryReader(readStream))
-                    {
-                        // Validate version number
-                        int version = binReader.ReadInt32();
-                        if (version == (int)CleanupDatabaseContent.DBVersions.BinaryFormatterVersion)
-                        {
-                            // Read the list of files.
-                            IFormatter formatter = new BinaryFormatter();
-                            string dbAsJson = binReader.ReadString();
-
-                            var tmpDbFiles = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, DateTime>>(dbAsJson, GetCleanupDatabaseJsonSerializerOptions());
-                            var dbFiles = tmpDbFiles.ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.InvariantCultureIgnoreCase);
-
-                            // Converting to new format.
-                            WriteCleanupDatabase(databaseFilename, dbFiles);
-                            return dbFiles;
-                        }
-                        else
-                        {
-                            LogWrite("Warning: found cleanup database in incompatible format v{0}, skipped.", version);
-                        }
-                    }
-                }
-                catch
-                {
-                    // nothing to do.
-                }
-                finally
-                {
-                    TryDeleteFile(oldDatabaseFormatFilename);
-                }
-            }
-            // END DEPRECATED CODE
-
             if (File.Exists(databaseFilename))
             {
                 try

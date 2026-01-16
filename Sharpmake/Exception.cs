@@ -36,10 +36,6 @@ namespace Sharpmake
             if (!condition)
                 throw new Error(message, args);
         }
-
-        protected Error(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        { }
     }
 
     [Serializable]
@@ -59,10 +55,6 @@ namespace Sharpmake
         { }
         public InternalError(Exception innerException, string message, params object[] args)
             : base(string.Format(message, args), innerException)
-        { }
-
-        protected InternalError(SerializationInfo info, StreamingContext context)
-            : base(info, context)
         { }
 
         public static void Valid(bool condition)

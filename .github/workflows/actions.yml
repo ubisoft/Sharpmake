@@ -20,7 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-14, windows-2022]
-        framework: [net6.0]
+        framework: [net8.0]
         configuration: [Debug, Release]
     uses: ./.github/workflows/build.yml
     with:
@@ -35,7 +35,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-2022]
-        framework: [net6.0]
+        framework: [net8.0]
 
     steps:
       - name: Checkout the repo

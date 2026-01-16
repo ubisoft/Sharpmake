@@ -21,10 +21,6 @@ namespace Sharpmake
         internal PlatformNotSupportedException(Platform platform, Type implType)
             : base($"No implementation of {implType.Name} for {Util.GetSimplePlatformString(platform)} is provided.")
         { }
-
-        protected PlatformNotSupportedException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        { }
     }
 
     /// <summary>
@@ -36,10 +32,6 @@ namespace Sharpmake
     {
         internal DuplicatePlatformImplementationException(string message)
             : base(message)
-        { }
-
-        protected DuplicatePlatformImplementationException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
         { }
     }
 
@@ -53,10 +45,6 @@ namespace Sharpmake
     {
         internal PlatformImplementationCreationException(Type type, Exception innerException)
             : base($"Failed to instantiate platform implementation type {type.Name}. Check the inner exception for details.", innerException)
-        { }
-
-        protected PlatformImplementationCreationException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
         { }
     }
 }

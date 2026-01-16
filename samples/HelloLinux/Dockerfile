@@ -1,8 +1,8 @@
-# Initial stage perform makefile generation with Sharpmake using .NET 6 runtime image.
+# Initial stage perform makefile generation with Sharpmake using .NET 8 runtime image.
 # This environment contains only .NET runtime necessary to execute Sharpmake.
-FROM  mcr.microsoft.com/dotnet/runtime:6.0 AS sharpmake-env
+FROM  mcr.microsoft.com/dotnet/runtime:8.0 AS sharpmake-env
 
-ARG FRAMEWORK=net6.0
+ARG FRAMEWORK=net8.0
 
 # Copy binaries and sample to container.
 # Sharpmake binaries are assumed to exists prior to build the container.
