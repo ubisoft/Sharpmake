@@ -97,9 +97,9 @@ namespace CompileDataBaseCommand
         }
     }
 
-    public static class main
+    public static class Main
     {
-        [Main]
+        [Sharpmake.Main]
         public static void SharpmakeMain(Arguments arguments)
         {
             // Generally you should only generate either for projets or solution but this is a sample so we do both ;)

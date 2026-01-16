@@ -8,7 +8,7 @@ using Sharpmake;
 
 namespace ConfigureOrdering
 {
-    public class main
+    public class Main
     {
         [Sharpmake.Main]
         public static void SharpmakeMain(Sharpmake.Arguments arguments)
