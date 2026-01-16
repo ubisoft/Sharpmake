@@ -48,6 +48,7 @@ foreach ($sample in ($testDefs.Samples | Where-Object { $_.Name -eq $sampleName}
 {
     $found = $true;
     Write-Host "running sample $($sample.Name)"
+    Write-Host "Configuration: $configuration"
     # run all commands registered in sample
     foreach ($command in $sample.Commands) 
     {

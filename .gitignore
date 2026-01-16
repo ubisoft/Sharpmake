@@ -58,3 +58,6 @@ Sharpmake.Application.args.json
 
 # Desktop Services Store on MacOS
 **/.DS_Store
+
+# Claude and other AI localconfig files below
+.claude/settings.local.json

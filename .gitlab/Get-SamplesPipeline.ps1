@@ -95,8 +95,9 @@ foreach ($sample in $samplesDef.Samples)
                         }
                     }
 
-                    
-                    $script += "pwsh ./RunSample.ps1 -sampleName ""$($sample.Name)"" -configuration $configuration -framework $framework -os $os -vsVersionSuffix $vsVersionSuffix"
+
+                    # Use PowerShell array syntax to avoid quoting issues with spaces in configuration
+                    $script += "pwsh -Command `"& './RunSample.ps1' -sampleName '$($sample.Name)' -configuration '$configuration' -framework '$framework' -os '$os' -vsVersionSuffix '$vsVersionSuffix'`""
 
                     # Merge sample properties into a single hash table.
                     $sampleJob = $osProperties + @{
