@@ -14,8 +14,9 @@ namespace FastBuild
             SourceRootPath = @"[project.SharpmakeCsPath]\codebase";
             SourceFilesExtensions.Add(".bat");
 
-            // need to add it explicitly since it's gonna be generated it doesn't exist yet
+            // need to add generated files explicitly since they don't exist yet
             SourceFiles.Add(@"[project.SourceRootPath]\main.cpp");
+            SourceFiles.Add(@"[project.SourceRootPath]\concatenated.cpp");
 
             AddTargets(
                 new Target(
@@ -32,6 +33,7 @@ namespace FastBuild
         [Configure]
         public void ConfigureAll(Configuration conf, Target target)
         {
+            // A simple custom build step that generates main.cpp via a .bat file
             conf.CustomFileBuildSteps.Add(
                 new Configuration.CustomFileBuildStep
                 {
@@ -39,6 +41,19 @@ namespace FastBuild
                     Output = "main.cpp",
                     Description = $"Generate main.cpp",
                     Executable = "filegeneration.bat"
+                }
+            );
+
+            // Demonstrates a custom file build step that has two inputs and one output
+            conf.CustomFileBuildSteps.Add(
+                new Configuration.CustomFileBuildStep
+                {
+                    KeyInput = "concatenatefiles.bat",
+                    Output = "concatenated.cpp",
+                    Description = $"Generate concatenated.cpp",
+                    Executable = "concatenatefiles.bat",
+                    ExecutableArguments = "../codebase/concatenate_file1.in ../codebase/concatenate_file2.in",
+                    AdditionalInputs = { "[project.SourceRootPath]\\concatenate_file1.in", "[project.SourceRootPath]\\concatenate_file2.in" }
                 }
             );
 
@@ -52,6 +67,9 @@ namespace FastBuild
             conf.Name = "FastBuild " + conf.Name;
             conf.IsFastBuild = true;
             conf.FastBuildBlobbed = target.Blob == Blob.FastBuildUnitys;
+
+            // Force writing to pdb from different cl.exe process to go through the pdb server
+            conf.AdditionalCompilerOptions.Add("/FS");
         }
     }
 

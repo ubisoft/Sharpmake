@@ -1,0 +1,6 @@
+#include <stdio.h>
+
+const char *GetFile1Content()
+{
+    return "This is the content of file 1.\n";
+}
