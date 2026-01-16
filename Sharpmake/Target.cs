@@ -50,12 +50,6 @@ namespace Sharpmake
         xcode = 1 << 7,
 
         /// <summary>
-        /// iOS project with Xcode [deprecated]
-        /// </summary>
-        [Obsolete("xcode4ios has been deprecated, please use 'xcode'", error: true)]
-        xcode4ios = 1 << 7,
-
-        /// <summary>
         /// Eclipse.
         /// </summary>
         eclipse = 1 << 8,
