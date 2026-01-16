@@ -55,7 +55,7 @@ namespace SimpleExeLibDependency
         }
     }
 
-    public static class main
+    public static class Main
     {
         [Sharpmake.Main]
         public static void SharpmakeMain(Sharpmake.Arguments arguments)
