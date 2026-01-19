@@ -16,6 +16,7 @@ namespace FastBuild
 
             // need to add it explicitly since it's gonna be generated it doesn't exist yet
             SourceFiles.Add(@"[project.SourceRootPath]\main.cpp");
+            SourceFiles.Add(@"[project.SourceRootPath]\secondaryfile.cpp");
 
             AddTargets(
                 new Target(
@@ -35,15 +36,23 @@ namespace FastBuild
             conf.CustomFileBuildSteps.Add(
                 new Configuration.CustomFileBuildStep
                 {
-                    KeyInput = "filegeneration.bat",
+                    KeyInput = "generatemain.bat",
                     Output = "main.cpp",
                     Description = $"Generate main.cpp",
-                    Executable = "filegeneration.bat"
-                }
-            );
+                    Executable = "generatemain.bat"
+                });
+            conf.CustomFileBuildSteps.Add(
+                new Configuration.CustomFileBuildStep
+                {
+                    KeyInput = "generatesecondaryfile.bat",
+                    Output = "secondaryfile.cpp",
+                    Description = $"Generate secondaryfile.cpp",
+                    Executable = "generatesecondaryfile.bat"
+                });
 
             conf.ProjectFileName = "[project.Name]_[target.DevEnv]_[target.Platform]";
             conf.ProjectPath = @"[project.SharpmakeCsPath]\projects";
+            conf.Options.Add(Sharpmake.Options.Vc.General.DebugInformation.C7Compatible);
         }
 
         [Configure(BuildSystem.FastBuild)]

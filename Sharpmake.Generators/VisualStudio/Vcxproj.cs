@@ -179,9 +179,15 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     relativeBuildStep.AdditionalInputs.Add(relativeBuildStep.Executable);
                 }
-                // Build the command.
+                
+                // Add "call" prefix for batch files to ensure control returns to MSBuild when there is multiple custom build steps.
+                // msbuild bundles together multiple builds steps in a single .bat. If one of them is a .bat file without "call", the rest of the steps are skipped.
+                string executableExtension = Path.GetExtension(relativeBuildStep.Executable);
+                string callPrefix = executableExtension.Equals(".bat", StringComparison.OrdinalIgnoreCase) ? "call " : "";
+
                 string command = string.Format(
-                    "\"{0}\" {1}",
+                    "{0}\"{1}\" {2}",
+                    callPrefix,
                     relativeBuildStep.Executable,
                     relativeBuildStep.ExecutableArguments
                 );

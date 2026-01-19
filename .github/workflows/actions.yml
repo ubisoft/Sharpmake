@@ -103,7 +103,7 @@ jobs:
         run: |
           foreach ($configuration in '${{ matrix.configurations }}'.Split(','))
           {
-            .\RunSample.ps1 -sampleName "${{ matrix.name }}" -configuration $configuration -framework ${{ matrix.framework }} -os ${{ matrix.os }} -vsVersionSuffix ${env:VS_VERSION_SUFFIX}
+            .\RunSample.ps1 -sampleName "${{ matrix.name }}" -configuration "$configuration" -framework "${{ matrix.framework }}" -os "${{ matrix.os }}" -vsVersionSuffix "${env:VS_VERSION_SUFFIX}"
           }
 
       - name: Store MSBuild binary logs
