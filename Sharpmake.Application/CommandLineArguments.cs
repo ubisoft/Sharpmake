@@ -19,10 +19,6 @@ namespace Sharpmake.Application
                 public Error(string message, params object[] args)
                     : base(string.Format(message, args))
                 { }
-
-                protected Error(SerializationInfo info, StreamingContext context)
-                    : base(info, context)
-                { }
             }
 
             public enum InputType

@@ -4,7 +4,7 @@
 
   <PropertyGroup>
     <!-- While Microsoft.Build.NoTargets doesn't build anything, it still requires to have a valid TargetFramework defined -->
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     
     <!-- Disable auto discovery of file to compile, and explicitly list .sharpmake.cs files only -->
     <EnableDefaultItems>false</EnableDefaultItems>

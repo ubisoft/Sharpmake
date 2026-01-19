@@ -377,10 +377,11 @@ namespace Sharpmake
             }
 
 #if NET7_0_OR_GREATER
-            [Obsolete("Directly use 'char.IsAsciiLetter()' in 'IsCharEqual()' bellow (char.IsAsciiLetter() is available starting net7)")]
-#endif
+            static bool IsCharEqual(char a, char b, bool ignoreCase) => a == b || (ignoreCase && (a | 0x20) == (b | 0x20) && char.IsAsciiLetter(a));
+#else
             static bool IsAsciiLetter(char c) => (uint)((c | 0x20) - 'a') <= 'z' - 'a';
             static bool IsCharEqual(char a, char b, bool ignoreCase) => a == b || (ignoreCase && (a | 0x20) == (b | 0x20) && IsAsciiLetter(a));
+#endif
 
             // Check if both paths are the same (ignoring the last directory separator if any)
             if ((relativeToLength == commonPartLength && pathLength == commonPartLength)
