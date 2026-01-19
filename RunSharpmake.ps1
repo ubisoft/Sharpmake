@@ -31,15 +31,17 @@ try
     Write-Host "run sharpmake.application on $sharpmakeFile"
     $curentDir = Get-Location
 
-    $sharpmakeWinExe = Join-Path $curentDir 'Sharpmake.Application' 'bin' $configuration $framework 'Sharpmake.Application.exe'
-    $sharpmakeLinuxExe = Join-Path $curentDir 'Sharpmake.Application' 'bin' $configuration $framework 'Sharpmake.Application'
+    $sharpmakeWinExe = [IO.Path]::Combine($curentDir, 'Sharpmake.Application', 'bin', $configuration, $framework, 'Sharpmake.Application.exe')
+    $sharpmakeLinuxExe = [IO.Path]::Combine($curentDir, 'Sharpmake.Application', 'bin', $configuration, $framework, 'Sharpmake.Application')
     $arguments = "/sources('$sharpmakeFile') /verbose"
     if ($devenvVersion -ne "")
     {
         $arguments = "$arguments /devenvversion('$devenvVersion')"
     }
 
-    if ($IsWindows)
+    $onWindows = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
+
+    if ($onWindows)
     {
         # run on windows
         Write-Host "running on windows"
