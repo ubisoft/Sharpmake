@@ -1,0 +1,10 @@
+const char *GetFile2Content()
+{
+    return "This is the content of file 2.\n";
+}
+
+void PrintSecondaryFileContent()
+{
+    printf("%s", GetFile1Content());
+    printf("%s", GetFile2Content());
+}
