@@ -1188,6 +1188,7 @@ namespace Sharpmake.Generators.FastBuild
                                     using (bffGenerator.Declare("fastBuildStampArguments", fastBuildStampArguments))
                                     using (bffGenerator.Declare("fastBuildEmbeddedOutputPrefix", fastBuildEmbeddedOutputPrefix))
                                     using (bffGenerator.Declare("fastbuildConcurrencyGroupName", conf.FastBuildLinkConcurrencyGroup ?? FileGeneratorUtilities.RemoveLineTag))
+                                    using (bffGenerator.Declare("fastBuildAllowCaching", conf.FastBuildCacheAllowed ? "true" : "false"))
                                     {
                                         if (projectHasResourceFiles)
                                         {
@@ -1213,6 +1214,8 @@ namespace Sharpmake.Generators.FastBuild
                                         )
                                         {
                                             bffGenerator.Write(Template.ConfigurationFile.ObjectListBeginSection);
+
+                                            bffGenerator.Write(Template.ConfigurationFile.AllowCaching);
 
                                             if (conf.Platform.IsMicrosoft())
                                             {
@@ -1263,6 +1266,8 @@ namespace Sharpmake.Generators.FastBuild
                                         if (isOutputTypeDll && !isLastSubConfig)
                                         {
                                             bffGenerator.Write(Template.ConfigurationFile.ObjectListBeginSection);
+
+                                            bffGenerator.Write(Template.ConfigurationFile.AllowCaching);
 
                                             if (conf.Platform.IsMicrosoft())
                                             {
@@ -1357,6 +1362,8 @@ namespace Sharpmake.Generators.FastBuild
 
                                             if (outputLib)
                                             {
+                                                bffGenerator.Write(Template.ConfigurationFile.AllowCaching);
+
                                                 if (conf.Platform.IsMicrosoft())
                                                 {
                                                     bffGenerator.Write(fastBuildCompilerExtraOptions);

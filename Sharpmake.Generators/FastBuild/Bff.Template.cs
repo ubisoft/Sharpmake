@@ -66,6 +66,9 @@ Settings
     .ConcurrencyPerJobMiB = [fastBuildConcurrencyPerJobMiB]
 ]
 ";
+                public static string AllowCaching = @"
+    .AllowCaching = [fastBuildAllowCaching]
+";
 
                 public const string WinEnvironment =
 @"    #import TMP
