@@ -1910,7 +1910,11 @@ namespace Sharpmake.Generators.VisualStudio
                 if (conf.IsFastBuild) // copies handled in bff
                     continue;
 
-                if (conf.Output != Project.Configuration.OutputType.Exe && !conf.ExecuteTargetCopy)
+                bool isOutputTypeExe = conf.Output == Project.Configuration.OutputType.Exe;
+                bool isOutputTypeDll = conf.Output == Project.Configuration.OutputType.Dll;
+                bool isOutputTypeExeOrDll = isOutputTypeExe || isOutputTypeDll;
+
+                if (!isOutputTypeExeOrDll && !conf.ExecuteTargetCopy)
                     continue;
 
                 var copies = ProjectOptionsGenerator.ConvertPostBuildCopiesToRelative(conf, context.ProjectDirectory);
