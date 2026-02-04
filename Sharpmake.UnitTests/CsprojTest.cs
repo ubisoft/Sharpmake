@@ -23,7 +23,7 @@ namespace Sharpmake.UnitTests
 
                 var result = CSproj.GetProjectLinkedFolder(filePath, projectPath, project);
 
-                Assert.AreEqual("", result);
+                Assert.That(result, Is.EqualTo(""));
             }
 
             [Test]
@@ -38,7 +38,7 @@ namespace Sharpmake.UnitTests
 
                 var result = CSproj.GetProjectLinkedFolder(filePath, projectPath, project);
 
-                Assert.AreEqual("", result);
+                Assert.That(result, Is.EqualTo(""));
             }
 
             [Test]
@@ -53,7 +53,7 @@ namespace Sharpmake.UnitTests
 
                 var result = CSproj.GetProjectLinkedFolder(filePath, projectPath, project);
 
-                Assert.AreNotEqual("codebase\\helloworld", result);
+                Assert.That(result, Is.Not.EqualTo("codebase\\helloworld"));
             }
 
             [Test]
@@ -68,7 +68,7 @@ namespace Sharpmake.UnitTests
 
                 var result = CSproj.GetProjectLinkedFolder(filePath, projectPath, project);
 
-                Assert.IsNull(result);
+                Assert.That(result, Is.Null);
             }
 
             [Test]
@@ -83,7 +83,7 @@ namespace Sharpmake.UnitTests
 
                 var result = CSproj.GetProjectLinkedFolder(filePath, projectPath, project);
 
-                Assert.AreEqual(".nuget\\dd\\llvm\\build\\native", result);
+                Assert.That(result, Is.EqualTo(".nuget\\dd\\llvm\\build\\native"));
             }
 
             [Test]
@@ -98,7 +98,7 @@ namespace Sharpmake.UnitTests
 
                 var result = CSproj.GetProjectLinkedFolder(filePath, projectPath, project);
 
-                Assert.AreEqual("code\\platform", result);
+                Assert.That(result, Is.EqualTo("code\\platform"));
             }
 
             [Test]
@@ -112,7 +112,7 @@ namespace Sharpmake.UnitTests
 
                 var result = CSproj.GetProjectLinkedFolder(filePath, projectPath, project);
 
-                Assert.IsNull(result);
+                Assert.That(result, Is.Null);
             }
 
             [Test]
@@ -126,7 +126,7 @@ namespace Sharpmake.UnitTests
 
                 var result = CSproj.GetProjectLinkedFolder(filePath, projectPath, project);
 
-                Assert.IsNull(result);
+                Assert.That(result, Is.Null);
             }
 
             [Test]
@@ -143,14 +143,14 @@ namespace Sharpmake.UnitTests
                 var projectLowerCase = new Project() { SourceRootPath = sourceRootPathLowerCase };
                 var result = CSproj.GetProjectLinkedFolder(filePathLowerCase, projectPathLowerCase, projectLowerCase);
 
-                Assert.IsTrue(string.Equals("helloworld", result, System.StringComparison.Ordinal));
-                Assert.IsFalse(string.Equals("HelloWorld", result, System.StringComparison.Ordinal));
+                Assert.That(string.Equals("helloworld", result, System.StringComparison.Ordinal), Is.True);
+                Assert.That(string.Equals("HelloWorld", result, System.StringComparison.Ordinal), Is.False);
 
                 var projectCamelCase = new Project() { SourceRootPath = sourceRootPathCamelCase };
                 result = CSproj.GetProjectLinkedFolder(filePathCamelCase, projectPathCamelCase, projectCamelCase);
 
-                Assert.IsTrue(string.Equals("HelloWorld", result, System.StringComparison.Ordinal));
-                Assert.IsFalse(string.Equals("helloworld", result, System.StringComparison.Ordinal));
+                Assert.That(string.Equals("HelloWorld", result, System.StringComparison.Ordinal), Is.True);
+                Assert.That(string.Equals("helloworld", result, System.StringComparison.Ordinal), Is.False);
             }
         }
     }

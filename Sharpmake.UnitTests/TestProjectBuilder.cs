@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -30,6 +31,7 @@ namespace Sharpmake.UnitTests
             _configureOrder = configureOrder;
         }
 
+        [SuppressMessage("NUnit1032", "NUnit1032:IDisposableFieldPropertyShouldBeDisposed", Justification = "Builder is disposed in OneTimeTearDown Shutdown method, not TearDown, since it's initialized once per test fixture.")]
         public Builder Builder { get; private set; }
 
         protected enum InitType

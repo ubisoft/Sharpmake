@@ -46,7 +46,7 @@ namespace Sharpmake.UnitTests
                     "SimpleProject_vs2019_Release : SimpleProject_vs2019_Debug_Release_unity", // but different names because of different conf.FastBuildUnityUseRelativePaths from vs2017.
                     "SimpleProject_vs2019_Retail : SimpleProject_vs2019_Retail_unity",
                 };
-            CollectionAssert.AreEqual(expectedLogNames, unityLogNames);
+            Assert.That(unityLogNames, Is.EqualTo(expectedLogNames));
         }
 
         [Test]
@@ -64,7 +64,7 @@ namespace Sharpmake.UnitTests
                     "SimpleProject_vs2019_Release : SimpleProject_unity_9590105D", // but different hash values because of different conf.FastBuildUnityUseRelativePaths from vs2017.
                     "SimpleProject_vs2019_Retail : SimpleProject_unity_8B4A18D4",
                 };
-            CollectionAssert.AreEqual(expectedLogNames, unityLogNames);
+            Assert.That(unityLogNames, Is.EqualTo(expectedLogNames));
         }
 
         [Test]
@@ -82,7 +82,7 @@ namespace Sharpmake.UnitTests
                     "SimpleProject_vs2019_Release : SimpleProject_unity_63ED6EB4", // but different hash values because of different conf.FastBuildUnityUseRelativePaths from vs2017.
                     "SimpleProject_vs2019_Retail : SimpleProject_unity_D405C80E",
                 };
-            CollectionAssert.AreEqual(expectedLogNames, unityLogNames);
+            Assert.That(unityLogNames, Is.EqualTo(expectedLogNames));
         }
 
         protected void GenerateAndBuildUsingResolver<T>(DevEnv devEnv) where T : Bff.IUnityResolver, new()
@@ -98,7 +98,7 @@ namespace Sharpmake.UnitTests
         protected List<string> GetProjectUnityLogNames()
         {
             var project = GetProject<BffUnityResolverTestProjects.SimpleProject>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             var logUnityNames = project.Configurations.OfType<CommonProjectConfiguration>().Select(x => x.Name + " : " + x.LogUnityName).ToList();
             logUnityNames.Sort();
@@ -132,8 +132,8 @@ namespace Sharpmake.UnitTests
                     var unityConfigurations = unitySection.Value;
                     foreach (var conf in unityConfigurations.OfType<CommonProjectConfiguration>())
                     {
-                        Assert.IsNull(conf.LogUnityName);
-                        Assert.IsNotNull(unity.UnityName);
+                        Assert.That(conf.LogUnityName, Is.Null);
+                        Assert.That(unity.UnityName, Is.Not.Null);
                         conf.LogUnityName = unity.UnityName;
                     }
                 }

@@ -33,7 +33,7 @@ namespace Sharpmake.UnitTests
         public void ConfiguresCalled()
         {
             var project = GetProject<ConfigureAttributesTestProjects.SimpleProject>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (Project.Configuration configuration in project.Configurations)
             {
@@ -45,13 +45,13 @@ namespace Sharpmake.UnitTests
                     "CommonProject.Configure" + configuration.Target.GetOptimization(),
                     "CommonProject.Configure" + configuration.Target.GetOptimization() + "Win64",
                 };
-                CollectionAssert.AreEqual(expectedCalls, conf.ConfigureCalls);
+                Assert.That(conf.ConfigureCalls, Is.EqualTo(expectedCalls));
             }
         }
 
         public static void ConfigureOverrideCalled(Project project)
         {
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (Project.Configuration configuration in project.Configurations)
             {
@@ -78,7 +78,7 @@ namespace Sharpmake.UnitTests
                     expectedCalls.Add("CommonProject.ConfigureDebugWin64");
                 }
 
-                CollectionAssert.AreEqual(expectedCalls, conf.ConfigureCalls);
+                Assert.That(conf.ConfigureCalls, Is.EqualTo(expectedCalls));
             }
         }
 

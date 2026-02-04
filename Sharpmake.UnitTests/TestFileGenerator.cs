@@ -84,7 +84,7 @@ namespace Sharpmake.UnitTests
                 bool r1 = Generator.IsEmpty();
                 Writer.Flush();
                 bool r2 = Stream.Length == 0;
-                Assert.AreEqual(r1, r2);
+                Assert.That(r2, Is.EqualTo(r1));
                 return r1;
             }
 
@@ -122,29 +122,29 @@ namespace Sharpmake.UnitTests
                 var fileInfo1 = new FileInfo(tmpFile1);
                 var fileInfo2 = new FileInfo(tmpFile2);
 
-                Assert.IsTrue(testHelper.Generator.IsFileDifferent(fileInfo1));
-                Assert.IsTrue(testHelper.Generator.IsFileDifferent(fileInfo2));
+                Assert.That(testHelper.Generator.IsFileDifferent(fileInfo1), Is.True);
+                Assert.That(testHelper.Generator.IsFileDifferent(fileInfo2), Is.True);
 
                 // Write the file using reference stream
-                Assert.IsTrue(Util.FileWriteIfDifferentInternal(fileInfo1, testHelper.Stream, true));
+                Assert.That(Util.FileWriteIfDifferentInternal(fileInfo1, testHelper.Stream, true), Is.True);
                 fileInfo1.Refresh();
 
                 // Using second file to write a file using generator.
-                Assert.IsTrue(testHelper.Generator.FileWriteIfDifferent(fileInfo2, true));
+                Assert.That(testHelper.Generator.FileWriteIfDifferent(fileInfo2, true), Is.True);
                 fileInfo2.Refresh();
 
                 // Verify that generator content is the same.
-                Assert.IsFalse(testHelper.Generator.IsFileDifferent(fileInfo1));
+                Assert.That(testHelper.Generator.IsFileDifferent(fileInfo1), Is.False);
 
                 // Verify that written file is identical to stream
-                Assert.IsFalse(Util.IsFileDifferent(fileInfo2, testHelper.Stream));
+                Assert.That(Util.IsFileDifferent(fileInfo2, testHelper.Stream), Is.False);
 
                 // Read the two files and verify that they are identical
                 var contentFile1 = File.ReadAllBytes(tmpFile1);
                 var contentFile2 = File.ReadAllBytes(tmpFile2);
                 ReadOnlySpan<byte> span1 = new ReadOnlySpan<byte>(contentFile1);
                 ReadOnlySpan<byte> span2 = new ReadOnlySpan<byte>(contentFile2);
-                Assert.IsTrue(span1.SequenceEqual(span2));
+                Assert.That(span1.SequenceEqual(span2), Is.True);
             }
             finally
             {
@@ -159,7 +159,7 @@ namespace Sharpmake.UnitTests
             var testHelper = new FileGeneratorTestHelper(encoding);
             if (encoding != null)
             {
-                Assert.AreEqual(encoding, testHelper.Generator.Encoding);
+                Assert.That(testHelper.Generator.Encoding, Is.EqualTo(encoding));
             }
 
             testHelper.Write("testWrite");
@@ -204,7 +204,7 @@ namespace Sharpmake.UnitTests
 
             // Verify that win64 environment resolver is available. If not it means one time setup fixture wasn't initialized correctly.
             var envVarResolver = PlatformRegistry.Get<IPlatformDescriptor>(Platform.win64).GetPlatformEnvironmentResolver();
-            Assert.NotNull(envVarResolver);
+            Assert.That(envVarResolver, Is.Not.Null);
 
             testHelper.Generator.ResolveEnvironmentVariables(Platform.win64,
                 new VariableAssignment("name1", "name1_value"));
@@ -231,9 +231,9 @@ namespace Sharpmake.UnitTests
         {
             var testHelper = new FileGeneratorTestHelper();
 
-            Assert.IsTrue(testHelper.Generator.IsEmpty());
+            Assert.That(testHelper.Generator.IsEmpty(), Is.True);
             testHelper.Write("abc");
-            Assert.IsFalse(testHelper.Generator.IsEmpty());
+            Assert.That(testHelper.Generator.IsEmpty(), Is.False);
         }
 
         [Test]
@@ -242,7 +242,7 @@ namespace Sharpmake.UnitTests
             var testHelper = new FileGeneratorTestHelper();
             testHelper.Write("abc");
             testHelper.Clear();
-            Assert.IsTrue(testHelper.Generator.IsEmpty());
+            Assert.That(testHelper.Generator.IsEmpty(), Is.True);
         }
 
         [Test]
@@ -260,11 +260,11 @@ namespace Sharpmake.UnitTests
                 var fileInfo1 = new FileInfo(tmpFile1);
 
                 // Write the file using reference stream
-                Assert.IsTrue(generator1.FileWriteIfDifferent(fileInfo1, true));
+                Assert.That(generator1.FileWriteIfDifferent(fileInfo1, true), Is.True);
                 fileInfo1.Refresh();
 
                 // Using second file to write a file using generator.
-                Assert.IsFalse(generator2.IsFileDifferent(fileInfo1));
+                Assert.That(generator2.IsFileDifferent(fileInfo1), Is.False);
             }
             finally
             {
@@ -277,7 +277,7 @@ namespace Sharpmake.UnitTests
         {
             Resolver resolver = new Resolver();
             var generator1 = new FileGenerator(resolver);
-            Assert.AreSame(resolver, generator1.Resolver);
+            Assert.That(generator1.Resolver, Is.SameAs(resolver));
         }
     }
 }

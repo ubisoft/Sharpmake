@@ -72,13 +72,13 @@ namespace Sharpmake.UnitTests
             var notFullyQualifiedUnixPath = "MountedDiskName:";
             var fullyQualifiedRoot = Path.DirectorySeparatorChar.ToString();
 
-            Assert.AreEqual(fullyQualifiedRoot, Util.PathMakeStandard(fullyQualifiedRoot));
+            Assert.That(Util.PathMakeStandard(fullyQualifiedRoot), Is.EqualTo(fullyQualifiedRoot));
 
             // Check case sensitivness on Unix 
             if (!Util.IsRunningOnUnix())
                 notFullyQualifiedUnixPath = notFullyQualifiedUnixPath.ToLower();
 
-            Assert.AreEqual(notFullyQualifiedUnixPath, Util.PathMakeStandard(notFullyQualifiedUnixPath));
+            Assert.That(Util.PathMakeStandard(notFullyQualifiedUnixPath), Is.EqualTo(notFullyQualifiedUnixPath));
         }
 
         [Test]
@@ -90,8 +90,8 @@ namespace Sharpmake.UnitTests
             var driveRelativePath = @"d:toto\tata\";
             var fullyQualifiedPath = Path.Combine("d:", "toto", "tata");
 
-            Assert.AreEqual(expectedResult, Util.PathMakeStandard(driveRelativePath));
-            Assert.AreNotEqual(fullyQualifiedPath, Util.PathMakeStandard(driveRelativePath));
+            Assert.That(Util.PathMakeStandard(driveRelativePath), Is.EqualTo(expectedResult));
+            Assert.That(Util.PathMakeStandard(driveRelativePath), Is.Not.EqualTo(fullyQualifiedPath));
         }
 
         [Test]
@@ -102,8 +102,8 @@ namespace Sharpmake.UnitTests
                 var notFullyQualifiedRoot = "d:";
                 var fullyQualifiedRoot = @"d:\";
 
-                Assert.AreEqual(fullyQualifiedRoot, Util.PathMakeStandard(notFullyQualifiedRoot));
-                Assert.AreEqual(fullyQualifiedRoot, Util.PathMakeStandard(fullyQualifiedRoot));
+                Assert.That(Util.PathMakeStandard(notFullyQualifiedRoot), Is.EqualTo(fullyQualifiedRoot));
+                Assert.That(Util.PathMakeStandard(fullyQualifiedRoot), Is.EqualTo(fullyQualifiedRoot));
             }
         }
 
@@ -153,7 +153,7 @@ namespace Sharpmake.UnitTests
 
             Util.PathMakeStandard(listString);
 
-            Assert.AreEqual(expectedList, listString);
+            Assert.That(listString, Is.EqualTo(expectedList));
         }
     }
 
@@ -410,7 +410,7 @@ namespace Sharpmake.UnitTests
             string stringsSource = Util.PathMakeStandard(@"C:\Windows\System32\cmd.exe");
             string expectedString = Util.PathMakeStandard(@"..\..\local\cmd.exe");
 
-            Assert.AreEqual(expectedString, Util.PathGetRelative(stringsSource, stringsDest, false)[0]);
+            Assert.That(Util.PathGetRelative(stringsSource, stringsDest, false)[0], Is.EqualTo(expectedString));
         }
 
         [Test]
@@ -426,9 +426,9 @@ namespace Sharpmake.UnitTests
             Util.PathMakeStandard(stringsDest);
             OrderableStrings listResult = Util.PathGetRelative(stringsSource, stringsDest, false);
 
-            Assert.AreEqual(Util.PathMakeStandard(@"..\Sharpmake.Generators\Generic", !Util.IsRunningInMono()), listResult[0]);
-            Assert.AreEqual(Util.PathMakeStandard(@"subdir\test.txt", !Util.IsRunningInMono()), listResult[1]);
-            Assert.AreEqual("test2.txt", listResult[2]);
+            Assert.That(listResult[0], Is.EqualTo(Util.PathMakeStandard(@"..\Sharpmake.Generators\Generic", !Util.IsRunningInMono())));
+            Assert.That(listResult[1], Is.EqualTo(Util.PathMakeStandard(@"subdir\test.txt", !Util.IsRunningInMono())));
+            Assert.That(listResult[2], Is.EqualTo("test2.txt"));
         }
 
         [Test]
@@ -443,8 +443,8 @@ namespace Sharpmake.UnitTests
             Util.PathMakeStandard(stringsDest);
 
             var result = Util.PathGetRelative(stringsSource, stringsDest, false);
-            Assert.AreEqual(Util.PathMakeStandard(@"..\Generic"), result[0]);
-            Assert.AreEqual(Util.PathMakeStandard(@"..\Properties"), result[1]);
+            Assert.That(result[0], Is.EqualTo(Util.PathMakeStandard(@"..\Generic")));
+            Assert.That(result[1], Is.EqualTo(Util.PathMakeStandard(@"..\Properties")));
         }
     }
 
@@ -453,109 +453,109 @@ namespace Sharpmake.UnitTests
         [Test]
         public void NullIfEmpty()
         {
-            Assert.IsNull(Util.FindCommonRootPath(Enumerable.Empty<string>()));
+            Assert.That(Util.FindCommonRootPath(Enumerable.Empty<string>()), Is.Null);
         }
 
         [Test]
         public void EmptyString()
         {
-            Assert.IsNull(Util.FindCommonRootPath(new[] { "" }));
-            Assert.IsNull(Util.FindCommonRootPath(new[] { "", "" }));
+            Assert.That(Util.FindCommonRootPath(new[] { "" }), Is.Null);
+            Assert.That(Util.FindCommonRootPath(new[] { "", "" }), Is.Null);
         }
 
         [Test]
         public void DifferentDrives()
         {
-            Assert.IsNull(Util.FindCommonRootPath(new[] {
+            Assert.That(Util.FindCommonRootPath(new[] {
                 @"C:\bla",
                 @"D:\bla"
-            }));
+            }), Is.Null);
         }
 
         [Test]
         public void OnlyRoot()
         {
-            Assert.AreEqual(Util.PathMakeStandard("/"), Util.FindCommonRootPath(new[] {"/bla", "/bli"}));
-            Assert.AreEqual(Util.PathMakeStandard(@"c:\"), Util.FindCommonRootPath(new[] {@"c:\bla", @"c:\bli"}));
+            Assert.That(Util.FindCommonRootPath(new[] {"/bla", "/bli"}), Is.EqualTo(Util.PathMakeStandard("/")));
+            Assert.That(Util.FindCommonRootPath(new[] {@"c:\bla", @"c:\bli"}), Is.EqualTo(Util.PathMakeStandard(@"c:\")));
         }
 
         [Test]
         public void SameDir()
         {
-            Assert.AreEqual(
-                Util.PathMakeStandard(@"C:\bla"),
+            Assert.That(
                 Util.FindCommonRootPath(new[] {
                     @"C:\bla",
                     @"C:\bla"
-                })
+                }),
+                Is.EqualTo(Util.PathMakeStandard(@"C:\bla"))
             );
 
-            Assert.AreEqual(
-                Util.PathMakeStandard(@"C:\bla"),
+            Assert.That(
                 Util.FindCommonRootPath(new[] {
                     @"C:\bla\",
                     @"C:\bla"
-                })
+                }),
+                Is.EqualTo(Util.PathMakeStandard(@"C:\bla"))
             );
 
-            Assert.AreEqual(
-                Util.PathMakeStandard(@"C:\bla"),
+            Assert.That(
                 Util.FindCommonRootPath(new[] {
                     @"C:\\bla\",
                     @"C:\bla"
-                })
+                }),
+                Is.EqualTo(Util.PathMakeStandard(@"C:\bla"))
             );
 
-            Assert.AreEqual(
-                Util.PathMakeStandard(@"C:\bla"),
+            Assert.That(
                 Util.FindCommonRootPath(new[] {
                     @"C:\bla",
                     @"C:\bla",
                     @"C:\bla",
                     @"C:\bla"
-                })
+                }),
+                Is.EqualTo(Util.PathMakeStandard(@"C:\bla"))
             );
         }
 
         [Test]
         public void LongPaths()
         {
-            Assert.AreEqual(
-                Util.PathMakeStandard(@"C:\a\b\c\d"),
+            Assert.That(
                 Util.FindCommonRootPath(new[] {
                     @"C:\a\b\c\d\e\f",
                     @"C:\a\b\c\d\file1.ext",
                     @"C:\a\b\c\d\file2.ext",
                     @"C:\a\b\c\d\e\file3.ext",
                     @"C:\a\b\c\d\e\f\g\h\file4.ext",
-                })
+                }),
+                Is.EqualTo(Util.PathMakeStandard(@"C:\a\b\c\d"))
             );
 
             // check that it's case sensitive on unix and not on windows
             if (Util.IsRunningOnUnix())
             {
-                Assert.AreEqual(
-                    Util.PathMakeStandard(@"/a/b"),
+                Assert.That(
                     Util.FindCommonRootPath(new[] {
                         @"/a/b/c/d/e/f",
                         @"/a/b/C/d/file1.ext",
                         @"/a/b/c/d/file2.ext",
                         @"/a/b/c/D/E/file3.ext",
                         @"/a/b/c/d/e/f/g/h/file4.ext",
-                    })
+                    }),
+                    Is.EqualTo(Util.PathMakeStandard(@"/a/b"))
                 );
             }
             else
             {
-                Assert.AreEqual(
-                    Util.PathMakeStandard(@"C:\a\b\c\d"),
+                Assert.That(
                     Util.FindCommonRootPath(new[] {
                         @"C:\a\B\c\d\e\f",
                         @"C:\a\b\c\d\file1.ext",
                         @"C:\a\b\C\d\file2.ext",
                         @"C:\a\b\c\D\E\file3.ext",
                         @"C:\a\b\c\d\e\f\g\h\file4.ext",
-                    })
+                    }),
+                    Is.EqualTo(Util.PathMakeStandard(@"C:\a\b\c\d"))
                 );
             }
         }
@@ -580,19 +580,19 @@ namespace Sharpmake.UnitTests
         {
             string output = null;
 
-            Assert.AreEqual(DefaultValue, Util.GetEnvironmentVariable(VariableName, DefaultValue, ref output, true));
+            Assert.That(Util.GetEnvironmentVariable(VariableName, DefaultValue, ref output, true), Is.EqualTo(DefaultValue));
         }
         [Test]
         public void GetEnvironmentVariableExisting()
         {
             string output = null;
-            Assert.AreEqual(DefaultValue, Util.GetEnvironmentVariable(VariableName, DefaultValue, ref output, true));
+            Assert.That(Util.GetEnvironmentVariable(VariableName, DefaultValue, ref output, true), Is.EqualTo(DefaultValue));
             Environment.SetEnvironmentVariable(VariableName, ExpectedVariableValue);
             output = null;
-            Assert.AreEqual(ExpectedVariableValue, Util.GetEnvironmentVariable(VariableName, DefaultValue, ref output, true));
+            Assert.That(Util.GetEnvironmentVariable(VariableName, DefaultValue, ref output, true), Is.EqualTo(ExpectedVariableValue));
             Environment.SetEnvironmentVariable(VariableName, null);
             output = null;
-            Assert.AreEqual(DefaultValue, Util.GetEnvironmentVariable(VariableName, DefaultValue, ref output, true));
+            Assert.That(Util.GetEnvironmentVariable(VariableName, DefaultValue, ref output, true), Is.EqualTo(DefaultValue));
         }
     }
 
@@ -616,8 +616,8 @@ namespace Sharpmake.UnitTests
 
             pathsToLower.ToLower();
 
-            Assert.AreEqual(paths, Util.PathGetCapitalized(pathsToLower));
-            Assert.AreEqual(paths, Util.PathGetCapitalized(pathsToUpper));
+            Assert.That(Util.PathGetCapitalized(pathsToLower), Is.EqualTo(paths));
+            Assert.That(Util.PathGetCapitalized(pathsToUpper), Is.EqualTo(paths));
 
             File.Delete(mockPath1);
             File.Delete(mockPath2);
@@ -645,7 +645,7 @@ namespace Sharpmake.UnitTests
                 tempDirectory1.FullName,
                 tempDirectory2.FullName
             };
-            Assert.AreEqual(expectedOutput, Util.PathGetCapitalized(paths));
+            Assert.That(Util.PathGetCapitalized(paths), Is.EqualTo(expectedOutput));
 
             Directory.Delete(tempDirectory1.FullName);
             Directory.Delete(tempDirectory2.FullName);
@@ -708,7 +708,7 @@ namespace Sharpmake.UnitTests
         {
             string[] listFileInfo = Util.GetCurrentSharpmakeFileInfo().FullName.Split('\\');
 
-            Assert.AreEqual("UtilTest.cs", listFileInfo[listFileInfo.Length - 1]);
+            Assert.That(listFileInfo[listFileInfo.Length - 1], Is.EqualTo("UtilTest.cs"));
         }
 
         /// <summary>
@@ -721,8 +721,8 @@ namespace Sharpmake.UnitTests
 
             File.WriteAllLines(mockPath, new[] { "<#@ output extension=\".txt\" #>", "<#@ log extension=\".dll\" #>" });
 
-            Assert.AreEqual(".txt", Util.GetTextTemplateDirectiveParam(mockPath, "output", "extension"));
-            Assert.AreEqual(".dll", Util.GetTextTemplateDirectiveParam(mockPath, "log", "extension"));
+            Assert.That(Util.GetTextTemplateDirectiveParam(mockPath, "output", "extension"), Is.EqualTo(".txt"));
+            Assert.That(Util.GetTextTemplateDirectiveParam(mockPath, "log", "extension"), Is.EqualTo(".dll"));
 
             File.Delete(mockPath);
         }
@@ -746,7 +746,7 @@ namespace Sharpmake.UnitTests
                     bool result = Util.FileWriteIfDifferentInternal(new FileInfo(filePath1), s, true);
 
                     // File should never be different anymore after the call above
-                    Assert.IsFalse(Util.IsFileDifferent(new FileInfo(filePath1), s));
+                    Assert.That(Util.IsFileDifferent(new FileInfo(filePath1), s), Is.False);
 
                     return result;
                 }
@@ -769,7 +769,7 @@ namespace Sharpmake.UnitTests
                     bool result = Util.FileWriteIfDifferentInternal(new FileInfo(filePath1), s, true);
 
                     // File should never be different anymore after the call above
-                    Assert.IsFalse(Util.IsFileDifferent(new FileInfo(filePath1), s));
+                    Assert.That(Util.IsFileDifferent(new FileInfo(filePath1), s), Is.False);
                 }
             }
             finally
@@ -795,7 +795,7 @@ namespace Sharpmake.UnitTests
                     bool result = Util.FileWriteIfDifferentInternal(fileInfo, s, true);
 
                     // File should never be different anymore after the call above
-                    Assert.IsFalse(Util.IsFileDifferent(fileInfo, s));
+                    Assert.That(Util.IsFileDifferent(fileInfo, s), Is.False);
                 }
             }
             finally
@@ -812,8 +812,8 @@ namespace Sharpmake.UnitTests
             try
             {
                 var fileInfo = new FileInfo(filePath1);
-                Assert.IsFalse(fileInfo.Directory.Exists);
-                Assert.IsFalse(fileInfo.Exists);
+                Assert.That(fileInfo.Directory.Exists, Is.False);
+                Assert.That(fileInfo.Exists, Is.False);
 
                 // Prepare a different memory stream
                 using (MemoryStream s = PrepareMemoryStream(12, 42, -1, 0))
@@ -822,7 +822,7 @@ namespace Sharpmake.UnitTests
 
                     // File should never be different anymore after the call above
                     fileInfo.Refresh();
-                    Assert.IsFalse(Util.IsFileDifferent(fileInfo, s));
+                    Assert.That(Util.IsFileDifferent(fileInfo, s), Is.False);
                 }
             }
             finally
@@ -878,12 +878,12 @@ namespace Sharpmake.UnitTests
             File.WriteAllLines(mockPathSource, new[] { "MockFile" });
             File.WriteAllBytes(mockPathExpected, File.ReadAllBytes(mockPathSource));
             Util.ForceCopy(mockPathSource, mockPathDest);
-            Assert.AreEqual(File.ReadAllText(mockPathExpected), File.ReadAllText(mockPathDest));
+            Assert.That(File.ReadAllText(mockPathDest), Is.EqualTo(File.ReadAllText(mockPathExpected)));
 
             File.WriteAllLines(mockPathSource, new[] { "MockFile Test" });
             File.WriteAllBytes(mockPathExpected, File.ReadAllBytes(mockPathSource));
             Util.ForceCopy(mockPathSource, mockPathDest);
-            Assert.AreEqual(File.ReadAllText(mockPathExpected), File.ReadAllText(mockPathDest));
+            Assert.That(File.ReadAllText(mockPathDest), Is.EqualTo(File.ReadAllText(mockPathExpected)));
 
             File.Delete(mockPathSource);
             File.Delete(mockPathDest);
@@ -898,7 +898,7 @@ namespace Sharpmake.UnitTests
         {
             var mockPath = Path.GetTempFileName();
 
-            Assert.True(Util.TryDeleteFile(mockPath, true));
+            Assert.That(Util.TryDeleteFile(mockPath, true), Is.True);
 
             File.Delete(mockPath);
         }
@@ -916,9 +916,9 @@ namespace Sharpmake.UnitTests
                 var fileInfoWrap = new FileInfo(mockPath);
                 fileInfoWrap.IsReadOnly = true;
 
-                Assert.True(fileInfoWrap.IsReadOnly);
+                Assert.That(fileInfoWrap.IsReadOnly, Is.True);
 
-                Assert.False(Util.TryDeleteFile(mockPath));
+                Assert.That(Util.TryDeleteFile(mockPath), Is.False);
                 fileInfoWrap.IsReadOnly = false;
                 fileInfoWrap.Delete();
                 File.Delete(mockPath);
@@ -934,7 +934,7 @@ namespace Sharpmake.UnitTests
             string expectedOutput = "Exception Message";
             Exception e = new Exception(expectedOutput);
 
-            Assert.True(Util.GetCompleteExceptionMessage(e, "   ").Contains(expectedOutput));
+            Assert.That(Util.GetCompleteExceptionMessage(e, "   ").Contains(expectedOutput), Is.True);
         }
     }
 
@@ -957,11 +957,11 @@ namespace Sharpmake.UnitTests
         [Test]
         public void GetVisualStudioPlatformString()
         {
-            Assert.AreEqual("x86", Util.GetToolchainPlatformString(Platform.win32, new CSharpProject(), null, false));
-            Assert.AreEqual("x64", Util.GetToolchainPlatformString(Platform.win64, new CSharpProject(), null, false));
-            Assert.AreEqual("AnyCPU", Util.GetToolchainPlatformString(Platform.win64, new PythonProject(), null, false));
-            Assert.AreEqual("Any CPU", Util.GetToolchainPlatformString(Platform.win64, new PythonProject(), null, true));
-            Assert.AreEqual("x64", Util.GetToolchainPlatformString(Platform.win64, new AndroidPackageProject(), null, true));
+            Assert.That(Util.GetToolchainPlatformString(Platform.win32, new CSharpProject(), null, false), Is.EqualTo("x86"));
+            Assert.That(Util.GetToolchainPlatformString(Platform.win64, new CSharpProject(), null, false), Is.EqualTo("x64"));
+            Assert.That(Util.GetToolchainPlatformString(Platform.win64, new PythonProject(), null, false), Is.EqualTo("AnyCPU"));
+            Assert.That(Util.GetToolchainPlatformString(Platform.win64, new PythonProject(), null, true), Is.EqualTo("Any CPU"));
+            Assert.That(Util.GetToolchainPlatformString(Platform.win64, new AndroidPackageProject(), null, true), Is.EqualTo("x64"));
         }
 
         /// <summary>
@@ -1130,12 +1130,12 @@ namespace Sharpmake.UnitTests
         [Test]
         public void TestPathWithWildcards()
         {
-            Assert.IsTrue(Util.IsPathWithWildcards(Path.Combine("test", "*test", "test")));
-            Assert.IsTrue(Util.IsPathWithWildcards(Path.Combine("test", "*test**", "test")));
-            Assert.IsTrue(Util.IsPathWithWildcards(Path.Combine("test", "tes?t", "test")));
-            Assert.IsTrue(Util.IsPathWithWildcards(Path.Combine("test", "tes??t", "test")));
+            Assert.That(Util.IsPathWithWildcards(Path.Combine("test", "*test", "test")), Is.True);
+            Assert.That(Util.IsPathWithWildcards(Path.Combine("test", "*test**", "test")), Is.True);
+            Assert.That(Util.IsPathWithWildcards(Path.Combine("test", "tes?t", "test")), Is.True);
+            Assert.That(Util.IsPathWithWildcards(Path.Combine("test", "tes??t", "test")), Is.True);
 
-            Assert.IsFalse(Util.IsPathWithWildcards(Path.Combine("test", "test", "test")));
+            Assert.That(Util.IsPathWithWildcards(Path.Combine("test", "test", "test")), Is.False);
         }
 
         [Test]
@@ -1227,13 +1227,13 @@ namespace Sharpmake.UnitTests
         public void CanListFileWithWildcards_NoMatch()
         {
             // Last file doesn't exist in test folder
-            Assert.IsEmpty(Util.DirectoryGetFilesWithWildcards(Path.Combine(Util.FakePathPrefix, "c?de", "test", "main.cpp")));
+            Assert.That(Util.DirectoryGetFilesWithWildcards(Path.Combine(Util.FakePathPrefix, "c?de", "test", "main.cpp")), Is.Empty);
 
             // No folder with only one character exist
-            Assert.IsEmpty(Util.DirectoryGetFilesWithWildcards(Path.Combine(Util.FakePathPrefix, "code", "?", "main.cpp")));
+            Assert.That(Util.DirectoryGetFilesWithWildcards(Path.Combine(Util.FakePathPrefix, "code", "?", "main.cpp")), Is.Empty);
 
             // No file with only one character exist
-            Assert.IsEmpty(Util.DirectoryGetFilesWithWildcards(Path.Combine(Util.FakePathPrefix, "code", "*", "?")));
+            Assert.That(Util.DirectoryGetFilesWithWildcards(Path.Combine(Util.FakePathPrefix, "code", "*", "?")), Is.Empty);
         }
     }
 
@@ -1315,14 +1315,14 @@ namespace Sharpmake.UnitTests
 
                 // Validate creation of a new symbolic link
                 Assert.That(Util.CreateOrUpdateSymbolicLink(tempSource, tempDestination1, true), Is.EqualTo(Util.CreateOrUpdateSymbolicLinkResult.Created));
-                Assert.True(new DirectoryInfo(tempSource).Attributes.HasFlag(FileAttributes.ReparsePoint));
+                Assert.That(new DirectoryInfo(tempSource).Attributes.HasFlag(FileAttributes.ReparsePoint), Is.True);
                 Assert.That(Directory.ResolveLinkTarget(tempSource, false).FullName, Is.EqualTo(tempDestination1));
 
                 // Validate updating a symbolic
                 Assert.That(Util.CreateOrUpdateSymbolicLink(tempSource, tempDestination2, true), Is.EqualTo(Util.CreateOrUpdateSymbolicLinkResult.Updated));
-                Assert.True(new DirectoryInfo(tempSource).Attributes.HasFlag(FileAttributes.ReparsePoint));
+                Assert.That(new DirectoryInfo(tempSource).Attributes.HasFlag(FileAttributes.ReparsePoint), Is.True);
                 Assert.That(Directory.ResolveLinkTarget(tempSource, false).FullName, Is.EqualTo(tempDestination2));
-                Assert.True(File.Exists(tempDestination1File)); // Verify that the content of the old symlink is still there
+                Assert.That(File.Exists(tempDestination1File), Is.True); // Verify that the content of the old symlink is still there
 
                 // Validate noop when the symbolic link is already up to date
                 Assert.That(Util.CreateOrUpdateSymbolicLink(tempSource, tempDestination2, true), Is.EqualTo(Util.CreateOrUpdateSymbolicLinkResult.AlreadyUpToDate));
@@ -1337,7 +1337,7 @@ namespace Sharpmake.UnitTests
                 Directory.CreateDirectory(tempSourceNonEmpty);
                 File.WriteAllText(tempSourceNonEmptyFile, "Some content");
                 Assert.That(Util.CreateOrUpdateSymbolicLink(tempSourceNonEmpty, tempDestination1, true), Is.EqualTo(Util.CreateOrUpdateSymbolicLinkResult.Updated));
-                Assert.False(File.Exists(tempSourceNonEmptyFile)); // Should have been deleted when the symlink was created
+                Assert.That(File.Exists(tempSourceNonEmptyFile), Is.False); // Should have been deleted when the symlink was created
             }
             finally
             {
@@ -1377,15 +1377,15 @@ namespace Sharpmake.UnitTests
 
                 // Validate creation of a new symbolic link
                 Assert.That(Util.CreateOrUpdateSymbolicLink(tempSource, tempDestination1, false), Is.EqualTo(Util.CreateOrUpdateSymbolicLinkResult.Created));
-                Assert.True(new FileInfo(tempSource).Attributes.HasFlag(FileAttributes.ReparsePoint));
+                Assert.That(new FileInfo(tempSource).Attributes.HasFlag(FileAttributes.ReparsePoint), Is.True);
                 Assert.That(File.ResolveLinkTarget(tempSource, false).FullName, Is.EqualTo(tempDestination1));
-                Assert.True(Util.IsSymbolicLink(tempSource));
+                Assert.That(Util.IsSymbolicLink(tempSource), Is.True);
 
                 // Validate updating a symbolic link
                 Assert.That(Util.CreateOrUpdateSymbolicLink(tempSource, tempDestination2, false), Is.EqualTo(Util.CreateOrUpdateSymbolicLinkResult.Updated));
-                Assert.True(new FileInfo(tempSource).Attributes.HasFlag(FileAttributes.ReparsePoint));
+                Assert.That(new FileInfo(tempSource).Attributes.HasFlag(FileAttributes.ReparsePoint), Is.True);
                 Assert.That(File.ResolveLinkTarget(tempSource, false).FullName, Is.EqualTo(tempDestination2));
-                Assert.True(Util.IsSymbolicLink(tempSource));
+                Assert.That(Util.IsSymbolicLink(tempSource), Is.True);
 
                 // Validate noop when the symbolic link is already up to date
                 Assert.That(Util.CreateOrUpdateSymbolicLink(tempSource, tempDestination2, false), Is.EqualTo(Util.CreateOrUpdateSymbolicLinkResult.AlreadyUpToDate));
@@ -1417,10 +1417,10 @@ namespace Sharpmake.UnitTests
             var mockPath1 = Path.GetTempFileName();
             var mockPath2 = Path.GetTempFileName();
 
-            Assert.False(Util.IsSymbolicLink(mockPath1));
+            Assert.That(Util.IsSymbolicLink(mockPath1), Is.False);
 
             Assert.DoesNotThrow(() => Util.CreateOrUpdateSymbolicLink(mockPath1, mockPath2, false));
-            Assert.True(Util.IsSymbolicLink(mockPath1));
+            Assert.That(Util.IsSymbolicLink(mockPath1), Is.True);
 
             File.Delete(mockPath1);
             File.Delete(mockPath2);
@@ -1444,11 +1444,11 @@ namespace Sharpmake.UnitTests
 
             IComparer<string> comparer = new Util.VersionStringComparer();
 
-            Assert.AreEqual(-1, comparer.Compare(versionArray[0], versionArray[1]));
-            Assert.AreEqual(1, comparer.Compare(versionArray[1], versionArray[0]));
-            Assert.AreEqual(0, comparer.Compare(versionArray[0], versionArray[0]));
-            Assert.AreEqual(-1, comparer.Compare(versionArray[1], versionArray[2]));
-            Assert.AreEqual(1, comparer.Compare(versionArray[2], versionArray[0]));
+            Assert.That(comparer.Compare(versionArray[0], versionArray[1]), Is.EqualTo(-1));
+            Assert.That(comparer.Compare(versionArray[1], versionArray[0]), Is.EqualTo(1));
+            Assert.That(comparer.Compare(versionArray[0], versionArray[0]), Is.EqualTo(0));
+            Assert.That(comparer.Compare(versionArray[1], versionArray[2]), Is.EqualTo(-1));
+            Assert.That(comparer.Compare(versionArray[2], versionArray[0]), Is.EqualTo(1));
         }
 
         /// <summary>
@@ -1472,8 +1472,8 @@ namespace Sharpmake.UnitTests
                 "d"
             };
 
-            Assert.AreEqual("a-b-c-d", Util.JoinStrings(list1, "-", false));
-            Assert.AreEqual("a&amp;*b&lt;*c&gt;*d", Util.JoinStrings(list2, "*", true));
+            Assert.That(Util.JoinStrings(list1, "-", false), Is.EqualTo("a-b-c-d"));
+            Assert.That(Util.JoinStrings(list2, "*", true), Is.EqualTo("a&amp;*b&lt;*c&gt;*d"));
         }
 
         /// <summary>
@@ -1497,8 +1497,8 @@ namespace Sharpmake.UnitTests
                 "d"
             };
 
-            Assert.AreEqual("prefixa-prefixb-prefixc-prefixd", Util.JoinStrings(list1, "-", "prefix", false));
-            Assert.AreEqual("prefixa&amp;*prefixb&lt;*prefixc&gt;*prefixd", Util.JoinStrings(list2, "*", "prefix", true));
+            Assert.That(Util.JoinStrings(list1, "-", "prefix", false), Is.EqualTo("prefixa-prefixb-prefixc-prefixd"));
+            Assert.That(Util.JoinStrings(list2, "*", "prefix", true), Is.EqualTo("prefixa&amp;*prefixb&lt;*prefixc&gt;*prefixd"));
         }
 
         /// <summary>
@@ -1522,8 +1522,8 @@ namespace Sharpmake.UnitTests
                 "d"
             };
 
-            Assert.AreEqual("prefixasuffix-prefixbsuffix-prefixcsuffix-prefixdsuffix", Util.JoinStrings(list1, "-", "prefix", "suffix", false));
-            Assert.AreEqual("prefixa&amp;suffix*prefixb&lt;suffix*prefixc&gt;suffix*prefixdsuffix", Util.JoinStrings(list2, "*", "prefix", "suffix", true));
+            Assert.That(Util.JoinStrings(list1, "-", "prefix", "suffix", false), Is.EqualTo("prefixasuffix-prefixbsuffix-prefixcsuffix-prefixdsuffix"));
+            Assert.That(Util.JoinStrings(list2, "*", "prefix", "suffix", true), Is.EqualTo("prefixa&amp;suffix*prefixb&lt;suffix*prefixc&gt;suffix*prefixdsuffix"));
         }
 
         /// <summary>
@@ -1536,10 +1536,10 @@ namespace Sharpmake.UnitTests
             var path2 = @"C:/Windows/System32/cmd.exe";
             var path3 = @"C:\Windows\local\cmd.exe";
 
-            Assert.True(Util.PathIsSame(path1, path2));
-            Assert.True(Util.PathIsSame(path1, path1));
-            Assert.False(Util.PathIsSame(path3, path2));
-            Assert.True(Util.PathIsSame(path2, path2));
+            Assert.That(Util.PathIsSame(path1, path2), Is.True);
+            Assert.That(Util.PathIsSame(path1, path1), Is.True);
+            Assert.That(Util.PathIsSame(path3, path2), Is.False);
+            Assert.That(Util.PathIsSame(path2, path2), Is.True);
         }
 
         /// <summary>
@@ -1552,9 +1552,9 @@ namespace Sharpmake.UnitTests
             ITarget target2 = new Target(Platform.win64, DevEnv.vs2017, Optimization.Release, OutputType.Dll, Blob.Blob, BuildSystem.FastBuild, DotNetFramework.net8_0);
             ITarget target3 = new Target(Platform.win64, DevEnv.vs2017, Optimization.Debug, OutputType.Dll, Blob.Blob, BuildSystem.FastBuild, DotNetFramework.net10_0);
 
-            Assert.True(Util.MakeDifferenceString(target1, target2).Length == 0);
-            Assert.True(Util.MakeDifferenceString(target1, target3).Contains("\"net8.0\" and \"net10.0\""));
-            Assert.True(Util.MakeDifferenceString(target1, target3).Contains("\"Release\" and \"Debug\""));
+            Assert.That(Util.MakeDifferenceString(target1, target2).Length == 0, Is.True);
+            Assert.That(Util.MakeDifferenceString(target1, target3).Contains("\"net8.0\" and \"net10.0\""), Is.True);
+            Assert.That(Util.MakeDifferenceString(target1, target3).Contains("\"Release\" and \"Debug\""), Is.True);
         }
 
         /// <summary>
@@ -1571,7 +1571,7 @@ namespace Sharpmake.UnitTests
 
             var results = paths.Select((p) => Util.EnsureTrailingSeparator(p));
 
-            Assert.True(results.All((p) => p.Equals(expectedOutputPath)));
+            Assert.That(results.All((p) => p.Equals(expectedOutputPath)), Is.True);
         }
 
         /// <summary>
@@ -1584,7 +1584,7 @@ namespace Sharpmake.UnitTests
             string filename = Path.GetFileName(mockPath);
             string stringsSource = Path.GetDirectoryName(mockPath);
 
-            Assert.AreEqual(Path.Combine(stringsSource.ToLower(), filename), Util.PathGetAbsolute(stringsSource, new Strings(filename))[0]);
+            Assert.That(Util.PathGetAbsolute(stringsSource, new Strings(filename))[0], Is.EqualTo(Path.Combine(stringsSource.ToLower(), filename)));
 
             File.Delete(mockPath);
         }
@@ -1601,7 +1601,7 @@ namespace Sharpmake.UnitTests
             string stringsDest = mockPath.Substring(mockPath.IndexOf(separator, mockPath.IndexOf(separator) + 1));
             string expectedOutputPath = stringsSource.ToLower() + stringsDest;
             //v
-            Assert.AreEqual(expectedOutputPath, Util.PathGetAbsolute(stringsSource, stringsDest));
+            Assert.That(Util.PathGetAbsolute(stringsSource, stringsDest), Is.EqualTo(expectedOutputPath));
 
             File.Delete(mockPath);
         }
@@ -1620,7 +1620,7 @@ namespace Sharpmake.UnitTests
 
             Util.ResolvePath(root, ref paths);
 
-            Assert.AreEqual(expectedOutputPath, paths);
+            Assert.That(paths, Is.EqualTo(expectedOutputPath));
 
             File.Delete(mockPath);
         }
@@ -1647,7 +1647,7 @@ namespace Sharpmake.UnitTests
             expectedOutputPath.Sort();
             paths.Sort();
 
-            Assert.AreEqual(expectedOutputPath.ToString(), paths.ToString());
+            Assert.That(paths.ToString(), Is.EqualTo(expectedOutputPath.ToString()));
 
             File.Delete(mockPath1);
             File.Delete(mockPath2);
@@ -1664,9 +1664,10 @@ namespace Sharpmake.UnitTests
             string[] pathB = { "f:" + Path.DirectorySeparatorChar, "sharpmake", "sharpmake", "sharpmake.generators", "properties", "assemblyinfo.cs" };
             string[] expectedOutputPath = { "f:" + Path.DirectorySeparatorChar, "sharpmake", "sharpmake", "sharpmake.generators" };
 
-            Assert.AreEqual(Path.Combine(expectedOutputPath) + Path.DirectorySeparatorChar,
-                            Util.GetPathIntersection(Path.Combine(pathA),
-                            Path.Combine(pathB)));
+            Assert.That(
+                Util.GetPathIntersection(Path.Combine(pathA),
+                Path.Combine(pathB)),
+                Is.EqualTo(Path.Combine(expectedOutputPath) + Path.DirectorySeparatorChar));
         }
 
         /// <summary>
@@ -1681,8 +1682,8 @@ namespace Sharpmake.UnitTests
 
             Util.PathSplitFileNameFromPath(Path.Combine(filePath, fileName), out fileNameResult, out pathNameResult);
 
-            Assert.AreEqual(fileName, fileNameResult);
-            Assert.AreEqual(filePath, pathNameResult);
+            Assert.That(fileNameResult, Is.EqualTo(fileName));
+            Assert.That(pathNameResult, Is.EqualTo(filePath));
         }
 
         /// <summary>
@@ -1698,15 +1699,15 @@ namespace Sharpmake.UnitTests
 
             if (Util.IsRunningInMono())
             {
-                Assert.AreEqual(Path.Combine(pathParams1), Util.RegexPathCombine(pathParams1));
-                Assert.AreEqual(Path.Combine(pathParams2), Util.RegexPathCombine(pathParams2));
-                Assert.AreEqual(Path.Combine(pathParams3), Util.RegexPathCombine(pathParams3));
+                Assert.That(Util.RegexPathCombine(pathParams1), Is.EqualTo(Path.Combine(pathParams1)));
+                Assert.That(Util.RegexPathCombine(pathParams2), Is.EqualTo(Path.Combine(pathParams2)));
+                Assert.That(Util.RegexPathCombine(pathParams3), Is.EqualTo(Path.Combine(pathParams3)));
             }
             else
             {
-                Assert.AreEqual(string.Join(@"\\", pathParams1), Util.RegexPathCombine(pathParams1));
-                Assert.AreEqual(string.Join(@"\\", pathParams2), Util.RegexPathCombine(pathParams2));
-                Assert.AreEqual(string.Join(@"\\", pathParams3), Util.RegexPathCombine(pathParams3));
+                Assert.That(Util.RegexPathCombine(pathParams1), Is.EqualTo(string.Join(@"\\", pathParams1)));
+                Assert.That(Util.RegexPathCombine(pathParams2), Is.EqualTo(string.Join(@"\\", pathParams2)));
+                Assert.That(Util.RegexPathCombine(pathParams3), Is.EqualTo(string.Join(@"\\", pathParams3)));
             }
         }
 
@@ -1722,20 +1723,25 @@ namespace Sharpmake.UnitTests
 
             var root = @"C:\SharpMake\sharpmake\Sharpmake.Application\Properties";
 
-            Assert.AreEqual(Path.Combine(absolutePath.ToLower(), fileName),
-                Util.GetConvertedRelativePath(absolutePath, fileName, newRelativeToFullPath: "", false, null));
+            Assert.That(
+                Util.GetConvertedRelativePath(absolutePath, fileName, newRelativeToFullPath: "", false, null),
+                Is.EqualTo(Path.Combine(absolutePath.ToLower(), fileName)));
 
-            Assert.AreEqual(mockPath,
-                Util.GetConvertedRelativePath(absolutePath, mockPath, newRelativeToFullPath: "", false, root));
+            Assert.That(
+                Util.GetConvertedRelativePath(absolutePath, mockPath, newRelativeToFullPath: "", false, root),
+                Is.EqualTo(mockPath));
 
-            Assert.AreEqual(Path.Combine(absolutePath.ToLower(), fileName),
-                Util.GetConvertedRelativePath(absolutePath, fileName, newRelativeToFullPath: "", false, ""));
+            Assert.That(
+                Util.GetConvertedRelativePath(absolutePath, fileName, newRelativeToFullPath: "", false, ""),
+                Is.EqualTo(Path.Combine(absolutePath.ToLower(), fileName)));
 
-            Assert.AreEqual(absolutePath,
-                Util.GetConvertedRelativePath(absolutePath, null, newRelativeToFullPath: "", false, null));
+            Assert.That(
+                Util.GetConvertedRelativePath(absolutePath, null, newRelativeToFullPath: "", false, null),
+                Is.EqualTo(absolutePath));
 
-            Assert.AreEqual(Path.GetTempPath(),
-                Util.GetConvertedRelativePath(root, Path.GetTempPath(), newRelativeToFullPath: "", false, null));
+            Assert.That(
+                Util.GetConvertedRelativePath(root, Path.GetTempPath(), newRelativeToFullPath: "", false, null),
+                Is.EqualTo(Path.GetTempPath()));
 
             File.Delete(mockPath);
         }
@@ -1757,9 +1763,9 @@ namespace Sharpmake.UnitTests
             var callerInfo2 = "solution.cs";
             var callerInfo3 = "application.sharpmake";
 
-            Assert.AreEqual(callerInfo1, Util.PickOrConcatCallerInfo(callerInfo1, callerInfo2));
-            Assert.AreEqual(callerInfo1 + Environment.NewLine + callerInfo3, Util.PickOrConcatCallerInfo(callerInfo1, callerInfo3));
-            Assert.AreEqual(callerInfo3, Util.PickOrConcatCallerInfo(callerInfo2, callerInfo3));
+            Assert.That(Util.PickOrConcatCallerInfo(callerInfo1, callerInfo2), Is.EqualTo(callerInfo1));
+            Assert.That(Util.PickOrConcatCallerInfo(callerInfo1, callerInfo3), Is.EqualTo(callerInfo1 + Environment.NewLine + callerInfo3));
+            Assert.That(Util.PickOrConcatCallerInfo(callerInfo2, callerInfo3), Is.EqualTo(callerInfo3));
         }
 
         [Test]
@@ -1792,15 +1798,15 @@ namespace Sharpmake.UnitTests
             var relativeFilePathNotUnderRoot = "..\\otherfolder\\code\\factory.cs";
             var relativeFolderPathNotUnderRoot = "..\\otherfolder\\code\\";
 
-            Assert.IsTrue(Util.PathIsUnderRoot(rootPath, absoluteFilePathUnderRoot));
-            Assert.IsTrue(Util.PathIsUnderRoot(rootPath, absoluteFolderPathUnderRoot));
-            Assert.IsTrue(Util.PathIsUnderRoot(rootPath, relativeFilePathUnderRoot));
-            Assert.IsTrue(Util.PathIsUnderRoot(rootPath, relativeFolderPathUnderRoot));
+            Assert.That(Util.PathIsUnderRoot(rootPath, absoluteFilePathUnderRoot), Is.True);
+            Assert.That(Util.PathIsUnderRoot(rootPath, absoluteFolderPathUnderRoot), Is.True);
+            Assert.That(Util.PathIsUnderRoot(rootPath, relativeFilePathUnderRoot), Is.True);
+            Assert.That(Util.PathIsUnderRoot(rootPath, relativeFolderPathUnderRoot), Is.True);
 
-            Assert.IsFalse(Util.PathIsUnderRoot(rootPath, absoluteFilePathNotUnderRoot));
-            Assert.IsFalse(Util.PathIsUnderRoot(rootPath, absoluteFolderPathNotUnderRoot));
-            Assert.IsFalse(Util.PathIsUnderRoot(rootPath, relativeFilePathNotUnderRoot));
-            Assert.IsFalse(Util.PathIsUnderRoot(rootPath, relativeFolderPathNotUnderRoot));
+            Assert.That(Util.PathIsUnderRoot(rootPath, absoluteFilePathNotUnderRoot), Is.False);
+            Assert.That(Util.PathIsUnderRoot(rootPath, absoluteFolderPathNotUnderRoot), Is.False);
+            Assert.That(Util.PathIsUnderRoot(rootPath, relativeFilePathNotUnderRoot), Is.False);
+            Assert.That(Util.PathIsUnderRoot(rootPath, relativeFolderPathNotUnderRoot), Is.False);
 
         }
 
@@ -1820,8 +1826,8 @@ namespace Sharpmake.UnitTests
             var pathNotUnderRoot = "C:\\.nuget\\dd\\androidsdk";
             var pathUnderRoot = rootPath + "\\foo\\bar";
 
-            Assert.IsFalse(Util.PathIsUnderRoot(rootPath, pathNotUnderRoot));
-            Assert.IsTrue(Util.PathIsUnderRoot(rootPath, pathUnderRoot));
+            Assert.That(Util.PathIsUnderRoot(rootPath, pathNotUnderRoot), Is.False);
+            Assert.That(Util.PathIsUnderRoot(rootPath, pathUnderRoot), Is.True);
         }
 
         [Test]
@@ -1832,7 +1838,7 @@ namespace Sharpmake.UnitTests
             var rootWithFile = root + "CLRTest.sharpmake.cs";
             var pathUnderRoot = root + "\\foo\\bar";
 
-            Assert.IsTrue(Util.PathIsUnderRoot(rootWithFile, pathUnderRoot));
+            Assert.That(Util.PathIsUnderRoot(rootWithFile, pathUnderRoot), Is.True);
         }
 
         [Test]
@@ -1842,7 +1848,7 @@ namespace Sharpmake.UnitTests
             var rootWithExtraDir = root + "CLRTest";
             var pathNotUnderRoot = root + @"\foo\";
 
-            Assert.IsFalse(Util.PathIsUnderRoot(rootWithExtraDir, pathNotUnderRoot));
+            Assert.That(Util.PathIsUnderRoot(rootWithExtraDir, pathNotUnderRoot), Is.False);
         }
 
         [Test]
@@ -1853,14 +1859,14 @@ namespace Sharpmake.UnitTests
                 var fullyQualifiedRoot = Util.UnixSeparator.ToString();
                 var pathUnderRoot = "/versioncontrol/solutionname/projectname/src/code/factory.cs";
 
-                Assert.IsTrue(Util.PathIsUnderRoot(fullyQualifiedRoot, pathUnderRoot));
+                Assert.That(Util.PathIsUnderRoot(fullyQualifiedRoot, pathUnderRoot), Is.True);
             }
             else
             {
                 var fullyQualifiedRoot = @"D:\";
                 var pathUnderRoot = @"D:\versioncontrol\solutionname\projectname\src\code\factory.cs";
 
-                Assert.IsTrue(Util.PathIsUnderRoot(fullyQualifiedRoot, pathUnderRoot));
+                Assert.That(Util.PathIsUnderRoot(fullyQualifiedRoot, pathUnderRoot), Is.True);
             }
         }
     }
@@ -1876,10 +1882,10 @@ namespace Sharpmake.UnitTests
             var unixFilePath = "../../../code/file.cs";
             var unixFolderPath = "../../../code/";
 
-            Assert.AreEqual("code\\file.cs", Util.TrimAllLeadingDotDot(windowsFilePath));
-            Assert.AreEqual(Util.TrimAllLeadingDotDot(windowsFolderPath), "code\\");
-            Assert.AreEqual(Util.TrimAllLeadingDotDot(unixFilePath), "code/file.cs");
-            Assert.AreEqual(Util.TrimAllLeadingDotDot(unixFolderPath), "code/");
+            Assert.That(Util.TrimAllLeadingDotDot(windowsFilePath), Is.EqualTo("code\\file.cs"));
+            Assert.That(Util.TrimAllLeadingDotDot(windowsFolderPath), Is.EqualTo("code\\"));
+            Assert.That(Util.TrimAllLeadingDotDot(unixFilePath), Is.EqualTo("code/file.cs"));
+            Assert.That(Util.TrimAllLeadingDotDot(unixFolderPath), Is.EqualTo("code/"));
         }
 
 
@@ -1889,8 +1895,8 @@ namespace Sharpmake.UnitTests
             var dotFolderRelativeWindows = "..\\.nuget\\packages";
             var dotFolderRelativeUnix = "../.nuget/packages";
 
-            Assert.AreEqual(Util.TrimAllLeadingDotDot(dotFolderRelativeWindows), ".nuget\\packages");
-            Assert.AreEqual(Util.TrimAllLeadingDotDot(dotFolderRelativeUnix), ".nuget/packages");
+            Assert.That(Util.TrimAllLeadingDotDot(dotFolderRelativeWindows), Is.EqualTo(".nuget\\packages"));
+            Assert.That(Util.TrimAllLeadingDotDot(dotFolderRelativeUnix), Is.EqualTo(".nuget/packages"));
         }
 
         [Test]
@@ -1898,7 +1904,7 @@ namespace Sharpmake.UnitTests
         {
             var mixedSeparatorPath = "..\\../..\\code\\";
 
-            Assert.AreEqual(Util.TrimAllLeadingDotDot(mixedSeparatorPath), "code\\");
+            Assert.That(Util.TrimAllLeadingDotDot(mixedSeparatorPath), Is.EqualTo("code\\"));
         }
     }
 }

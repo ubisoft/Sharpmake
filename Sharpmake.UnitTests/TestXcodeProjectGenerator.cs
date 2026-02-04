@@ -23,7 +23,7 @@ namespace Sharpmake.UnitTests
             var projectBuildFile1 = new ProjectBuildFile(projectFile1);
             var projectBuildFile2 = new ProjectBuildFile(projectFile2);
 
-            Assert.IsFalse(projectBuildFile1.Equals(projectBuildFile2));
+            Assert.That(projectBuildFile1.Equals(projectBuildFile2), Is.False);
         }
 
         [Test]
@@ -48,7 +48,7 @@ namespace Sharpmake.UnitTests
             xcodePrj.PrepareSourceFiles(xCodeTargetName, sourceFiles, project, configuration, false);
             var compileSources = xcodePrj._projectItems.Where(item => item is ProjectBuildFile);
 
-            Assert.IsTrue(compileSources.Count() == 0);
+            Assert.That(compileSources.Count() == 0, Is.True);
         }
 
         [Test]
@@ -57,22 +57,22 @@ namespace Sharpmake.UnitTests
             string folder = "sourceroot";
             string refFolder = "differentSourceRoot";
             string retFolder = XCodeProj.GetLongestCommonPath(folder, refFolder);
-            Assert.IsTrue(retFolder.Equals(string.Empty));
+            Assert.That(retFolder.Equals(string.Empty), Is.True);
 
             folder = Path.Combine("sourceRoot", "source");
             refFolder = "sourceRoot";
             retFolder = XCodeProj.GetLongestCommonPath(folder, refFolder);
-            Assert.IsTrue(retFolder.Equals(Path.Combine("sourceRoot", "source")));
+            Assert.That(retFolder.Equals(Path.Combine("sourceRoot", "source")), Is.True);
 
             folder = Path.Combine("sourceRoot", "source");
             refFolder = Path.Combine("sourceRoot", "other");
             retFolder = XCodeProj.GetLongestCommonPath(folder, refFolder);
-            Assert.IsTrue(retFolder.Equals(Path.Combine("sourceRoot", "source")));
+            Assert.That(retFolder.Equals(Path.Combine("sourceRoot", "source")), Is.True);
 
             folder = "sourceRoot";
             refFolder = Path.Combine("sourceRoot", "source");
             retFolder = XCodeProj.GetLongestCommonPath(folder, refFolder);
-            Assert.IsTrue(retFolder.Equals("sourceRoot"));
+            Assert.That(retFolder.Equals("sourceRoot"), Is.True);
         }
     }
 }

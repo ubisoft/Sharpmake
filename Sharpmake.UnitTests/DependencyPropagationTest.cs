@@ -1,4 +1,4 @@
-﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Copyright (c) Ubisoft. All Rights Reserved.
 // Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System;
@@ -21,7 +21,7 @@ namespace Sharpmake.UnitTests
         public void NoDependency()
         {
             var project = GetProject<SharpmakeProjects.NoDependencyProject1>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
             foreach (var conf in project.Configurations)
             {
                 Assert.That<int>(conf.ResolvedDependencies.Count, Is.EqualTo(0));
@@ -35,7 +35,7 @@ namespace Sharpmake.UnitTests
         public void OnePublicDependency()
         {
             var project = GetProject<SharpmakeProjects.OnePublicDependencyProject>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
             foreach (var conf in project.Configurations)
             {
                 Assert.That<int>(conf.ResolvedDependencies.Count, Is.EqualTo(1));
@@ -46,11 +46,11 @@ namespace Sharpmake.UnitTests
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(1));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(1));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"), Is.True);
 
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
             }
         }
 
@@ -58,7 +58,7 @@ namespace Sharpmake.UnitTests
         public void OnePublicDependencyWithoutLinking()
         {
             var project = GetProject<SharpmakeProjects.OnePublicDependencyWithoutLinkingProject>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
             foreach (var conf in project.Configurations)
             {
                 Assert.That<int>(conf.ResolvedDependencies.Count, Is.EqualTo(1));
@@ -69,9 +69,9 @@ namespace Sharpmake.UnitTests
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(0));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(0));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
             }
         }
 
@@ -79,7 +79,7 @@ namespace Sharpmake.UnitTests
         public void OnePublicOnePrivateDependency()
         {
             var project = GetProject<SharpmakeProjects.OnePublicOnePrivateDependencyProject>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
             foreach (var conf in project.Configurations)
             {
                 Assert.That<int>(conf.ResolvedDependencies.Count, Is.EqualTo(2));
@@ -90,15 +90,15 @@ namespace Sharpmake.UnitTests
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(2));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(2));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject2"));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject2"), Is.True);
 
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)));
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)), Is.True);
             }
         }
 
@@ -106,7 +106,7 @@ namespace Sharpmake.UnitTests
         public void TwoPublicDependencies()
         {
             var project = GetProject<SharpmakeProjects.TwoPublicDependenciesProject>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
             foreach (var conf in project.Configurations)
             {
                 Assert.That<int>(conf.ResolvedDependencies.Count, Is.EqualTo(2));
@@ -117,15 +117,15 @@ namespace Sharpmake.UnitTests
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(2));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(2));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject2"));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject2"), Is.True);
 
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)));
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)), Is.True);
             }
         }
 
@@ -133,7 +133,7 @@ namespace Sharpmake.UnitTests
         public void TwoPrivateDependencies()
         {
             var project = GetProject<SharpmakeProjects.TwoPrivateDependenciesProject>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
             foreach (var conf in project.Configurations)
             {
                 Assert.That<int>(conf.ResolvedDependencies.Count, Is.EqualTo(2));
@@ -144,15 +144,15 @@ namespace Sharpmake.UnitTests
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(2));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(2));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject2"));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject2"), Is.True);
 
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)));
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)), Is.True);
             }
         }
 
@@ -160,15 +160,15 @@ namespace Sharpmake.UnitTests
         public void InheritOnePublicDependency()
         {
             var project = GetProject<SharpmakeProjects.InheritOnePublicDependencyProject>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
             foreach (var conf in project.Configurations)
             {
                 Assert.That<int>(conf.ResolvedDependencies.Count, Is.EqualTo(2));
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(2));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(0));
 
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)));
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)), Is.True);
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
 
                 // The dependency chain is Public all the way, and "Default", so
                 // both NoDependencyProject1 and OnePublicDependencyProject 
@@ -177,12 +177,12 @@ namespace Sharpmake.UnitTests
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(2));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(2));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("OnePublicDependencyProject"));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("OnePublicDependencyProject"), Is.True);
             }
         }
 
@@ -190,15 +190,15 @@ namespace Sharpmake.UnitTests
         public void InheritOnePrivateDependency()
         {
             var project = GetProject<SharpmakeProjects.InheritOnePrivateDependencyProject>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
             foreach (var conf in project.Configurations)
             {
                 Assert.That<int>(conf.ResolvedDependencies.Count, Is.EqualTo(2));
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(0));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(2));
 
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
 
                 // The dependency chain is PRIVATE from the base project to OnePublic,
                 // *but* is Public from OnePublic to NoDependency, so it should be able to access NoDependency
@@ -207,14 +207,14 @@ namespace Sharpmake.UnitTests
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(2));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(2));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("OnePublicDependencyProject"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("OnePublicDependencyProject"), Is.True);
             }
         }
 
@@ -222,15 +222,15 @@ namespace Sharpmake.UnitTests
         public void InheritOnePrivateDependencyOnlyBuildOrder()
         {
             var project = GetProject<SharpmakeProjects.InheritOnePrivateDependencyOnlyBuildOrderProject>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
             foreach (var conf in project.Configurations)
             {
                 Assert.That<int>(conf.ResolvedDependencies.Count, Is.EqualTo(2));
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(0));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(2));
 
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(0));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(0));
@@ -244,7 +244,7 @@ namespace Sharpmake.UnitTests
             // ProjectA and ProjectB share the same dependencies settings, as the only change
             // is the type of the immediate dependency to InheritOnePrivateDependencyProject
             var project = GetProject<SharpmakeProjects.ProjectA>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -252,23 +252,23 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(0));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(3));
 
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.InheritOnePrivateDependencyProject)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.InheritOnePrivateDependencyProject)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(1));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(3));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(3));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("InheritOnePrivateDependencyProject", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("InheritOnePrivateDependencyProject", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("InheritOnePrivateDependencyProject", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("InheritOnePrivateDependencyProject", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("InheritOnePrivateDependencyProject"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("OnePublicDependencyProject"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("InheritOnePrivateDependencyProject"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("OnePublicDependencyProject"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"), Is.True);
             }
         }
 
@@ -278,7 +278,7 @@ namespace Sharpmake.UnitTests
             // ProjectA and ProjectB share the same settings, as the only change
             // is the type of the immediate dependency to InheritOnePrivateDependencyProject
             var project = GetProject<SharpmakeProjects.ProjectB>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -288,23 +288,23 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(1));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(2));
 
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.InheritOnePrivateDependencyProject)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.InheritOnePrivateDependencyProject)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(1));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(3));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(3));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("InheritOnePrivateDependencyProject", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("InheritOnePrivateDependencyProject", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("InheritOnePrivateDependencyProject", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("InheritOnePrivateDependencyProject", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("InheritOnePrivateDependencyProject"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("OnePublicDependencyProject"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("InheritOnePrivateDependencyProject"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("OnePublicDependencyProject"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"), Is.True);
             }
         }
 
@@ -314,7 +314,7 @@ namespace Sharpmake.UnitTests
             // ProjectA and ProjectB share the same settings, as the only change
             // is the type of the immediate dependency to InheritOnePrivateDependencyProject
             var project = GetProject<SharpmakeProjects.ProjectF>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -324,24 +324,24 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(2));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(1));
 
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.InheritPublicFromPrivateDependencyProject)));
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePrivateDependencyProject)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.InheritPublicFromPrivateDependencyProject)), Is.True);
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePrivateDependencyProject)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(2));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(3));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(3));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("InheritPublicFromPrivateDependencyProject", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("OnePrivateDependencyProject", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("InheritPublicFromPrivateDependencyProject", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("OnePrivateDependencyProject", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("InheritPublicFromPrivateDependencyProject", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("OnePrivateDependencyProject", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("InheritPublicFromPrivateDependencyProject", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("OnePrivateDependencyProject", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("InheritPublicFromPrivateDependencyProject"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("OnePrivateDependencyProject"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("InheritPublicFromPrivateDependencyProject"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("OnePrivateDependencyProject"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"), Is.True);
             }
         }
 
@@ -349,7 +349,7 @@ namespace Sharpmake.UnitTests
         public void InheritPublicDependenciesWithPrivate()
         {
             var project = GetProject<SharpmakeProjects.ProjectC>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -357,25 +357,25 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(0));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(3));
 
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.InheritOnePublicDependencyProject)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.InheritOnePublicDependencyProject)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(3));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(3));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(3));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("InheritOnePublicDependencyProject", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("InheritOnePublicDependencyProject", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("InheritOnePublicDependencyProject", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("InheritOnePublicDependencyProject", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("InheritOnePublicDependencyProject"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("OnePublicDependencyProject"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("InheritOnePublicDependencyProject"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("OnePublicDependencyProject"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"), Is.True);
             }
         }
 
@@ -383,7 +383,7 @@ namespace Sharpmake.UnitTests
         public void DLLWithDependenciesPublic()
         {
             var project = GetProject<SharpmakeProjects.ProjectDLLPublic>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -391,21 +391,21 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(2));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(0));
 
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)));
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(2));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(2));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(2));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject2"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject2"), Is.True);
             }
         }
 
@@ -413,7 +413,7 @@ namespace Sharpmake.UnitTests
         public void DLLWithDependenciesPrivate()
         {
             var project = GetProject<SharpmakeProjects.ProjectDLLPrivate>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -421,21 +421,21 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(0));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(2));
 
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)));
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(2));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(2));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(2));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject2"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject2"), Is.True);
             }
         }
 
@@ -443,7 +443,7 @@ namespace Sharpmake.UnitTests
         public void DLLWithDLLDependencyPrivate()
         {
             var project = GetProject<SharpmakeProjects.ProjectDLLPrivateDLL>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -451,19 +451,19 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(0));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(3));
 
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDLLPrivate)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)));
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDLLPrivate)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(1));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(1));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(1));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectDLLPrivate", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectDLLPrivate", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectDLLPrivate", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectDLLPrivate", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("ProjectDLLPrivate"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("ProjectDLLPrivate"), Is.True);
             }
         }
 
@@ -471,7 +471,7 @@ namespace Sharpmake.UnitTests
         public void ExeWithDLLPrivate()
         {
             var project = GetProject<SharpmakeProjects.ProjectExePrivate>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -479,19 +479,19 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(0));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(3));
 
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDLLPrivate)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)));
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDLLPrivate)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(1));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(1));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(1));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectDLLPrivate", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectDLLPrivate", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectDLLPrivate", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectDLLPrivate", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("ProjectDLLPrivate"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("ProjectDLLPrivate"), Is.True);
             }
         }
 
@@ -499,7 +499,7 @@ namespace Sharpmake.UnitTests
         public void ExeWithDLLPublic()
         {
             var project = GetProject<SharpmakeProjects.ProjectExePublic>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -507,19 +507,19 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(1));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(2));
 
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDLLPrivate)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)));
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDLLPrivate)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(1));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(1));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(1));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectDLLPrivate", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectDLLPrivate", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectDLLPrivate", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectDLLPrivate", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("ProjectDLLPrivate"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("ProjectDLLPrivate"), Is.True);
             }
         }
 
@@ -527,7 +527,7 @@ namespace Sharpmake.UnitTests
         public void ExeWithDLLPublicInheritance()
         {
             var project = GetProject<SharpmakeProjects.ProjectExePublicDLLInheritance>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -535,20 +535,20 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(1));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(3));
 
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDLLPrivateDLL)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDLLPrivate)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)));
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDLLPrivateDLL)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDLLPrivate)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(1));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(1));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(1));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectDLLPrivateDLL", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectDLLPrivateDLL", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectDLLPrivateDLL", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectDLLPrivateDLL", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("ProjectDLLPrivateDLL"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("ProjectDLLPrivateDLL"), Is.True);
             }
         }
 
@@ -556,7 +556,7 @@ namespace Sharpmake.UnitTests
         public void ExeDoublePublicDLLInheritance()
         {
             var project = GetProject<SharpmakeProjects.ProjectExeDoublePublicDLLInheritance>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -564,25 +564,25 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(4));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(0));
 
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDLLPublicDLL)));
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDLLPublic)));
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)));
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDLLPublicDLL)), Is.True);
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDLLPublic)), Is.True);
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(4));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(2));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(2));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectDLLPublicDLL", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectDLLPublic", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectDLLPublicDLL", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectDLLPublic", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectDLLPublicDLL", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectDLLPublic", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectDLLPublicDLL", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectDLLPublic", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("ProjectDLLPublicDLL"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("ProjectDLLPublic"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("ProjectDLLPublicDLL"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("ProjectDLLPublic"), Is.True);
             }
         }
 
@@ -592,7 +592,7 @@ namespace Sharpmake.UnitTests
         public void PrivateDependOnExported()
         {
             var project = GetProject<SharpmakeProjects.ProjectPrivateDependOnExported>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -600,17 +600,17 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(0));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(1));
 
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectExported)));
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectExported)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(1));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(1));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(1));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectExported", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectExported", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectExported", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectExported", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("ProjectExported"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("ProjectExported"), Is.True);
             }
         }
 
@@ -618,7 +618,7 @@ namespace Sharpmake.UnitTests
         public void PrivateInheritExported()
         {
             var project = GetProject<SharpmakeProjects.ProjectPrivateInheritExported>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -626,20 +626,20 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(0));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(2));
 
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectPrivateDependOnExported)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectExported)));
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectPrivateDependOnExported)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectExported)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(1));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(2));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(2));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectPrivateDependOnExported", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectPrivateDependOnExported", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectPrivateDependOnExported", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectExported", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectPrivateDependOnExported", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectExported", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("ProjectPrivateDependOnExported"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("ProjectExported"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("ProjectPrivateDependOnExported"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("ProjectExported"), Is.True);
             }
         }
 
@@ -647,7 +647,7 @@ namespace Sharpmake.UnitTests
         public void InheritExportAsPublic()
         {
             var project = GetProject<SharpmakeProjects.ProjectInheritExportAsPublic>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -655,21 +655,21 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(2));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(0));
 
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectPublicDependOnExported)));
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectExported)));
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectPublicDependOnExported)), Is.True);
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectExported)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(2));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(2));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(2));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectPublicDependOnExported", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectExported", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectPublicDependOnExported", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectExported", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectPublicDependOnExported", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectExported", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectPublicDependOnExported", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectExported", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("ProjectPublicDependOnExported"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("ProjectExported"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("ProjectPublicDependOnExported"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("ProjectExported"), Is.True);
             }
         }
 
@@ -677,7 +677,7 @@ namespace Sharpmake.UnitTests
         public void DuplicateInDeepInheritance()
         {
             var project = GetProject<SharpmakeProjects.ProjectDuplicateInDeepInheritance>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -685,28 +685,28 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(2));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(2));
 
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectPublicDependOnExported)));
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectExported)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDeepInheritExport)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectInheritExportAsPublic)));
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectPublicDependOnExported)), Is.True);
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectExported)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDeepInheritExport)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectInheritExportAsPublic)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(3));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(4));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(4));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectDeepInheritExport", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectPublicDependOnExported", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectExported", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectDeepInheritExport", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectPublicDependOnExported", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectExported", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectPublicDependOnExported", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectExported", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectDeepInheritExport", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectInheritExportAsPublic", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectPublicDependOnExported", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectExported", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectDeepInheritExport", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectInheritExportAsPublic", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("ProjectPublicDependOnExported"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("ProjectExported"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("ProjectDeepInheritExport"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("ProjectInheritExportAsPublic"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("ProjectPublicDependOnExported"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("ProjectExported"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("ProjectDeepInheritExport"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("ProjectInheritExportAsPublic"), Is.True);
             }
         }
 
@@ -714,7 +714,7 @@ namespace Sharpmake.UnitTests
         public void InheritAsPrivateAndPublic()
         {
             var project = GetProject<SharpmakeProjects.ProjectInheritAsPrivateAndPublic>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -722,21 +722,21 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(2));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(0));
 
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)));
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)), Is.True);
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(2));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(2));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(2));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("OnePublicDependencyProject"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("OnePublicDependencyProject"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"), Is.True);
             }
         }
 
@@ -744,7 +744,7 @@ namespace Sharpmake.UnitTests
         public void InheritLibFromDllAndLib()
         {
             var project = GetProject<SharpmakeProjects.ProjectInheritLibFromDllAndLib>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -752,30 +752,30 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(0));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(5));
 
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDLLPrivate)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.AProjectDLL)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)));
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDLLPrivate)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.AProjectDLL)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(4));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(4));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(4));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectDLLPrivate", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("AProjectDLL", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectDLLPrivate", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("AProjectDLL", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectDLLPrivate", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("AProjectDLL", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectDLLPrivate", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("AProjectDLL", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("OnePublicDependencyProject"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("ProjectDLLPrivate"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("AProjectDLL"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("OnePublicDependencyProject"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("ProjectDLLPrivate"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("AProjectDLL"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"), Is.True);
             }
         }
 
@@ -783,7 +783,7 @@ namespace Sharpmake.UnitTests
         public void InheritIdenticalFromDll()
         {
             var project = GetProject<SharpmakeProjects.ProjectInheritIdenticalFromDll>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -791,25 +791,25 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(0));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(4));
 
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.AProjectDLL)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDLLPublic)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)));
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.AProjectDLL)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDLLPublic)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(4));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(2));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(2));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("AProjectDLL", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectDLLPublic", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("AProjectDLL", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectDLLPublic", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("AProjectDLL", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectDLLPublic", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("AProjectDLL", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectDLLPublic", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("AProjectDLL"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("ProjectDLLPublic"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("AProjectDLL"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("ProjectDLLPublic"), Is.True);
             }
         }
 
@@ -817,7 +817,7 @@ namespace Sharpmake.UnitTests
         public void ComplexDllInheritance()
         {
             var project = GetProject<SharpmakeProjects.ProjectComplexDllInheritance>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -825,18 +825,18 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(2));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(2));
 
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)));
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)), Is.True);
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
 
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDllPubDepWithoutLink)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)));
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDllPubDepWithoutLink)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(2));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(0));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(0));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)), Is.True);
             }
         }
 
@@ -844,7 +844,7 @@ namespace Sharpmake.UnitTests
         public void InheritFromComplexDllInheritance()
         {
             var project = GetProject<SharpmakeProjects.ProjectInheritComplexDllInheritance>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -852,23 +852,23 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(0));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(5));
 
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectComplexDllInheritance)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDllPubDepWithoutLink)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)));
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectComplexDllInheritance)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDllPubDepWithoutLink)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(3));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(1));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(1));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectComplexDllInheritance", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectComplexDllInheritance", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectComplexDllInheritance", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectComplexDllInheritance", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("ProjectComplexDllInheritance"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("ProjectComplexDllInheritance"), Is.True);
             }
         }
 
@@ -876,7 +876,7 @@ namespace Sharpmake.UnitTests
         public void InheritComplexDllInheritanceAndDirect()
         {
             var project = GetProject<SharpmakeProjects.ProjectInheritComplexDllInheritanceAndDirect>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -884,27 +884,27 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(1));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(4));
 
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)));
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)), Is.True);
 
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectComplexDllInheritance)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDllPubDepWithoutLink)));
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectComplexDllInheritance)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectDllPubDepWithoutLink)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(4));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(2));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(2));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectComplexDllInheritance", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)));
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectComplexDllInheritance", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("OnePublicDependencyProject", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.IncludeFolder)), Is.True);
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectComplexDllInheritance", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectComplexDllInheritance", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject2", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("ProjectComplexDllInheritance"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject2"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("ProjectComplexDllInheritance"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject2"), Is.True);
             }
         }
 
@@ -912,7 +912,7 @@ namespace Sharpmake.UnitTests
         public void OnlyBuildOrder()
         {
             var project = GetProject<SharpmakeProjects.ProjectOnlyBuildOrder>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -920,8 +920,8 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(0));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(2));
 
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(0));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(0));
@@ -933,7 +933,7 @@ namespace Sharpmake.UnitTests
         public void ProjectInheritBuildOrder()
         {
             var project = GetProject<SharpmakeProjects.ProjectInheritBuildOrder>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -941,19 +941,19 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(0));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(3));
 
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectOnlyBuildOrder)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.ProjectOnlyBuildOrder)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(1));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(1));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(1));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectOnlyBuildOrder", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("ProjectOnlyBuildOrder", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectOnlyBuildOrder", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("ProjectOnlyBuildOrder", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("ProjectOnlyBuildOrder"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("ProjectOnlyBuildOrder"), Is.True);
             }
         }
 
@@ -961,7 +961,7 @@ namespace Sharpmake.UnitTests
         public void InheritAndBuildOrder()
         {
             var project = GetProject<SharpmakeProjects.ProjectInheritAndBuildOrder>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -969,23 +969,23 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(0));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(3));
 
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.InheritPrivateFromPrivateDependencyProject)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePrivateDependencyProject)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.InheritPrivateFromPrivateDependencyProject)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePrivateDependencyProject)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(1));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(3));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(3));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("InheritPrivateFromPrivateDependencyProject", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("InheritPrivateFromPrivateDependencyProject", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("InheritPrivateFromPrivateDependencyProject", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("OnePrivateDependencyProject", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("InheritPrivateFromPrivateDependencyProject", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("OnePrivateDependencyProject", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("InheritPrivateFromPrivateDependencyProject"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("OnePrivateDependencyProject"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("InheritPrivateFromPrivateDependencyProject"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("OnePrivateDependencyProject"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"), Is.True);
             }
         }
 
@@ -993,7 +993,7 @@ namespace Sharpmake.UnitTests
         public void PubToImmediateAndBuildOrder()
         {
             var project = GetProject<SharpmakeProjects.ProjectPubToImmediateAndBuildOrder>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -1001,21 +1001,21 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(0));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(3));
 
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePrivateDependencyProject)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePublicDependencyProject)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePrivateDependencyProject)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(1));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(2));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(2));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("OnePrivateDependencyProject", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("OnePrivateDependencyProject", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("OnePrivateDependencyProject", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("OnePrivateDependencyProject", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyProject1", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("OnePrivateDependencyProject"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("OnePrivateDependencyProject"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyProject1"), Is.True);
             }
         }
 
@@ -1023,7 +1023,7 @@ namespace Sharpmake.UnitTests
         public void LibInheritLibAndDLLPublic()
         {
             var project = GetProject<SharpmakeProjects.LibInheritLibAndDLLPublicProject>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -1031,20 +1031,20 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(1));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(1));
 
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyDLLProject)));
-                Assert.True(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.LibDependOnDLLProject)));
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyDLLProject)), Is.True);
+                Assert.That(conf.ResolvedPublicDependencies.ContainsProjectType(typeof(SharpmakeProjects.LibDependOnDLLProject)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(1));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(2));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(2));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("LibDependOnDLLProject", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("LibDependOnDLLProject", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyDLLProject", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("LibDependOnDLLProject", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyDLLProject", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("LibDependOnDLLProject", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyDLLProject"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("LibDependOnDLLProject"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyDLLProject"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("LibDependOnDLLProject"), Is.True);
             }
         }
 
@@ -1052,7 +1052,7 @@ namespace Sharpmake.UnitTests
         public void LibInheritLibAndDLLPrivate()
         {
             var project = GetProject<SharpmakeProjects.LibInheritLibAndDLLPrivateProject>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
@@ -1060,20 +1060,20 @@ namespace Sharpmake.UnitTests
                 Assert.That<int>(conf.ResolvedPublicDependencies.Count, Is.EqualTo(0));
                 Assert.That<int>(conf.ResolvedPrivateDependencies.Count, Is.EqualTo(2));
 
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyDLLProject)));
-                Assert.True(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.LibDependOnDLLProject)));
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyDLLProject)), Is.True);
+                Assert.That(conf.ResolvedPrivateDependencies.ContainsProjectType(typeof(SharpmakeProjects.LibDependOnDLLProject)), Is.True);
 
                 Assert.That(conf.DependenciesIncludePaths.Count, Is.EqualTo(1));
                 Assert.That(conf.DependenciesLibraryPaths.Count, Is.EqualTo(2));
                 Assert.That(conf.DependenciesLibraryFiles.Count, Is.EqualTo(2));
 
-                Assert.True(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("LibDependOnDLLProject", UTestUtilities.IncludeFolder)));
+                Assert.That(conf.DependenciesIncludePaths.ContainsElement(Path.Combine("LibDependOnDLLProject", UTestUtilities.IncludeFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyDLLProject", UTestUtilities.LibOutputFolder)));
-                Assert.True(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("LibDependOnDLLProject", UTestUtilities.LibOutputFolder)));
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("NoDependencyDLLProject", UTestUtilities.LibOutputFolder)), Is.True);
+                Assert.That(conf.DependenciesLibraryPaths.ContainsElement(Path.Combine("LibDependOnDLLProject", UTestUtilities.LibOutputFolder)), Is.True);
 
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyDLLProject"));
-                Assert.True(conf.DependenciesLibraryFiles.ContainsElement("LibDependOnDLLProject"));
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("NoDependencyDLLProject"), Is.True);
+                Assert.That(conf.DependenciesLibraryFiles.ContainsElement("LibDependOnDLLProject"), Is.True);
             }
         }
     }

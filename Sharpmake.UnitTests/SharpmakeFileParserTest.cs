@@ -1,4 +1,4 @@
-﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Copyright (c) Ubisoft. All Rights Reserved.
 // Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System;
@@ -114,7 +114,7 @@ namespace Sharpmake.UnitTests
             new Assembler().ParseSourceAttributesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
             Assert.That(assemblerContext.Sources.Count, Is.EqualTo(1));
-            StringAssert.AreEqualIgnoringCase(sharpmakeIncludeFullPath, assemblerContext.Sources.First());
+            Assert.That(assemblerContext.Sources.First(), Is.EqualTo(sharpmakeIncludeFullPath).IgnoreCase);
         }
 
         [Test]
@@ -131,7 +131,7 @@ namespace Sharpmake.UnitTests
             new Assembler().ParseSourceAttributesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
             Assert.That(assemblerContext.Sources.Count, Is.EqualTo(1));
-            StringAssert.AreEqualIgnoringCase(sharpmakeIncludeFullPath, assemblerContext.Sources.First());
+            Assert.That(assemblerContext.Sources.First(), Is.EqualTo(sharpmakeIncludeFullPath).IgnoreCase);
         }
 
         [Test]
@@ -148,7 +148,7 @@ namespace Sharpmake.UnitTests
             new Assembler().ParseSourceAttributesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
             Assert.That(assemblerContext.Sources.Count, Is.EqualTo(1));
-            StringAssert.AreEqualIgnoringCase(sharpmakeIncludeFullPath, assemblerContext.Sources.First());
+            Assert.That(assemblerContext.Sources.First(), Is.EqualTo(sharpmakeIncludeFullPath).IgnoreCase);
         }
 
         [Test]
@@ -174,9 +174,9 @@ namespace Sharpmake.UnitTests
             new Assembler().ParseSourceAttributesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
             Assert.That(assemblerContext.Sources.Count, Is.EqualTo(5));
-            CollectionAssert.IsSubsetOf(assemblerContext.Sources, sharpmakeIncludesFullPath);
+            Assert.That(assemblerContext.Sources, Is.SubsetOf(sharpmakeIncludesFullPath));
             foreach (string include in assemblerContext.Sources)
-                StringAssert.DoesNotContain(include, "nottoinclude.sharpmake.cs");
+                Assert.That(include, Does.Not.Contain("nottoinclude.sharpmake.cs"));
         }
 
         [Test]
@@ -202,9 +202,9 @@ namespace Sharpmake.UnitTests
             new Assembler().ParseSourceAttributesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
             Assert.That(assemblerContext.Sources.Count, Is.EqualTo(5));
-            CollectionAssert.IsSubsetOf(assemblerContext.Sources, sharpmakeIncludesFullPath);
+            Assert.That(assemblerContext.Sources, Is.SubsetOf(sharpmakeIncludesFullPath));
             foreach (string include in assemblerContext.Sources)
-                StringAssert.DoesNotContain(include, "nottoinclude.sharpmake.cs");
+                Assert.That(include, Does.Not.Contain("nottoinclude.sharpmake.cs"));
         }
 
         [Test]
@@ -254,9 +254,9 @@ namespace Sharpmake.UnitTests
             new Assembler().ParseSourceAttributesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
             Assert.That(assemblerContext.Sources.Count, Is.EqualTo(5));
-            CollectionAssert.IsSubsetOf(assemblerContext.Sources, sharpmakeIncludesFullPath);
+            Assert.That(assemblerContext.Sources, Is.SubsetOf(sharpmakeIncludesFullPath));
             foreach (string include in assemblerContext.Sources)
-                StringAssert.DoesNotContain(include, "anotherfiletonotinclude.sharpmake.cs");
+                Assert.That(include, Does.Not.Contain("anotherfiletonotinclude.sharpmake.cs"));
         }
 
         [Test]
@@ -290,7 +290,7 @@ namespace Sharpmake.UnitTests
             new Assembler().ParseSourceAttributesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
             Assert.That(assemblerContext.Sources.Count, Is.EqualTo(1));
-            StringAssert.AreEqualIgnoringCase(sharpmakeIncludeFullPath, assemblerContext.Sources.First());
+            Assert.That(assemblerContext.Sources.First(), Is.EqualTo(sharpmakeIncludeFullPath).IgnoreCase);
         }
 
         #endregion
@@ -310,7 +310,7 @@ namespace Sharpmake.UnitTests
             new Assembler().ParseSourceAttributesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
             Assert.That(assemblerContext.RuntimeReferences.Count, Is.EqualTo(1));
-            StringAssert.AreEqualIgnoringCase(sharpmakeReferenceFullPath, assemblerContext.RuntimeReferences.First());
+            Assert.That(assemblerContext.RuntimeReferences.First(), Is.EqualTo(sharpmakeReferenceFullPath).IgnoreCase);
         }
 
         [Test]
@@ -327,7 +327,7 @@ namespace Sharpmake.UnitTests
             new Assembler().ParseSourceAttributesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
             Assert.That(assemblerContext.RuntimeReferences.Count, Is.EqualTo(1));
-            StringAssert.AreEqualIgnoringCase(sharpmakeReferenceFullPath, assemblerContext.RuntimeReferences.First());
+            Assert.That(assemblerContext.RuntimeReferences.First(), Is.EqualTo(sharpmakeReferenceFullPath).IgnoreCase);
         }
 
         [Test]
@@ -344,7 +344,7 @@ namespace Sharpmake.UnitTests
             new Assembler().ParseSourceAttributesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
             Assert.That(assemblerContext.RuntimeReferences.Count, Is.EqualTo(1));
-            StringAssert.AreEqualIgnoringCase(sharpmakeReferenceFullPath, assemblerContext.RuntimeReferences.First());
+            Assert.That(assemblerContext.RuntimeReferences.First(), Is.EqualTo(sharpmakeReferenceFullPath).IgnoreCase);
         }
 
         [Test]
@@ -385,7 +385,7 @@ namespace Sharpmake.UnitTests
             {
                 parser.ParseLine(Line, fileInfo, index, assemblerContext);
                 bool shouldParseLine = parser.ShouldParseLine();
-                Assert.AreEqual(ExpectedResult, shouldParseLine, $"ShouldParseLine for line ({index}) \"{Line}\" should return {ExpectedResult} after evaluation!");
+                Assert.That(shouldParseLine, Is.EqualTo(ExpectedResult), $"ShouldParseLine for line ({index}) \"{Line}\" should return {ExpectedResult} after evaluation!");
             }
         }
 

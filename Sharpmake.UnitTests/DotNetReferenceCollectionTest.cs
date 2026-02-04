@@ -174,7 +174,7 @@ namespace Sharpmake.UnitTests
             DotNetReferenceCollection collection = new DotNetReferenceCollection { _testReferences[0] };
 
             Assert.That(collection.Count, Is.EqualTo(1));
-            Assert.True(collection.Contains(_testReferences[0]));
+            Assert.That(collection.Contains(_testReferences[0]), Is.True);
         }
 
         [Test]
@@ -195,8 +195,8 @@ namespace Sharpmake.UnitTests
             collection.Add(_testReferences[1]);
             collection.Add(_testReferences[0]);
             Assert.That(collection.Count, Is.EqualTo(2));
-            Assert.True(collection.Contains(_testReferences[1]));
-            Assert.True(collection.Contains(_testReferences[0]));
+            Assert.That(collection.Contains(_testReferences[1]), Is.True);
+            Assert.That(collection.Contains(_testReferences[0]), Is.True);
         }
 
         [Test]
@@ -208,7 +208,7 @@ namespace Sharpmake.UnitTests
             collection.Add(_testReferences[0]);
             collection.Add(_testReferences[0]);
             Assert.That(collection.Count, Is.EqualTo(1));
-            Assert.True(collection.Contains(_testReferences[0]));
+            Assert.That(collection.Contains(_testReferences[0]), Is.True);
         }
 
         [Test]
@@ -217,7 +217,7 @@ namespace Sharpmake.UnitTests
             DotNetReferenceCollection collection = new DotNetReferenceCollection { _testReferences[0] };
 
             Assert.That(collection.Count, Is.EqualTo(1));
-            Assert.True(collection.Remove(_testReferences[0]));
+            Assert.That(collection.Remove(_testReferences[0]), Is.True);
             Assert.That(collection.Count, Is.EqualTo(0));
         }
 
@@ -227,7 +227,7 @@ namespace Sharpmake.UnitTests
             DotNetReferenceCollection collection = new DotNetReferenceCollection { _testReferences[0] };
 
             Assert.That(collection.Count, Is.EqualTo(1));
-            Assert.False(collection.Remove(_testReferences[2]));
+            Assert.That(collection.Remove(_testReferences[2]), Is.False);
             Assert.That(collection.Count, Is.EqualTo(1));
         }
 

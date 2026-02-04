@@ -18,7 +18,7 @@ namespace Sharpmake.UnitTests
         public void CSharpNoDependency()
         {
             var project = GetProject<CSharpTestProjects.CSharpNoDependencyProject1>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
             foreach (var conf in project.Configurations)
             {
                 Assert.That(conf.DotNetPublicDependencies.Count, Is.EqualTo(0));
@@ -30,13 +30,13 @@ namespace Sharpmake.UnitTests
         public void CSharpOnePublicDependency()
         {
             var project = GetProject<CSharpTestProjects.CSharpOnePublicDependencyProject>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
             foreach (var conf in project.Configurations)
             {
                 Assert.That(conf.DotNetPublicDependencies.Count, Is.EqualTo(1));
                 Assert.That(conf.DotNetPrivateDependencies.Count, Is.EqualTo(0));
 
-                Assert.True(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject1)));
+                Assert.That(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject1)), Is.True);
             }
         }
 
@@ -44,14 +44,14 @@ namespace Sharpmake.UnitTests
         public void CSharpOnePublicOnePrivateDependency()
         {
             var project = GetProject<CSharpTestProjects.CSharpOnePublicOnePrivateDependencyProject>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
             foreach (var conf in project.Configurations)
             {
                 Assert.That(conf.DotNetPublicDependencies.Count, Is.EqualTo(1));
                 Assert.That(conf.DotNetPrivateDependencies.Count, Is.EqualTo(1));
 
-                Assert.True(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject1)));
-                Assert.True(conf.DotNetPrivateDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject2)));
+                Assert.That(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject1)), Is.True);
+                Assert.That(conf.DotNetPrivateDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject2)), Is.True);
             }
         }
 
@@ -59,14 +59,14 @@ namespace Sharpmake.UnitTests
         public void CSharpTwoPublicDependencies()
         {
             var project = GetProject<CSharpTestProjects.CSharpTwoPublicDependenciesProject>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
             foreach (var conf in project.Configurations)
             {
                 Assert.That(conf.DotNetPublicDependencies.Count, Is.EqualTo(2));
                 Assert.That(conf.DotNetPrivateDependencies.Count, Is.EqualTo(0));
 
-                Assert.True(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject1)));
-                Assert.True(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject2)));
+                Assert.That(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject1)), Is.True);
+                Assert.That(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject2)), Is.True);
             }
         }
 
@@ -74,14 +74,14 @@ namespace Sharpmake.UnitTests
         public void CSharpTwoPrivateDependencies()
         {
             var project = GetProject<CSharpTestProjects.CSharpTwoPrivateDependenciesProject>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
             foreach (var conf in project.Configurations)
             {
                 Assert.That(conf.DotNetPublicDependencies.Count, Is.EqualTo(0));
                 Assert.That(conf.DotNetPrivateDependencies.Count, Is.EqualTo(2));
 
-                Assert.True(conf.DotNetPrivateDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject1)));
-                Assert.True(conf.DotNetPrivateDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject2)));
+                Assert.That(conf.DotNetPrivateDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject1)), Is.True);
+                Assert.That(conf.DotNetPrivateDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject2)), Is.True);
             }
         }
 
@@ -89,14 +89,14 @@ namespace Sharpmake.UnitTests
         public void CSharpInheritOnePublicDependency()
         {
             var project = GetProject<CSharpTestProjects.CSharpInheritOnePublicDependencyProject>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
             foreach (var conf in project.Configurations)
             {
                 Assert.That(conf.DotNetPublicDependencies.Count, Is.EqualTo(2));
                 Assert.That(conf.DotNetPrivateDependencies.Count, Is.EqualTo(0));
 
-                Assert.True(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpOnePublicDependencyProject)));
-                Assert.True(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject1)));
+                Assert.That(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpOnePublicDependencyProject)), Is.True);
+                Assert.That(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject1)), Is.True);
             }
         }
 
@@ -104,14 +104,14 @@ namespace Sharpmake.UnitTests
         public void CSharpInheritOnePrivateDependency()
         {
             var project = GetProject<CSharpTestProjects.CSharpInheritOnePrivateDependencyProject>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
             foreach (var conf in project.Configurations)
             {
                 Assert.That(conf.DotNetPublicDependencies.Count, Is.EqualTo(0));
                 Assert.That(conf.DotNetPrivateDependencies.Count, Is.EqualTo(2));
 
-                Assert.True(conf.DotNetPrivateDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpOnePublicDependencyProject)));
-                Assert.True(conf.DotNetPrivateDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject1)));
+                Assert.That(conf.DotNetPrivateDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpOnePublicDependencyProject)), Is.True);
+                Assert.That(conf.DotNetPrivateDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject1)), Is.True);
             }
         }
 
@@ -119,7 +119,7 @@ namespace Sharpmake.UnitTests
         public void CSharpInheritPrivateDependenciesWithPrivate()
         {
             var project = GetProject<CSharpTestProjects.CSharpProjectA>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             // CSharpProjectA has private dependency to CSharpInheritOnePrivateDependencyProject
             // CSharpInheritOnePrivateDependencyProject has private dependency to CSharpOnePublicDependencyProject
@@ -131,7 +131,7 @@ namespace Sharpmake.UnitTests
                 Assert.That(conf.DotNetPublicDependencies.Count, Is.EqualTo(0));
                 Assert.That(conf.DotNetPrivateDependencies.Count, Is.EqualTo(1));
 
-                Assert.True(conf.DotNetPrivateDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpInheritOnePrivateDependencyProject)));
+                Assert.That(conf.DotNetPrivateDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpInheritOnePrivateDependencyProject)), Is.True);
             }
         }
 
@@ -139,7 +139,7 @@ namespace Sharpmake.UnitTests
         public void CSharpInheritPrivateDependenciesWithPublic()
         {
             var project = GetProject<CSharpTestProjects.CSharpProjectB>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             // CSharpProjectB has a private dependency on CSharpOnePublicDependencyProject
             // CSharpOnePublicDependencyProject has a public dependency on CSharpNoDependencyProject1
@@ -149,8 +149,8 @@ namespace Sharpmake.UnitTests
                 Assert.That(conf.DotNetPublicDependencies.Count, Is.EqualTo(0));
                 Assert.That(conf.DotNetPrivateDependencies.Count, Is.EqualTo(2));
 
-                Assert.True(conf.DotNetPrivateDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpOnePublicDependencyProject)));
-                Assert.True(conf.DotNetPrivateDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject1)));
+                Assert.That(conf.DotNetPrivateDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpOnePublicDependencyProject)), Is.True);
+                Assert.That(conf.DotNetPrivateDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject1)), Is.True);
             }
         }
 
@@ -158,7 +158,7 @@ namespace Sharpmake.UnitTests
         public void CSharpInheritPublicToPrivateLeaf()
         {
             var project = GetProject<CSharpTestProjects.CSharpProjectD>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             // CSharpProjectD has a public dependency on CSharpInheritPublicFromPrivateDependencyProject
             // CSharpInheritPublicFromPrivateDependencyProject has a public dependency on CSharpOnePrivateDependencyProject
@@ -169,8 +169,8 @@ namespace Sharpmake.UnitTests
                 Assert.That(conf.DotNetPublicDependencies.Count, Is.EqualTo(2));
                 Assert.That(conf.DotNetPrivateDependencies.Count, Is.EqualTo(0));
 
-                Assert.True(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpInheritPublicFromPrivateDependencyProject)));
-                Assert.True(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpOnePrivateDependencyProject)));
+                Assert.That(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpInheritPublicFromPrivateDependencyProject)), Is.True);
+                Assert.That(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpOnePrivateDependencyProject)), Is.True);
             }
         }
 
@@ -178,16 +178,16 @@ namespace Sharpmake.UnitTests
         public void CSharpInheritPublicDependenciesWithPrivate()
         {
             var project = GetProject<CSharpTestProjects.CSharpProjectC>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             foreach (var conf in project.Configurations)
             {
                 Assert.That(conf.DotNetPublicDependencies.Count, Is.EqualTo(0));
                 Assert.That(conf.DotNetPrivateDependencies.Count, Is.EqualTo(3));
 
-                Assert.True(conf.DotNetPrivateDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpInheritOnePublicDependencyProject)));
-                Assert.True(conf.DotNetPrivateDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpOnePublicDependencyProject)));
-                Assert.True(conf.DotNetPrivateDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject1)));
+                Assert.That(conf.DotNetPrivateDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpInheritOnePublicDependencyProject)), Is.True);
+                Assert.That(conf.DotNetPrivateDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpOnePublicDependencyProject)), Is.True);
+                Assert.That(conf.DotNetPrivateDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject1)), Is.True);
             }
         }
 
@@ -195,7 +195,7 @@ namespace Sharpmake.UnitTests
         public void CSharpDuplicateInDeepInheritance()
         {
             var project = GetProject<CSharpTestProjects.CSharpProjectDuplicateInDeepInheritance>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             // CSharpProjectDuplicateInDeepInheritance
             //
@@ -219,12 +219,12 @@ namespace Sharpmake.UnitTests
                 Assert.That(conf.DotNetPublicDependencies.Count, Is.EqualTo(5));
                 Assert.That(conf.DotNetPrivateDependencies.Count, Is.EqualTo(0));
 
-                Assert.True(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpTwoPrivateDependenciesProject)));
-                Assert.True(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpOnePublicDependencyProject)));
-                Assert.True(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpInheritOnePublicDependencyProject)));
-                Assert.True(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpInheritOnePrivateDependencyProject)));
-                Assert.True(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject1)));
-                Assert.False(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject2)));
+                Assert.That(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpTwoPrivateDependenciesProject)), Is.True);
+                Assert.That(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpOnePublicDependencyProject)), Is.True);
+                Assert.That(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpInheritOnePublicDependencyProject)), Is.True);
+                Assert.That(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpInheritOnePrivateDependencyProject)), Is.True);
+                Assert.That(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject1)), Is.True);
+                Assert.That(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject2)), Is.False);
             }
         }
 
@@ -232,7 +232,7 @@ namespace Sharpmake.UnitTests
         public void CSharpDependenciesOnlyBuildOrder()
         {
             var project = GetProject<CSharpTestProjects.CSharpProjectReferenceOutputAssemblyInheritance>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
 
             // CSharpProjectReferenceOutputAssemblyInheritance
             //     + --- CSharpInheritOnePublicDependencyProject (Public)
@@ -246,15 +246,15 @@ namespace Sharpmake.UnitTests
                 Assert.That(conf.DotNetPublicDependencies.Count, Is.EqualTo(5));
                 Assert.That(conf.DotNetPrivateDependencies.Count, Is.EqualTo(0));
 
-                Assert.True(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpInheritOnePublicDependencyProject)));
-                Assert.True(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpOnlyBuildOrderDependency)));
-                Assert.True(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject2)));
-                Assert.True(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpOnePublicDependencyProject)));
-                Assert.True(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject1)));
+                Assert.That(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpInheritOnePublicDependencyProject)), Is.True);
+                Assert.That(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpOnlyBuildOrderDependency)), Is.True);
+                Assert.That(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject2)), Is.True);
+                Assert.That(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpOnePublicDependencyProject)), Is.True);
+                Assert.That(conf.DotNetPublicDependencies.ContainsProjectType(typeof(CSharpTestProjects.CSharpNoDependencyProject1)), Is.True);
 
                 foreach (var dependency in conf.DotNetPublicDependencies)
                 {
-                    Assert.IsNull(dependency.ReferenceOutputAssembly);
+                    Assert.That(dependency.ReferenceOutputAssembly, Is.Null);
                 }
             }
         }
@@ -274,9 +274,9 @@ namespace Sharpmake.UnitTests
                 {
                     // All of them should be Swapped except CsharpProjectB (because it's transitive)
                     if (dependency.Configuration.Project.FullClassName == typeof(CSharpTestProjects.CSharpProjectB).FullName)
-                        Assert.False(dependency.ReferenceSwappedWithOutputAssembly);
+                        Assert.That(dependency.ReferenceSwappedWithOutputAssembly, Is.False);
                     else
-                        Assert.True(dependency.ReferenceSwappedWithOutputAssembly);
+                        Assert.That(dependency.ReferenceSwappedWithOutputAssembly, Is.True);
                 }
             }
 
