@@ -120,7 +120,7 @@ namespace Sharpmake.UnitTests
         public void HaveFragmentOfSameType_returnsExpected(object fragment, bool expectedResult)
         {
             var target = new Target();
-            Assert.AreEqual(expectedResult, target.HaveFragmentOfSameType(fragment));
+            Assert.That(target.HaveFragmentOfSameType(fragment), Is.EqualTo(expectedResult));
         }
 
         [TestCase(Optimization.Release, true)]

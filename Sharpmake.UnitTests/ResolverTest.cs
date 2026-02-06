@@ -299,7 +299,7 @@ namespace Sharpmake.UnitTests
             resolver.SetParameter("obj", obj);
             string result = resolver.Resolve(someTemplate);
 
-            Assert.AreEqual("<Field>&lt;stuff&gt;</Field>", result);
+            Assert.That(result, Is.EqualTo("<Field>&lt;stuff&gt;</Field>"));
         }
     }
 }

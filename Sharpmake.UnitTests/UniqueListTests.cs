@@ -29,8 +29,8 @@ namespace Sharpmake.UnitTests
                 "D",
                 "H"
             };
-            Assert.AreEqual("AA,BBB,CC,DDD", uniqueList1.ToString());
-            Assert.AreEqual("U,D,H", uniqueList2.ToString());
+            Assert.That(uniqueList1.ToString(), Is.EqualTo("AA,BBB,CC,DDD"));
+            Assert.That(uniqueList2.ToString(), Is.EqualTo("U,D,H"));
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace Sharpmake.UnitTests
             };
             uniqueList.UpdateValue("AA", "EE");
 
-            Assert.AreEqual("EE,BBB,CC,DDD", uniqueList.ToString());
+            Assert.That(uniqueList.ToString(), Is.EqualTo("EE,BBB,CC,DDD"));
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace Sharpmake.UnitTests
             };
             uniqueList.UpdateValue("BBB", "AA");
 
-            Assert.AreEqual("AA,CC,DDD", uniqueList.ToString());
+            Assert.That(uniqueList.ToString(), Is.EqualTo("AA,CC,DDD"));
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace Sharpmake.UnitTests
             };
             uniqueList.Add("EE");
 
-            Assert.AreEqual("AA,BBB,CC,DDD,EE", uniqueList.ToString());
+            Assert.That(uniqueList.ToString(), Is.EqualTo("AA,BBB,CC,DDD,EE"));
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace Sharpmake.UnitTests
             };
             uniqueList.Add("EE", "FFF");
 
-            Assert.AreEqual("AA,BBB,CC,DDD,EE,FFF", uniqueList.ToString());
+            Assert.That(uniqueList.ToString(), Is.EqualTo("AA,BBB,CC,DDD,EE,FFF"));
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace Sharpmake.UnitTests
             };
             uniqueList.Add("EE", "FFF", "GG");
 
-            Assert.AreEqual("AA,BBB,CC,DDD,EE,FFF,GG", uniqueList.ToString());
+            Assert.That(uniqueList.ToString(), Is.EqualTo("AA,BBB,CC,DDD,EE,FFF,GG"));
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace Sharpmake.UnitTests
             };
             uniqueList.Add("EE", "FFF", "GG", "HHH");
 
-            Assert.AreEqual("AA,BBB,CC,DDD,EE,FFF,GG,HHH", uniqueList.ToString());
+            Assert.That(uniqueList.ToString(), Is.EqualTo("AA,BBB,CC,DDD,EE,FFF,GG,HHH"));
         }
 
         /// <summary>
@@ -156,7 +156,7 @@ namespace Sharpmake.UnitTests
             };
             uniqueList.Add("EE", "FFF", "GG", "HHH", "II");
 
-            Assert.AreEqual("AA,BBB,CC,DDD,EE,FFF,GG,HHH,II", uniqueList.ToString());
+            Assert.That(uniqueList.ToString(), Is.EqualTo("AA,BBB,CC,DDD,EE,FFF,GG,HHH,II"));
         }
 
         /// <summary>
@@ -179,7 +179,7 @@ namespace Sharpmake.UnitTests
                 "H"
             });
 
-            Assert.AreEqual("AA,BBB,CC,DDD,EE,FFF,GG,H", uniqueList.ToString());
+            Assert.That(uniqueList.ToString(), Is.EqualTo("AA,BBB,CC,DDD,EE,FFF,GG,H"));
         }
 
         /// <summary>
@@ -205,7 +205,7 @@ namespace Sharpmake.UnitTests
 
             uniqueList.AddRange(listParams);
 
-            Assert.AreEqual("AA,BBB,CC,DDD,EE,FFF,GG,H", uniqueList.ToString());
+            Assert.That(uniqueList.ToString(), Is.EqualTo("AA,BBB,CC,DDD,EE,FFF,GG,H"));
         }
 
         /// <summary>
@@ -231,7 +231,7 @@ namespace Sharpmake.UnitTests
 
             uniqueList.AddRange(listParams);
 
-            Assert.AreEqual("AA,BBB,CC,DDD,EE,FFF,GG,H", uniqueList.ToString());
+            Assert.That(uniqueList.ToString(), Is.EqualTo("AA,BBB,CC,DDD,EE,FFF,GG,H"));
         }
 
         /// <summary>
@@ -257,7 +257,7 @@ namespace Sharpmake.UnitTests
 
             uniqueList.AddRange(listParams);
 
-            Assert.AreEqual("AA,BBB,CC,DDD,EE,FFF,GG,H", uniqueList.ToString());
+            Assert.That(uniqueList.ToString(), Is.EqualTo("AA,BBB,CC,DDD,EE,FFF,GG,H"));
         }
 
         /// <summary>
@@ -282,7 +282,7 @@ namespace Sharpmake.UnitTests
 
             uniqueList1.IntersectWith(uniqueList2);
 
-            Assert.AreEqual("AA", uniqueList1.ToString());
+            Assert.That(uniqueList1.ToString(), Is.EqualTo("AA"));
         }
 
         /// <summary>
@@ -307,7 +307,7 @@ namespace Sharpmake.UnitTests
 
             uniqueList1.IntersectWith(uniqueList2);
 
-            Assert.AreEqual(0, uniqueList1.Count);
+            Assert.That(uniqueList1.Count, Is.EqualTo(0));
         }
 
         /// <summary>
@@ -333,8 +333,8 @@ namespace Sharpmake.UnitTests
 
             uniqueList1.IntersectWith(uniqueList2, uniqueRest);
 
-            Assert.AreEqual("AA", uniqueList1.ToString());
-            Assert.AreEqual("G,H,BBB,CC,DDD", uniqueRest.ToString());
+            Assert.That(uniqueList1.ToString(), Is.EqualTo("AA"));
+            Assert.That(uniqueRest.ToString(), Is.EqualTo("G,H,BBB,CC,DDD"));
         }
 
         /// <summary>
@@ -359,8 +359,8 @@ namespace Sharpmake.UnitTests
             UniqueList<string> uniqueRest = new UniqueList<string>();
 
             uniqueList1.IntersectWith(uniqueList2, uniqueRest);
-            Assert.AreEqual(0, uniqueList1.Count);
-            Assert.AreEqual("U,D,H,AA,BBB,CC,DDD", uniqueRest.ToString());
+            Assert.That(uniqueList1.Count, Is.EqualTo(0));
+            Assert.That(uniqueRest.ToString(), Is.EqualTo("U,D,H,AA,BBB,CC,DDD"));
         }
 
         /// <summary>
@@ -378,7 +378,7 @@ namespace Sharpmake.UnitTests
             };
             uniqueList.RemoveAll(s => s.Length == 3);
 
-            Assert.AreEqual("AA,CC", uniqueList.ToString());
+            Assert.That(uniqueList.ToString(), Is.EqualTo("AA,CC"));
         }
 
         /// <summary>
@@ -403,7 +403,7 @@ namespace Sharpmake.UnitTests
 
             uniqueList.RemoveRange(listParams);
 
-            Assert.AreEqual("AA,BBB", uniqueList.ToString());
+            Assert.That(uniqueList.ToString(), Is.EqualTo("AA,BBB"));
         }
 
         /// <summary>
@@ -423,7 +423,7 @@ namespace Sharpmake.UnitTests
 
             uniqueList.Remove(listParams);
 
-            Assert.AreEqual("DDD", uniqueList.ToString());
+            Assert.That(uniqueList.ToString(), Is.EqualTo("DDD"));
         }
 
         /// <summary>
@@ -444,7 +444,7 @@ namespace Sharpmake.UnitTests
                 return x.Length.CompareTo(y.Length);
             });
 
-            Assert.AreEqual(new List<string>() { "AA", "CC", "BBB", "DDD" }, listReturn);
+            Assert.That(listReturn, Is.EqualTo(new List<string>() { "AA", "CC", "BBB", "DDD" }));
         }
 
         /// <summary>
@@ -462,7 +462,7 @@ namespace Sharpmake.UnitTests
             };
             uniqueList.Clear();
 
-            Assert.AreEqual(0, uniqueList.Count);
+            Assert.That(uniqueList.Count, Is.EqualTo(0));
         }
 
         /// <summary>
@@ -479,7 +479,7 @@ namespace Sharpmake.UnitTests
                 "DDD"
             };
 
-            Assert.IsTrue(uniqueList.Contains("BBB"));
+            Assert.That(uniqueList.Contains("BBB"), Is.True);
         }
 
         /// <summary>
@@ -496,7 +496,7 @@ namespace Sharpmake.UnitTests
                 "DDD"
             };
 
-            Assert.IsFalse(uniqueList.Contains("HHH"));
+            Assert.That(uniqueList.Contains("HHH"), Is.False);
         }
 
         private class ListContainer

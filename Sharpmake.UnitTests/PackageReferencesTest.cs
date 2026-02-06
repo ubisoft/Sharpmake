@@ -20,8 +20,8 @@ namespace Sharpmake.UnitTests
             foreach (PackageReferences.AssetsDependency dep in System.Enum.GetValues(typeof(PackageReferences.AssetsDependency)))
             {
                 var formatted = PackageReferences.PackageReference.GetFormatedAssetsDependency(dep);
-                Assert.AreEqual(1, formatted.Count());
-                Assert.AreEqual(formatted.First().ToLower(), dep.ToString().ToLower());
+                Assert.That(formatted.Count(), Is.EqualTo(1));
+                Assert.That(formatted.First().ToLower(), Is.EqualTo(dep.ToString().ToLower()));
             }
         }
 
@@ -29,12 +29,12 @@ namespace Sharpmake.UnitTests
         public void PackageReferencesAdded()
         {
             var project = GetProject<PackageReferencesTestProjects.PublicAndPrivatePackageReferencesProject>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
             foreach (var configuration in project.Configurations)
             {
-                Assert.AreEqual(2, configuration.ReferencesByNuGetPackage.Count);
-                Assert.True(configuration.ReferencesByNuGetPackage.SortedValues.Any(item => item.PrivateAssets == PackageReferences.DefaultPrivateAssets && item.Name == "NUnit"));
-                Assert.True(configuration.ReferencesByNuGetPackage.SortedValues.Any(item => item.PrivateAssets != PackageReferences.DefaultPrivateAssets && item.Name == "NUnit.Console"));
+                Assert.That(configuration.ReferencesByNuGetPackage.Count, Is.EqualTo(2));
+                Assert.That(configuration.ReferencesByNuGetPackage.SortedValues.Any(item => item.PrivateAssets == PackageReferences.DefaultPrivateAssets && item.Name == "NUnit"), Is.True);
+                Assert.That(configuration.ReferencesByNuGetPackage.SortedValues.Any(item => item.PrivateAssets != PackageReferences.DefaultPrivateAssets && item.Name == "NUnit.Console"), Is.True);
             }
         }
 
@@ -42,11 +42,11 @@ namespace Sharpmake.UnitTests
         public void InheritedPublicPackageReferencesToPrivateStillPublic()
         {
             var project = GetProject<PackageReferencesTestProjects.PrivateInheritedPackageReferencesProject>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
             foreach (var configuration in project.Configurations)
             {
-                Assert.AreEqual(1, configuration.ReferencesByNuGetPackage.Count);
-                Assert.True(configuration.ReferencesByNuGetPackage.SortedValues.Any(item => item.PrivateAssets == PackageReferences.DefaultPrivateAssets && item.Name == "NUnit"));
+                Assert.That(configuration.ReferencesByNuGetPackage.Count, Is.EqualTo(1));
+                Assert.That(configuration.ReferencesByNuGetPackage.SortedValues.Any(item => item.PrivateAssets == PackageReferences.DefaultPrivateAssets && item.Name == "NUnit"), Is.True);
             }
         }
 
@@ -54,11 +54,11 @@ namespace Sharpmake.UnitTests
         public void InheritedPrivatePackageReferencesToPublicBecomePublic()
         {
             var project = GetProject<PackageReferencesTestProjects.PublicInheritedPackageReferencesProject>();
-            Assert.IsNotNull(project);
+            Assert.That(project, Is.Not.Null);
             foreach (var configuration in project.Configurations)
             {
-                Assert.AreEqual(1, configuration.ReferencesByNuGetPackage.Count);
-                Assert.True(configuration.ReferencesByNuGetPackage.SortedValues.Any(item => item.PrivateAssets == PackageReferences.DefaultPrivateAssets && item.Name == "NUnit"));
+                Assert.That(configuration.ReferencesByNuGetPackage.Count, Is.EqualTo(1));
+                Assert.That(configuration.ReferencesByNuGetPackage.SortedValues.Any(item => item.PrivateAssets == PackageReferences.DefaultPrivateAssets && item.Name == "NUnit"), Is.True);
             }
         }
     }

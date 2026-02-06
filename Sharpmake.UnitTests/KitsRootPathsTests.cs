@@ -11,10 +11,10 @@ namespace Sharpmake.UnitTests
         [Test]
         public void Test_NETFXKitsDir_is_not_null_for_new_frameworks()
         {
-            Assert.IsNotNull(KitsRootPaths.GetNETFXKitsDir(DotNetFramework.v4_7));
-            Assert.IsNotNull(KitsRootPaths.GetNETFXKitsDir(DotNetFramework.v4_7_1));
-            Assert.IsNotNull(KitsRootPaths.GetNETFXKitsDir(DotNetFramework.v4_7_2));
-            Assert.IsNotNull(KitsRootPaths.GetNETFXKitsDir(DotNetFramework.v4_8));
+            Assert.That(KitsRootPaths.GetNETFXKitsDir(DotNetFramework.v4_7), Is.Not.Null);
+            Assert.That(KitsRootPaths.GetNETFXKitsDir(DotNetFramework.v4_7_1), Is.Not.Null);
+            Assert.That(KitsRootPaths.GetNETFXKitsDir(DotNetFramework.v4_7_2), Is.Not.Null);
+            Assert.That(KitsRootPaths.GetNETFXKitsDir(DotNetFramework.v4_8), Is.Not.Null);
         }
     }
 }

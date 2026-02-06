@@ -15,7 +15,7 @@ namespace Sharpmake.UnitTests
         {
             Strings strings = new Strings("aa", "bb", "cc");
 
-            Assert.AreEqual("aa,bb,cc", strings.ToString());
+            Assert.That(strings.ToString(), Is.EqualTo("aa,bb,cc"));
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace Sharpmake.UnitTests
 
             strings.ToLower();
 
-            Assert.AreEqual(expectedStrings, strings);
+            Assert.That(strings, Is.EqualTo(expectedStrings));
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Sharpmake.UnitTests
 
             strings.InsertPrefixSuffix("a", "b");
 
-            Assert.AreEqual(expectedStrings, strings);
+            Assert.That(strings, Is.EqualTo(expectedStrings));
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace Sharpmake.UnitTests
 
             strings.InsertSuffix(".a", true);
 
-            Assert.AreEqual(expectedStrings, strings);
+            Assert.That(strings, Is.EqualTo(expectedStrings));
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace Sharpmake.UnitTests
             strings.InsertSuffix(".a", false);
 
 
-            Assert.AreEqual(expectedStrings, strings);
+            Assert.That(strings, Is.EqualTo(expectedStrings));
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace Sharpmake.UnitTests
 
             strings.InsertSuffix(".a", true, new[] { ".so", ".dll" });
 
-            Assert.AreEqual(expectedStrings, strings);
+            Assert.That(strings, Is.EqualTo(expectedStrings));
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace Sharpmake.UnitTests
 
             strings.InsertSuffix(".a", false, new[] { ".so", ".dll" });
 
-            Assert.AreEqual(expectedStrings, strings);
+            Assert.That(strings, Is.EqualTo(expectedStrings));
         }
 
         /// <summary>
@@ -110,11 +110,11 @@ namespace Sharpmake.UnitTests
         public static void TestInsertSuffix()
         {
             Strings strings = new Strings("test", "abc", "alll", "efgh");
-            Strings expecteStrings = new Strings("testt", "abct", "alllt", "efght");
+            Strings expectedStrings = new Strings("testt", "abct", "alllt", "efght");
 
             strings.InsertSuffix("t");
 
-            Assert.AreEqual(expecteStrings, strings);
+            Assert.That(strings, Is.EqualTo(expectedStrings));
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace Sharpmake.UnitTests
 
             strings.InsertPrefix("abc");
 
-            Assert.AreEqual(expectedStrings, strings);
+            Assert.That(strings, Is.EqualTo(expectedStrings));
         }
 
         /// <summary>
@@ -140,8 +140,8 @@ namespace Sharpmake.UnitTests
             Strings strings1 = new Strings("test", "test-no-escape");
             Strings strings2 = new Strings("<escape-test1>", "&escape-test2&");
 
-            Assert.AreEqual("prefixtestsuffixprefixtest-no-escapesuffix", strings1.JoinStrings("", "prefix", "suffix", false));
-            Assert.AreEqual("a&amp;escape-test2&amp;ba&lt;escape-test1&gt;b", strings2.JoinStrings("", "a", "b", true));
+            Assert.That(strings1.JoinStrings("", "prefix", "suffix", false), Is.EqualTo("prefixtestsuffixprefixtest-no-escapesuffix"));
+            Assert.That(strings2.JoinStrings("", "a", "b", true), Is.EqualTo("a&amp;escape-test2&amp;ba&lt;escape-test1&gt;b"));
         }
 
         /// <summary>
@@ -153,8 +153,8 @@ namespace Sharpmake.UnitTests
             Strings strings1 = new Strings("test", "-escape");
             Strings strings3 = new Strings("<escape-test>", "&escape-test&");
 
-            Assert.AreEqual("prefix-escapeprefixtest", strings1.JoinStrings("", "prefix", false));
-            Assert.AreEqual("1&amp;escape-test&amp;1&lt;escape-test&gt;", strings3.JoinStrings("", "1", true));
+            Assert.That(strings1.JoinStrings("", "prefix", false), Is.EqualTo("prefix-escapeprefixtest"));
+            Assert.That(strings3.JoinStrings("", "1", true), Is.EqualTo("1&amp;escape-test&amp;1&lt;escape-test&gt;"));
         }
     }
 }

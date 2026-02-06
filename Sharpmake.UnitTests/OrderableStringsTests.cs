@@ -1,4 +1,4 @@
-﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Copyright (c) Ubisoft. All Rights Reserved.
 // Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System.Collections.Generic;
@@ -24,7 +24,7 @@ namespace Sharpmake.UnitTests
 
             strings.StableSort();
 
-            Assert.AreEqual("b,c,a,d", strings.ToString());
+            Assert.That(strings.ToString(), Is.EqualTo("b,c,a,d"));
         }
 
         /// <summary>
@@ -46,13 +46,13 @@ namespace Sharpmake.UnitTests
 
             strings.StableSort();
 
-            Assert.AreEqual("f", strings[0]);
-            Assert.AreEqual("d", strings[1]);
-            Assert.AreEqual("b", strings[2]);
-            Assert.AreEqual("a", strings[3]);
-            Assert.AreEqual("e", strings[4]);
-            Assert.AreEqual("c", strings[5]);
-            Assert.AreEqual("g", strings[6]);
+            Assert.That(strings[0], Is.EqualTo("f"));
+            Assert.That(strings[1], Is.EqualTo("d"));
+            Assert.That(strings[2], Is.EqualTo("b"));
+            Assert.That(strings[3], Is.EqualTo("a"));
+            Assert.That(strings[4], Is.EqualTo("e"));
+            Assert.That(strings[5], Is.EqualTo("c"));
+            Assert.That(strings[6], Is.EqualTo("g"));
         }
 
         /// <summary>
@@ -67,9 +67,9 @@ namespace Sharpmake.UnitTests
                     {"h", -1}
                 };
 
-            Assert.True(strings.Contains("u"));
-            Assert.True(strings.Contains("h"));
-            Assert.False(strings.Contains("w"));
+            Assert.That(strings.Contains("u"), Is.True);
+            Assert.That(strings.Contains("h"), Is.True);
+            Assert.That(strings.Contains("w"), Is.False);
         }
 
         /// <summary>
@@ -85,9 +85,9 @@ namespace Sharpmake.UnitTests
                     "O"
                 };
 
-            Assert.AreEqual(1, strings.IndexOf("E"));
-            Assert.AreEqual(2, strings.IndexOf("O"));
-            Assert.AreEqual(0, strings.IndexOf("W"));
+            Assert.That(strings.IndexOf("E"), Is.EqualTo(1));
+            Assert.That(strings.IndexOf("O"), Is.EqualTo(2));
+            Assert.That(strings.IndexOf("W"), Is.EqualTo(0));
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace Sharpmake.UnitTests
 
             strings.ToLower();
 
-            Assert.AreEqual("w,e,o", strings.ToString());
+            Assert.That(strings.ToString(), Is.EqualTo("w,e,o"));
         }
 
         /// <summary>
@@ -126,8 +126,8 @@ namespace Sharpmake.UnitTests
 
             strings.RemoveRange(stringsList);
 
-            Assert.AreEqual(3, strings.Count);
-            Assert.AreEqual("E,Y,U", strings.ToString());
+            Assert.That(strings.Count, Is.EqualTo(3));
+            Assert.That(strings.ToString(), Is.EqualTo("E,Y,U"));
         }
 
         /// <summary>
@@ -148,8 +148,8 @@ namespace Sharpmake.UnitTests
 
             strings.RemoveRange(stringsList);
 
-            Assert.AreEqual(2, strings.Count);
-            Assert.AreEqual("W,U", strings.ToString());
+            Assert.That(strings.Count, Is.EqualTo(2));
+            Assert.That(strings.ToString(), Is.EqualTo("W,U"));
         }
 
         /// <summary>
@@ -170,8 +170,8 @@ namespace Sharpmake.UnitTests
 
             strings.RemoveRange(stringsList);
 
-            Assert.AreEqual(2, strings.Count);
-            Assert.AreEqual("Y,I", strings.ToString());
+            Assert.That(strings.Count, Is.EqualTo(2));
+            Assert.That(strings.ToString(), Is.EqualTo("Y,I"));
         }
 
         /// <summary>
@@ -192,7 +192,7 @@ namespace Sharpmake.UnitTests
 
             strings.RemoveRange(stringsList);
 
-            Assert.AreEqual(0, strings.Count);
+            Assert.That(strings.Count, Is.EqualTo(0));
         }
 
         /// <summary>
@@ -213,8 +213,8 @@ namespace Sharpmake.UnitTests
 
             strings.RemoveRange(stringsList);
 
-            Assert.AreEqual(5, strings.Count);
-            Assert.AreEqual("W,E,Y,U,I", strings.ToString());
+            Assert.That(strings.Count, Is.EqualTo(5));
+            Assert.That(strings.ToString(), Is.EqualTo("W,E,Y,U,I"));
         }
 
         /// <summary>
@@ -232,8 +232,8 @@ namespace Sharpmake.UnitTests
                     "I"
                 };
 
-            Assert.True(strings.Remove("W"));
-            Assert.AreEqual("E,Y,U,I", strings.ToString());
+            Assert.That(strings.Remove("W"), Is.True);
+            Assert.That(strings.ToString(), Is.EqualTo("E,Y,U,I"));
         }
 
         /// <summary>
@@ -251,8 +251,8 @@ namespace Sharpmake.UnitTests
                     "I"
                 };
 
-            Assert.True(strings.Remove("I"));
-            Assert.AreEqual("W,E,Y,U", strings.ToString());
+            Assert.That(strings.Remove("I"), Is.True);
+            Assert.That(strings.ToString(), Is.EqualTo("W,E,Y,U"));
         }
 
         /// <summary>
@@ -268,8 +268,8 @@ namespace Sharpmake.UnitTests
                     "I"
                 };
 
-            Assert.True(strings.Remove("U"));
-            Assert.AreEqual("W,I", strings.ToString());
+            Assert.That(strings.Remove("U"), Is.True);
+            Assert.That(strings.ToString(), Is.EqualTo("W,I"));
         }
 
         /// <summary>
@@ -287,8 +287,8 @@ namespace Sharpmake.UnitTests
                     "I"
                 };
 
-            Assert.False(strings.Remove("o"));
-            Assert.AreEqual("W,E,Y,U,I", strings.ToString());
+            Assert.That(strings.Remove("o"), Is.False);
+            Assert.That(strings.ToString(), Is.EqualTo("W,E,Y,U,I"));
         }
 
         /// <summary>
@@ -318,8 +318,8 @@ namespace Sharpmake.UnitTests
 
             strings.IntersectWith(stringsList, stringsReturn);
 
-            Assert.AreEqual(stringsTestReturn.ToString(), stringsReturn.ToString());
-            Assert.AreEqual("W,U", strings.ToString());
+            Assert.That(stringsReturn.ToString(), Is.EqualTo(stringsTestReturn.ToString()));
+            Assert.That(strings.ToString(), Is.EqualTo("W,U"));
         }
 
 
@@ -350,8 +350,8 @@ namespace Sharpmake.UnitTests
 
             strings.IntersectWith(stringsList, stringsReturn);
 
-            Assert.AreEqual(stringsTestReturn.ToString(), stringsReturn.ToString());
-            Assert.AreEqual(0, strings.Count);
+            Assert.That(stringsReturn.ToString(), Is.EqualTo(stringsTestReturn.ToString()));
+            Assert.That(strings.Count, Is.EqualTo(0));
         }
 
         /// <summary>
@@ -373,8 +373,8 @@ namespace Sharpmake.UnitTests
 
             strings.IntersectWith(stringsList);
 
-            Assert.AreEqual(2, strings.Count);
-            Assert.AreEqual("W,U", strings.ToString());
+            Assert.That(strings.Count, Is.EqualTo(2));
+            Assert.That(strings.ToString(), Is.EqualTo("W,U"));
         }
 
         /// <summary>
@@ -393,7 +393,7 @@ namespace Sharpmake.UnitTests
 
             strings.IntersectWith(stringsList);
 
-            Assert.AreEqual(0, strings.Count);
+            Assert.That(strings.Count, Is.EqualTo(0));
         }
 
         /// <summary>
@@ -413,7 +413,7 @@ namespace Sharpmake.UnitTests
 
             strings.IntersectWith(stringsList);
 
-            Assert.AreEqual(0, strings.Count);
+            Assert.That(strings.Count, Is.EqualTo(0));
         }
 
         /// <summary>
@@ -431,8 +431,8 @@ namespace Sharpmake.UnitTests
 
             strings.AddRange(stringsList);
 
-            Assert.AreEqual(3, strings.Count);
-            Assert.AreEqual("W,h,J", strings.ToString());
+            Assert.That(strings.Count, Is.EqualTo(3));
+            Assert.That(strings.ToString(), Is.EqualTo("W,h,J"));
         }
 
         /// <summary>
@@ -462,12 +462,12 @@ namespace Sharpmake.UnitTests
 
             string2.AddRange(string1);
 
-            Assert.AreEqual(6, string2.Count);
-            Assert.AreEqual(-4, string2.GetOrderNumber(0));
-            Assert.AreEqual(-1, string2.GetOrderNumber(1));
-            Assert.AreEqual(3, string2.GetOrderNumber(2));
-            Assert.AreEqual(0, string2.GetOrderNumber(3));
-            Assert.AreEqual(-3, string2.GetOrderNumber(4));
+            Assert.That(string2.Count, Is.EqualTo(6));
+            Assert.That(string2.GetOrderNumber(0), Is.EqualTo(-4));
+            Assert.That(string2.GetOrderNumber(1), Is.EqualTo(-1));
+            Assert.That(string2.GetOrderNumber(2), Is.EqualTo(3));
+            Assert.That(string2.GetOrderNumber(3), Is.EqualTo(0));
+            Assert.That(string2.GetOrderNumber(4), Is.EqualTo(-3));
         }
 
         /// <summary>
@@ -507,8 +507,8 @@ namespace Sharpmake.UnitTests
             strings.Add("E");
             strings.Add("A");
 
-            Assert.AreEqual(4, strings.Count);
-            Assert.AreEqual("A,Y,W,E", strings.ToString());
+            Assert.That(strings.Count, Is.EqualTo(4));
+            Assert.That(strings.ToString(), Is.EqualTo("A,Y,W,E"));
         }
 
         /// <summary>
@@ -528,12 +528,12 @@ namespace Sharpmake.UnitTests
             strings.Add("E", 1);
             strings.Add("B", 0);
 
-            Assert.AreEqual("A,Y,W,E,B", strings.ToString());
+            Assert.That(strings.ToString(), Is.EqualTo("A,Y,W,E,B"));
 
-            Assert.AreEqual(-4, strings.GetOrderNumber(0));
-            Assert.AreEqual(-4, strings.GetOrderNumber(2));
-            Assert.AreEqual(1, strings.GetOrderNumber(3));
-            Assert.AreEqual(0, strings.GetOrderNumber(4));
+            Assert.That(strings.GetOrderNumber(0), Is.EqualTo(-4));
+            Assert.That(strings.GetOrderNumber(2), Is.EqualTo(-4));
+            Assert.That(strings.GetOrderNumber(3), Is.EqualTo(1));
+            Assert.That(strings.GetOrderNumber(4), Is.EqualTo(0));
         }
 
         /// <summary>
@@ -572,8 +572,8 @@ namespace Sharpmake.UnitTests
 
             strings.Add(stringTab);
 
-            Assert.AreEqual(4, strings.Count);
-            Assert.AreEqual("A,Y,W,E", strings.ToString());
+            Assert.That(strings.Count, Is.EqualTo(4));
+            Assert.That(strings.ToString(), Is.EqualTo("A,Y,W,E"));
         }
 
         /// <summary>
@@ -591,7 +591,7 @@ namespace Sharpmake.UnitTests
 
             strings.InsertPrefixSuffix("A", "O");
 
-            Assert.AreEqual("ALLO,AYO,AUTO", strings.ToString());
+            Assert.That(strings.ToString(), Is.EqualTo("ALLO,AYO,AUTO"));
         }
 
         /// <summary>
@@ -609,7 +609,7 @@ namespace Sharpmake.UnitTests
 
             strings.InsertSuffix("A");
 
-            Assert.AreEqual("LLA,YA,UTA", strings.ToString());
+            Assert.That(strings.ToString(), Is.EqualTo("LLA,YA,UTA"));
         }
 
         /// <summary>
@@ -627,7 +627,7 @@ namespace Sharpmake.UnitTests
 
             strings.InsertSuffix("A", false);
 
-            Assert.AreEqual("LLAA,YAA,UTA", strings.ToString());
+            Assert.That(strings.ToString(), Is.EqualTo("LLAA,YAA,UTA"));
         }
 
         /// <summary>
@@ -645,7 +645,7 @@ namespace Sharpmake.UnitTests
 
             strings.InsertSuffix("A", true);
 
-            Assert.AreEqual("LLA,YA,UTA", strings.ToString());
+            Assert.That(strings.ToString(), Is.EqualTo("LLA,YA,UTA"));
         }
 
         /// <summary>
@@ -659,7 +659,7 @@ namespace Sharpmake.UnitTests
 
             strings.InsertSuffix(".a", true, new[] { ".so", ".dll" });
 
-            Assert.AreEqual(expectedStrings.ToString(), strings.ToString());
+            Assert.That(strings.ToString(), Is.EqualTo(expectedStrings.ToString()));
         }
 
         /// <summary>
@@ -673,7 +673,7 @@ namespace Sharpmake.UnitTests
 
             strings.InsertSuffix(".a", false, new[] { ".so", ".dll" });
 
-            Assert.AreEqual(expectedStrings.ToString(), strings.ToString());
+            Assert.That(strings.ToString(), Is.EqualTo(expectedStrings.ToString()));
         }
 
 
@@ -692,7 +692,7 @@ namespace Sharpmake.UnitTests
 
             strings.InsertPrefix("H");
 
-            Assert.AreEqual("HLLA,HYA,HUT", strings.ToString());
+            Assert.That(strings.ToString(), Is.EqualTo("HLLA,HYA,HUT"));
         }
 
         /// <summary>
@@ -710,7 +710,7 @@ namespace Sharpmake.UnitTests
 
             strings.Insert(2, "test-insert");
 
-            Assert.AreEqual("LLA,YA,test-insert,UT", strings.ToString());
+            Assert.That(strings.ToString(), Is.EqualTo("LLA,YA,test-insert,UT"));
         }
 
         /// <summary>
@@ -726,7 +726,7 @@ namespace Sharpmake.UnitTests
                     {"UT", -3 }
                 };
 
-            Assert.AreEqual("LLA-YA-UT", strings.JoinStrings("-"));
+            Assert.That(strings.JoinStrings("-"), Is.EqualTo("LLA-YA-UT"));
         }
 
         /// <summary>
@@ -743,7 +743,7 @@ namespace Sharpmake.UnitTests
                 };
 
             //
-            Assert.AreEqual("HLLAA-HYAA-HUTA", strings.JoinStrings("-", "H", "A"));
+            Assert.That(strings.JoinStrings("-", "H", "A"), Is.EqualTo("HLLAA-HYAA-HUTA"));
         }
 
         /// <summary>
@@ -759,7 +759,7 @@ namespace Sharpmake.UnitTests
                     {"UT", -3 }
                 };
 
-            Assert.AreEqual("HLLA-HYA-HUT", strings.JoinStrings("-", "H"));
+            Assert.That(strings.JoinStrings("-", "H"), Is.EqualTo("HLLA-HYA-HUT"));
         }
 
         /// <summary>
@@ -777,7 +777,7 @@ namespace Sharpmake.UnitTests
 
             strings.Clear();
 
-            Assert.AreEqual(0, strings.Count);
+            Assert.That(strings.Count, Is.EqualTo(0));
         }
 
         /// <summary>
@@ -796,9 +796,9 @@ namespace Sharpmake.UnitTests
                     {"A", 6 }
                 };
 
-            Assert.AreEqual(0, strings.SetOrRemoveAtIndex(0, "H"));
-            Assert.AreEqual("H,E,Y,U,I,A", strings.ToString());
-            Assert.AreEqual(-4, strings.GetOrderNumber(0));
+            Assert.That(strings.SetOrRemoveAtIndex(0, "H"), Is.EqualTo(0));
+            Assert.That(strings.ToString(), Is.EqualTo("H,E,Y,U,I,A"));
+            Assert.That(strings.GetOrderNumber(0), Is.EqualTo(-4));
         }
 
         /// <summary>
@@ -817,9 +817,9 @@ namespace Sharpmake.UnitTests
                     {"A", 6 }
                 };
 
-            Assert.AreEqual("W,E,Y,U,I,A", strings.ToString());
-            Assert.AreEqual(0, strings.SetOrRemoveAtIndex(0, "W"));
-            Assert.AreEqual(-4, strings.GetOrderNumber(0));
+            Assert.That(strings.ToString(), Is.EqualTo("W,E,Y,U,I,A"));
+            Assert.That(strings.SetOrRemoveAtIndex(0, "W"), Is.EqualTo(0));
+            Assert.That(strings.GetOrderNumber(0), Is.EqualTo(-4));
         }
 
         /// <summary>
@@ -838,9 +838,9 @@ namespace Sharpmake.UnitTests
                     {"A", 6 }
                 };
 
-            Assert.AreEqual(0, strings.SetOrRemoveAtIndex(0, "H"));
-            Assert.AreEqual(3, strings.SetOrRemoveAtIndex(4, "H"));
-            Assert.AreEqual("H,E,Y,U,A", strings.ToString());
+            Assert.That(strings.SetOrRemoveAtIndex(0, "H"), Is.EqualTo(0));
+            Assert.That(strings.SetOrRemoveAtIndex(4, "H"), Is.EqualTo(3));
+            Assert.That(strings.ToString(), Is.EqualTo("H,E,Y,U,A"));
         }
 
         /// <summary>
@@ -857,8 +857,8 @@ namespace Sharpmake.UnitTests
 
             strings.RemoveAt(1);
 
-            Assert.AreEqual("W", strings.ToString());
-            Assert.AreEqual(-4, strings.GetOrderNumber(0));
+            Assert.That(strings.ToString(), Is.EqualTo("W"));
+            Assert.That(strings.GetOrderNumber(0), Is.EqualTo(-4));
         }
 
         /// <summary>
@@ -877,7 +877,7 @@ namespace Sharpmake.UnitTests
 
             strings.CopyTo(returnArray, 0);
 
-            Assert.AreEqual(new[] { "W", "E" }, returnArray);
+            Assert.That(returnArray, Is.EqualTo(new[] { "W", "E" }));
         }
     }
 }
