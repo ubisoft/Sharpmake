@@ -144,6 +144,12 @@
       "commandLineArgs": "/sources(@'PackageReferences.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)\\PackageReferences"
     },
+    "Sample (ProjectReferencesExport)": {
+      "commandName": "Executable",
+      "executablePath": "$(ProjectDir)\\..\\Sharpmake.Application\\bin\\$(Configuration)\\$(TargetFramework)\\Sharpmake.Application.exe",
+      "commandLineArgs": "/sources(@'ProjectReferencesExport.sharpmake.cs')",
+      "workingDirectory": "$(ProjectDir)\\ProjectReferencesExport"
+    },
     "Sample (QTFileCustomBuild)": {
       "commandName": "Executable",
       "executablePath": "$(ProjectDir)\\..\\Sharpmake.Application\\bin\\$(Configuration)\\$(TargetFramework)\\Sharpmake.Application.exe",
