@@ -265,7 +265,14 @@ namespace Sharpmake
                 _list.Add(new StringEntry(item));
         }
 
-        public void Add(string item, int orderNumber)
+        public enum OrderResolve
+        {
+            None,
+            Less,
+            Greater
+        }
+
+        public void Add(string item, int orderNumber, OrderResolve resolveMethod = OrderResolve.None)
         {
             if (_hashSet.Add(item))
                 _list.Add(new StringEntry(item, orderNumber));
@@ -280,9 +287,22 @@ namespace Sharpmake
                             _list[i] = new StringEntry(item, orderNumber);
                         else if (_list[i].OrderNumber != orderNumber)
                         {
-                            throw new Error(
-                                "Cannot specify 2 different non-zero order number for \"" +
-                                item + "\": " + _list[i].OrderNumber + " and " + orderNumber);
+                            if (resolveMethod == OrderResolve.Less)
+                            {
+                                if (orderNumber < _list[i].OrderNumber)
+                                    _list[i] = new StringEntry(item, orderNumber);
+                            }
+                            else if (resolveMethod == OrderResolve.Greater)
+                            {
+                                if (orderNumber > _list[i].OrderNumber)
+                                    _list[i] = new StringEntry(item, orderNumber);
+                            }
+                            else
+                            {
+                                throw new Error(
+                                    "Cannot specify 2 different non-zero order number for \"" +
+                                    item + "\": " + _list[i].OrderNumber + " and " + orderNumber);
+                            }
                         }
                     }
                 }
@@ -295,18 +315,20 @@ namespace Sharpmake
                 Add(item);
         }
 
-        public void AddRange(OrderableStrings collection)
+        public void AddRange(OrderableStrings collection, int outerOrderNumber = 0, OrderResolve resolveMethod = OrderResolve.None)
         {
             List<StringEntry> existingEntriesToAdd = null;
             foreach (var entry in collection._list)
             {
+                var newEntry = new StringEntry(entry.StringValue, entry.OrderNumber + outerOrderNumber);
+
                 if (_hashSet.Add(entry.StringValue))
-                    _list.Add(entry);
-                else if (entry.OrderNumber != 0)  // make sure to have orderNumber
+                    _list.Add(newEntry);
+                else if (newEntry.OrderNumber != 0)  // make sure to have orderNumber
                 {
                     if (existingEntriesToAdd == null)
                         existingEntriesToAdd = new List<StringEntry>();
-                    existingEntriesToAdd.Add(entry);
+                    existingEntriesToAdd.Add(newEntry);
                 }
             }
             if (existingEntriesToAdd != null)
@@ -321,9 +343,22 @@ namespace Sharpmake
                             _list[i] = new StringEntry(_list[i].StringValue, orderNumber);
                         else if (_list[i].OrderNumber != orderNumber)
                         {
-                            throw new Error(
-                                "Cannot specify 2 different non-zero order number for \"" +
-                                _list[i].StringValue + "\": " + _list[i].OrderNumber + " and " + orderNumber);
+                            if (resolveMethod == OrderResolve.Less)
+                            {
+                                if (orderNumber < _list[i].OrderNumber)
+                                    _list[i] = new StringEntry(_list[i].StringValue, orderNumber);
+                            }
+                            else if (resolveMethod == OrderResolve.Greater)
+                            {
+                                if (orderNumber > _list[i].OrderNumber)
+                                    _list[i] = new StringEntry(_list[i].StringValue, orderNumber);
+                            }
+                            else
+                            {
+                                throw new Error(
+                                    "Cannot specify 2 different non-zero order number for \"" +
+                                    _list[i].StringValue + "\": " + _list[i].OrderNumber + " and " + orderNumber);
+                            }
                         }
                     }
                 }
