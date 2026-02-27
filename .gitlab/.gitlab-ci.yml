@@ -4,9 +4,10 @@ include:
   - template: 'Workflows/Branch-Pipelines.gitlab-ci.yml'
   - project: 'Sharpmake/SharpmakeExtended'
     file: 'build/sharpmake-ci.yml'
-  - project: 'Square/Runners/ci/templates/square-runners-mac-ci-template'
-    file: 'square_mac_runner.yml'
-    ref: '6.0.0'
+  # WARNING: When this include is modified, we also need to modifify the corresponding include in Get-SamplesPipeline.ps1.
+  - project: 'ubi/runner/ci/templates'
+    file: 'ubi_runner.yml'
+    ref: '1.0.7'
 stages:
   - build
   - test
@@ -40,11 +41,9 @@ compilation:windows:
   extends: .compilation:base
 
 compilation:mac:
-  extends: 
+  extends:
     - .compilation:base
-    - .square_mac_arm_macos15
-  
-  tags: [square_mac_arm]
+    - .ubi_runner_mac
 
 compilation:linux:
   extends: .compilation:base
@@ -122,10 +121,14 @@ functional_test:
 #############
 samples:
   stage: test
-  variables:
-    PARENT_PIPELINE_ID: $CI_PIPELINE_ID
   trigger:
     include:
     - artifact: .gitlab/samples.yml
       job: generate_samples_pipeline
     strategy: depend
+    # Do not forward any variables to the child pipeline.
+    # It can cause conflicts with macOS templates used in the child pipeline.
+    forward:
+      pipeline_variables: false
+      yaml_variables: false
+

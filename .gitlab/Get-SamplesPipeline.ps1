@@ -16,9 +16,9 @@ $samplesDef = Get-Content -Raw -Path 'SamplesDef.json' | ConvertFrom-Json
 # Transform into a hash table with an entry for each samples.
 $samplesPipeline = @{
     include = @{
-        project = "Square/Runners/ci/templates/square-runners-mac-ci-template"
-        ref = "6.0.0"
-        file = "square_mac_runner.yml"
+        project = "ubi/runner/ci/templates"
+        ref = "1.0.7"
+        file = "ubi_runner.yml"
     }
 }
 
@@ -50,7 +50,7 @@ foreach ($sample in $samplesDef.Samples)
                                 }
                             }
                             $osCompilationName = 'linux'
-                            
+
                             # Install Powershell on Alpine (https://learn.microsoft.com/en-us/powershell/scripting/install/install-alpine?view=powershell-7.2)
                             # Required to run RunSample.ps1.
                             $script += @(
@@ -66,7 +66,9 @@ foreach ($sample in $samplesDef.Samples)
                         'macos'
                         {
                             $osProperties = @{
-                                extends = @( '.square_mac_arm_xcode16' )
+                                # Our samples are sensible to Xcode version.
+                                # Explicitly request Xcode 16.
+                                extends = @( '.ubi_runner_mac_macos15_xcode16' )
                             }
                             $osCompilationName = 'mac'
                         }
@@ -90,7 +92,7 @@ foreach ($sample in $samplesDef.Samples)
                     switch ($sample.Name)
                     {
                         'QTFileCustomBuild'
-                        {    
+                        {
                             $script += 'choco install python3 --version 3.10.6 --side-by-side -y --no-progress'
                         }
                     }
@@ -107,7 +109,7 @@ foreach ($sample in $samplesDef.Samples)
                             expire_in = '1 day'
                         }
                         needs = [PSCustomObject]@{
-                            pipeline = '$PARENT_PIPELINE_ID'
+                            pipeline = $env:CI_PIPELINE_ID
                             job = "compilation:${osCompilationName}: [release]"
                         }
                         script = $script
