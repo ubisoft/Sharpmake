@@ -513,24 +513,9 @@
                 "./Compile.ps1 -slnOrPrjFile \"XCodeProjects_macOS_xcode.xcworkspace\" -configuration {configuration}_fastbuild -WorkingDirectory \"{testFolder}/temp/solutions\" -compiler xcode -scheme \"SetBrightness FastBuild\""
             ]
         },
-        // {
-        //     "Name": "HelloIOS-github",
-        //     "CIs": [ "github" ],
-        //     "OSs": [ "macos" ],
-        //     "Frameworks": [ "net8.0" ],
-        //     "Configurations": [ "debug", "release" ],
-        //     "TestFolder": "samples/HelloIOS",
-        //     "Commands":
-        //     [
-        //         "xcodebuild -version",
-        //         "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"HelloIOS.Main.sharpmake.cs\" -framework {framework}",
-        //         "xcodebuild build-for-testing CODE_SIGNING_ALLOWED=NO -workspace {testFolder}/codebase/temp/solutions/HelloIOS_iOS.xcworkspace -configuration {configuration} -scheme exe_iOS -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 15 Pro'",
-        //         "xcodebuild test-without-building  -workspace {testFolder}/codebase/temp/solutions/HelloIOS_iOS.xcworkspace -configuration {configuration} -scheme exe_iOS -destination 'platform=iOS Simulator,name=iPhone 15 Pro' -derivedDataPath {testFolder}/test; $global:LastExitCode = 0"
-        //     ]
-        // },
         {
-            "Name": "HelloIOS-gitlab",
-            "CIs": [ "gitlab" ],
+            "Name": "HelloIOS",
+            "CIs": [ "github", "gitlab" ],
             "OSs": [ "macos" ],
             "Frameworks": [ "net8.0" ],
             "Configurations": [ "debug", "release" ],
@@ -539,7 +524,8 @@
             [
                 "xcodebuild -version",
                 "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"HelloIOS.Main.sharpmake.cs\" -framework {framework}",
-                "xcodebuild build-for-testing CODE_SIGNING_ALLOWED=NO -workspace {testFolder}/codebase/temp/solutions/HelloIOS_iOS.xcworkspace -configuration {configuration} -scheme exe_iOS -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16 Pro' test -derivedDataPath {testFolder}/test"
+                "xcodebuild build-for-testing CODE_SIGNING_ALLOWED=NO -workspace {testFolder}/codebase/temp/solutions/HelloIOS_iOS.xcworkspace -configuration {configuration} -scheme exe_iOS -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16 Pro'",
+                "xcodebuild test-without-building  -workspace {testFolder}/codebase/temp/solutions/HelloIOS_iOS.xcworkspace -configuration {configuration} -scheme exe_iOS -destination 'platform=iOS Simulator,name=iPhone 16 Pro' -derivedDataPath {testFolder}/test; $global:LastExitCode = 0"
             ]
         },
         {
