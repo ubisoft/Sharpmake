@@ -424,7 +424,7 @@
         },
         {
             "Name": "HelloXCode",
-            "CIs": [ "gitlab" ],
+            "CIs": [ "github", "gitlab" ],
             "OSs": [ "macos" ],
             "Frameworks": [ "net8.0" ],
             "Configurations": [ "debug", "release" ],
