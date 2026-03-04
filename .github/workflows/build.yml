@@ -37,6 +37,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
       # Requirement for GitVersion.
       # This step ensure current commit exists on a branch.
       # Its not the case when a workflow is triggered by a pull request coming from a fork.
