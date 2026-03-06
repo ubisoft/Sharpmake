@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-14, windows-2022]
+        os: [ubuntu-latest, macos-15, windows-2022]
         framework: [net8.0]
         configuration: [Debug, Release]
     uses: ./.github/workflows/build.yml
@@ -40,6 +40,11 @@ jobs:
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v6.0.2
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
 
       - name: Download sharpmake ${{ matrix.framework }} ${{ runner.os }}-release binaries
         uses: actions/download-artifact@v7
@@ -80,6 +85,11 @@ jobs:
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v6.0.2
+    
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
 
       # Setting a VS_VERSION_SUFFIX variable for use by steps that are using solutions specific to VS2019 or VS2022
       - name: SetVSVersionSuffix-VS2019
