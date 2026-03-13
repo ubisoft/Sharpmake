@@ -1560,13 +1560,12 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             // Write None files
-            if (context.Project.NoneFiles.Count > 0)
+            if (NoneFiles.Count > 0)
             {
                 fileGenerator.Write(Template.Project.ProjectFilesBegin);
-                foreach (string file in context.Project.NoneFiles)
+                foreach (var file in NoneFiles)
                 {
-                    var projectFile = new ProjectFile(context, file);
-                    using (fileGenerator.Declare("file", projectFile))
+                    using (fileGenerator.Declare("file", file))
                         fileGenerator.Write(Template.Project.ProjectFilesNone);
                 }
                 fileGenerator.Write(Template.Project.ProjectFilesEnd);
