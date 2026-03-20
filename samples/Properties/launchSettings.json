@@ -3,169 +3,169 @@
     "Sample (CompileCommandDatabase)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'CompileCommandDatabase.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'CompileCommandDatabase.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)CompileCommandDatabase"
     },
     "Sample (ConfigureOrder)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'main.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'main.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)ConfigureOrder"
     },
     "Sample (CPPCLI)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'CLRTest.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'CLRTest.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)CPPCLI"
     },
     "Sample (CPPForcePackageReference)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'CPPForcePackageReference.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'CPPForcePackageReference.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)CPPForcePackageReference"
     },
     "Sample (CSharpHelloWorld)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloWorld.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloWorld.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)CSharpHelloWorld"
     },
     "Sample (CSharpImports)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'CSharpImports.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'CSharpImports.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)CSharpImports"
     },
     "Sample (CSharpVsix)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'CSharpVsix.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'CSharpVsix.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)CSharpVsix"
     },
     "Sample (CSharpWCF)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'CSharpWCF.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'CSharpWCF.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)CSharpWCF"
     },
     "Sample (CustomBuildStep)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'CustomBuildStep.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'CustomBuildStep.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)CustomBuildStep"
     },
     "Sample (FastBuildSimpleExecutable)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'FastBuildSimpleExecutable.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'FastBuildSimpleExecutable.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)FastBuildSimpleExecutable"
     },
     "Sample (FastBuildDuplicateFile)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'FastBuildDuplicateFile.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'FastBuildDuplicateFile.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)FastBuildDuplicateFile"
     },
     "Sample (HelloAndroid)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloAndroid.Main.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloAndroid.Main.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)HelloAndroid"
     },
     "Sample (HelloAndroidAgde)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloAndroidAgde.Main.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloAndroidAgde.Main.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)HelloAndroidAgde"
     },
     "Sample (HelloClangCl)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloClangCl.Main.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloClangCl.Main.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)HelloClangCl"
     },
     "Sample (HelloEvents)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloEvents.Main.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloEvents.Main.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)HelloEvents"
     },
     "Sample (HelloLinux)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloLinux.Main.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloLinux.Main.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)HelloLinux"
     },
     "Sample (HelloRust)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloRust.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloRust.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)HelloRust"
     },
     "Sample (HelloWorld)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloWorld.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloWorld.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)HelloWorld"
     },
     "Sample (HelloXCode)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloXCode.Main.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloXCode.Main.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)HelloXCode"
     },
     "Sample (NetCore/DotNetCoreFrameworkHelloWorld)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloWorld.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloWorld.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)NetCore/DotNetCoreFrameworkHelloWorld"
     },
     "Sample (NetCore/DotNetFrameworkHelloWorld)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloWorld.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloWorld.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)NetCore/DotNetFrameworkHelloWorld"
     },
     "Sample (NetCore/DotNetMultiFrameworksHelloWorld)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloWorld.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloWorld.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)NetCore/DotNetMultiFrameworksHelloWorld"
     },
     "Sample (NetCore/DotNetOSMultiFrameworksHelloWorld)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloWorld.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'HelloWorld.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)NetCore/DotNetOSMultiFrameworksHelloWorld"
     },
     "Sample (PackageReferences)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'PackageReferences.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'PackageReferences.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)PackageReferences"
     },
     "Sample (QTFileCustomBuild)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'QTFileCustomBuild.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'QTFileCustomBuild.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)QTFileCustomBuild"
     },
     "Sample (SimpleExeLibDependency)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'SimpleExeLibDependency.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'SimpleExeLibDependency.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)SimpleExeLibDependency"
     },
     "Sample (vcpkg)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'main.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'main.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)vcpkg/sharpmake"
     },
     "Sample (XCodeProjects)": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "\"$(SolutionDir)Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'XCodeProjects.Main.sharpmake.cs')",
+      "commandLineArgs": "\"$(ProjectDir)../Sharpmake.Application/bin/$(Configuration)/$(TargetFramework)/Sharpmake.Application.dll\" /sources(@'XCodeProjects.Main.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)XCodeProjects"
     }
   }
