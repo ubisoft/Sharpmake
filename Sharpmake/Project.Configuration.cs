@@ -1423,7 +1423,7 @@ namespace Sharpmake
             {
                 if (_linkState != LinkState.Linking)
                     throw new Error($"Cannot add built target lib '{libraryFile}' outside of the link process of the Project.Configuration");
-                DependenciesBuiltTargetsLibraryFiles.Add(libraryFile, orderNumber);
+                DependenciesBuiltTargetsLibraryFiles.Add(libraryFile, orderNumber, OrderableStrings.OrderResolve.Greater);
             }
 
             public OrderableStrings DependenciesForceUsingFiles = new OrderableStrings();
@@ -2138,10 +2138,33 @@ namespace Sharpmake
             public string TargetFileFullNameWithExtension = "[conf.TargetFileFullName][conf.TargetFileFullExtension]";
 
             /// <summary>
-            /// Gets or sets the ordering index of the target when added as a library to another
+            /// Sets the ordering index of the target when added as a library to another. This will only affect the order of libraries
+            /// at the same dependency level. Dependent libraries always appear first.
             /// project.
+            /// Gets the combined user order and dependency order.
             /// </summary>
-            public int TargetFileOrderNumber = 0;
+            public int TargetFileOrderNumber
+            {
+                get
+                {
+                    return _targetFileOrderNumber + _autoFileOrderNumer;
+                }
+                set
+                {
+                    if (value <= -_autoFileNumberStep/2 || value >= _autoFileNumberStep/2)
+                    {
+                        throw new ArgumentOutOfRangeException(string.Format("TargetFileOrderNumber should only be between {0} and {1}. Got {2}",
+                            -_autoFileNumberStep / 2, _autoFileNumberStep / 2, value));
+                    }
+                    _targetFileOrderNumber = value;
+                }
+            }
+
+            internal int _targetFileOrderNumber = 0;
+            // Used internaly to order by dependency before applying TargetFileOrderNumber or other ordering
+            internal int _autoFileOrderNumer = 0;
+            // Make depdencies 1000 items from each other, this means that a user would need to put huge numbers in target file orders to cause cross over
+            internal const int _autoFileNumberStep = 1000;
 
             /// <summary>
             /// Gets or sets the ordering index of the library paths when added as a library to
@@ -3423,6 +3446,21 @@ namespace Sharpmake
                     _dependencySetting = inDependencySetting;
                 }
 
+                internal void UpdateAutoDependencies()
+                {
+                    // Configurations are shared so it's likely the dependency has been processed already so don't process it again
+                    // dependency roots will always be 0, but also have no children, anyone else will have a non-zero value once set
+                    // and that value should remain stable each time the dependency tree is walked.
+                    if (_configuration._autoFileOrderNumer == 0)
+                    {
+                        foreach (var child in _childNodes)
+                        {
+                            child.Key.UpdateAutoDependencies();
+                            _configuration._autoFileOrderNumer = Math.Min(_configuration._autoFileOrderNumer, child.Key._configuration._autoFileOrderNumer - 1000);
+                        }
+                    }
+                }
+
                 internal Configuration _configuration;
                 internal DependencySetting _dependencySetting;
                 internal List<(DependencyNode, DependencyType)> _childNodes = new List<(DependencyNode, DependencyType)>();
@@ -3721,8 +3759,9 @@ namespace Sharpmake
                                     if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
                                         DependenciesOtherLibraryPaths.AddRange(dependency.LibraryPaths);
 
+                                    // Use dependency.TargetFileOrderNumber to make sure to group dependent libraries by their dependencies
                                     if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
-                                        DependenciesOtherLibraryFiles.AddRange(dependency.LibraryFiles);
+                                        DependenciesOtherLibraryFiles.AddRange(dependency.LibraryFiles, dependency.TargetFileOrderNumber, OrderableStrings.OrderResolve.Greater);
 
                                     if (dependencySetting.HasFlag(DependencySetting.ForceUsingAssembly))
                                         DependenciesForceUsingFiles.AddRange(dependency.ForceUsingFiles);
@@ -3782,8 +3821,9 @@ namespace Sharpmake
                                         if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
                                             DependenciesOtherLibraryPaths.AddRange(dependency.LibraryPaths);
 
+                                        // Use dependency.TargetFileOrderNumber to make sure to group dependent libraries by their dependencies
                                         if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
-                                            DependenciesOtherLibraryFiles.AddRange(dependency.LibraryFiles);
+                                            DependenciesOtherLibraryFiles.AddRange(dependency.LibraryFiles, dependency.TargetFileOrderNumber, OrderableStrings.OrderResolve.Greater);
                                     }
                                 }
 
@@ -3976,6 +4016,7 @@ namespace Sharpmake
 
                 Stack<DependencyNode> visiting = new Stack<DependencyNode>();
                 visiting.Push(rootNode);
+
                 while (visiting.Count > 0)
                 {
                     DependencyNode visitedNode = visiting.Pop();
@@ -4029,6 +4070,7 @@ namespace Sharpmake
                             if (!visitedConfiguration._dependenciesSetting.TryGetValue(key, out dependencySetting))
                                 dependencySetting = DependencySetting.Default;
 
+                            // We use steps of 1000 to allow for related libraries to be grouped alongside their dependencies
                             DependencyNode childNode = new DependencyNode(dependencyConf, dependencySetting);
 #if DEBUG
                             Debug.Assert(visitedNode._childNodes.All(c => c.Item1 != childNode));
@@ -4040,6 +4082,9 @@ namespace Sharpmake
                     }
                     visitedNode._childNodes.Sort(SortDependencyForLink);
                 }
+
+                // update dependency hierarchy
+                rootNode.UpdateAutoDependencies();
 
                 return rootNode;
             }
