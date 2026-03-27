@@ -41,6 +41,8 @@ namespace HelloXCode
             conf.ProjectFileName = "[project.Name]_[target.Platform]";
             if (target.DevEnv != DevEnv.xcode)
                 conf.ProjectFileName += "_[target.DevEnv]";
+            if (target.BuildSystem == BuildSystem.FastBuild)
+                conf.ProjectFileName += "_FastBuild";
             conf.ProjectPath = Path.Combine(Globals.TmpDirectory, @"projects\[project.Name]");
             conf.IsFastBuild = target.BuildSystem == BuildSystem.FastBuild;
 
@@ -118,9 +120,6 @@ namespace HelloXCode
         {
             conf.FastBuildBlobbed = false;
             conf.IsBlobbed = false;
-
-            if (conf.IsFastBuild)
-                conf.ProjectName += "_NoBlob";
         }
         #endregion
         ////////////////////////////////////////////////////////////////////////

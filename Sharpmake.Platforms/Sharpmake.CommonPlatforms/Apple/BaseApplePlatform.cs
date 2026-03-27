@@ -1456,7 +1456,7 @@ namespace Sharpmake
 
         public void SelectPlatformAdditionalDependenciesOptions(IGenerationContext context)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void SelectApplicationFormatOptions(IGenerationContext context)
@@ -1469,7 +1469,7 @@ namespace Sharpmake
 
         public virtual void SelectPreprocessorDefinitionsVcxproj(IVcxprojGenerationContext context)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public bool HasPrecomp(IGenerationContext context)
@@ -1479,92 +1479,92 @@ namespace Sharpmake
 
         public void GenerateSdkVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GenerateMakefileConfigurationVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GenerateProjectCompileVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GenerateProjectLinkVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GenerateProjectMasmVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GenerateProjectNasmVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GenerateUserConfigurationFile(Project.Configuration conf, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GenerateRunFromPcDeployment(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GeneratePlatformSpecificProjectDescription(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GenerateProjectPlatformSdkDirectoryDescription(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GeneratePostDefaultPropsImport(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GenerateProjectConfigurationGeneral(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GenerateProjectConfigurationGeneral2(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GenerateProjectConfigurationFastBuildMakeFile(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GenerateProjectConfigurationCustomMakeFile(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GenerateProjectPlatformImportSheet(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GeneratePlatformResourceFileList(IVcxprojGenerationContext context, IFileGenerator generator, Strings alreadyWrittenPriFiles, IList<Vcxproj.ProjectFile> resourceFiles, IList<Vcxproj.ProjectFile> imageResourceFiles)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GeneratePlatformReferences(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         // type -> files
