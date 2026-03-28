@@ -1730,6 +1730,14 @@ namespace Sharpmake
   </PropertyGroup>
 ";
 
+        private const string _projectConfigurationsCustomMakefile =
+            @"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
+    <NMakeBuildCommandLine>[conf.CustomBuildSettings.BuildCommand]</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>[conf.CustomBuildSettings.RebuildCommand]</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>[conf.CustomBuildSettings.CleanCommand]</NMakeCleanCommandLine>
+  </PropertyGroup>
+";
+
         public void GenerateProjectConfigurationGeneral2(IVcxprojGenerationContext context, IFileGenerator generator)
         {
             generator.Write(_projectConfigurationsGeneral2);
@@ -1742,7 +1750,7 @@ namespace Sharpmake
 
         public void GenerateProjectConfigurationCustomMakeFile(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            generator.Write(_projectConfigurationsCustomMakefile);
         }
 
         public void GenerateProjectPlatformImportSheet(IVcxprojGenerationContext context, IFileGenerator generator)

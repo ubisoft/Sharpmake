@@ -71,6 +71,21 @@ namespace HelloXCode
             }
             else
                 conf.Options.Add(Sharpmake.Options.XCode.Compiler.DebugInformationFormat.Dwarf);
+
+            if (target.DevEnv != DevEnv.xcode && target.BuildSystem != BuildSystem.FastBuild)
+            {
+                // Provide NMake build/rebuild/clean commands so MSBuild can invoke xcodebuild
+                // for this project when opened via the generated vcxproj.
+                string xcodeProjectName = $"{Name}_{target.Platform}";
+                string xcodeProjectPath = Path.Combine(Globals.TmpDirectory, "projects", Name, xcodeProjectName + ".xcodeproj");
+                string xcodeConfiguration = target.Optimization.ToString(); // "Debug" or "Release"
+                conf.CustomBuildSettings = new Configuration.NMakeBuildSettings
+                {
+                    BuildCommand   = $"xcodebuild build   -project \"{xcodeProjectPath}\" -configuration {xcodeConfiguration}",
+                    RebuildCommand = $"xcodebuild clean build -project \"{xcodeProjectPath}\" -configuration {xcodeConfiguration}",
+                    CleanCommand   = $"xcodebuild clean   -project \"{xcodeProjectPath}\" -configuration {xcodeConfiguration}",
+                };
+            }
         }
 
         ////////////////////////////////////////////////////////////////////////

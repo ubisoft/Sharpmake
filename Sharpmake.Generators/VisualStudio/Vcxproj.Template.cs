@@ -188,6 +188,18 @@ namespace Sharpmake.Generators.VisualStudio
 @"  </Target>
 ";
 
+                public static string NMakeBuildTargets =
+@"  <Target Name=""Build"" Condition=""'$(NMakeBuildCommandLine)' != ''"" >
+    <Exec Command=""$(NMakeBuildCommandLine)"" WorkingDirectory=""$(NMakeWorkingDirectory)""/>
+  </Target>
+  <Target Name=""Rebuild"" Condition=""'$(NMakeReBuildCommandLine)' != ''"" >
+    <Exec Command=""$(NMakeReBuildCommandLine)"" WorkingDirectory=""$(NMakeWorkingDirectory)""/>
+  </Target>
+  <Target Name=""Clean"" Condition=""'$(NMakeCleanCommandLine)' != ''"" >
+    <Exec Command=""$(NMakeCleanCommandLine)"" WorkingDirectory=""$(NMakeWorkingDirectory)""/>
+  </Target>
+";
+
                 public static string ProjectConfigurationsResourceCompile =
                 @"    <ResourceCompile>[options.ResourceCompileTag]
       <PreprocessorDefinitions>[options.ResourcePreprocessorDefinitions];%(PreprocessorDefinitions)</PreprocessorDefinitions>

@@ -764,6 +764,9 @@ namespace Sharpmake.Generators.VisualStudio
                     platform.GenerateRunFromPcDeployment(context, fileGenerator);
             }
 
+            if (!isMSVC)
+                fileGenerator.Write(Template.Project.NMakeBuildTargets);
+
             fileGenerator.Write(Template.Project.ProjectEnd);
 
             // remove all line that contain RemoveLineTag
