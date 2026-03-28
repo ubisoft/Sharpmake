@@ -1730,11 +1730,30 @@ namespace Sharpmake
   </PropertyGroup>
 ";
 
+        private const string _projectConfigurationsFastBuildMakefile =
+            @"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
+    <NMakeBuildCommandLine>cd [fastBuildWorkingDirectory]
+[conf.FastBuildCustomActionsBeforeBuildCommand]
+[fastBuildMakeCommandBuild] </NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>cd [fastBuildWorkingDirectory]
+[conf.FastBuildCustomActionsBeforeBuildCommand]
+[fastBuildMakeCommandRebuild] </NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions>[EscapeXML:options.PreprocessorDefinitions][EscapeXML:options.IntellisenseAdditionalDefines]</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>[options.NMakeIncludeSearchPath]</NMakeIncludeSearchPath>
+    <NMakeForcedIncludes>[options.ForcedIncludeFiles]</NMakeForcedIncludes>
+    <AdditionalOptions>[options.IntellisenseCommandLineOptions]</AdditionalOptions>
+  </PropertyGroup>
+";
+
         private const string _projectConfigurationsCustomMakefile =
             @"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
     <NMakeBuildCommandLine>[conf.CustomBuildSettings.BuildCommand]</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>[conf.CustomBuildSettings.RebuildCommand]</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>[conf.CustomBuildSettings.CleanCommand]</NMakeCleanCommandLine>
+    <NMakePreprocessorDefinitions>[EscapeXML:options.PreprocessorDefinitions][EscapeXML:options.IntellisenseAdditionalDefines]</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>[options.NMakeIncludeSearchPath]</NMakeIncludeSearchPath>
+    <NMakeForcedIncludes>[options.ForcedIncludeFiles]</NMakeForcedIncludes>
+    <AdditionalOptions>[options.IntellisenseCommandLineOptions]</AdditionalOptions>
   </PropertyGroup>
 ";
 
@@ -1745,7 +1764,7 @@ namespace Sharpmake
 
         public void GenerateProjectConfigurationFastBuildMakeFile(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            generator.Write(_projectConfigurationsFastBuildMakefile);
         }
 
         public void GenerateProjectConfigurationCustomMakeFile(IVcxprojGenerationContext context, IFileGenerator generator)
