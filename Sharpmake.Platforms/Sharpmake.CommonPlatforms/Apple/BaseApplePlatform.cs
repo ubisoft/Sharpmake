@@ -575,6 +575,74 @@ namespace Sharpmake
         private static readonly Dictionary<string, IReadOnlyList<string>> s_clangSystemIncludeCache = new Dictionary<string, IReadOnlyList<string>>();
         private static readonly object s_clangSystemIncludeCacheLock = new object();
 
+        private static readonly Dictionary<string, IReadOnlyList<string>> s_clangBuiltinDefinesCache = new Dictionary<string, IReadOnlyList<string>>();
+        private static readonly object s_clangBuiltinDefinesCacheLock = new object();
+
+        // Returns "NAME=VALUE" strings for all non-function-like built-in macros reported by
+        //   clang++ -dM -E -x c++ /dev/null [-std=<stdFlag>] -isysroot <sdk-path>
+        private static IReadOnlyList<string> GetClangBuiltinDefinesForSdk(string sdkName, string stdFlag = null)
+        {
+            string cacheKey = string.IsNullOrEmpty(stdFlag) ? sdkName : $"{sdkName}|{stdFlag}";
+            lock (s_clangBuiltinDefinesCacheLock)
+            {
+                if (s_clangBuiltinDefinesCache.TryGetValue(cacheKey, out var cached))
+                    return cached;
+
+                var result = new List<string>();
+                try
+                {
+                    string sdkPath = RunProcessAndGetOutput("xcrun", $"--sdk {sdkName} --show-sdk-path").Trim();
+                    if (!string.IsNullOrEmpty(sdkPath))
+                    {
+                        string stdArg = string.IsNullOrEmpty(stdFlag) ? string.Empty : $"{stdFlag} ";
+                        string clangOutput = RunProcessAndGetOutput(
+                            "clang++",
+                            $"-dM -E -x c++ /dev/null {stdArg}-isysroot \"{sdkPath}\""
+                        );
+
+                        foreach (string line in clangOutput.Split('\n'))
+                        {
+                            string trimmed = line.Trim();
+                            if (!trimmed.StartsWith("#define ", StringComparison.Ordinal))
+                                continue;
+
+                            string rest = trimmed.Substring(8).Trim();
+                            int space = rest.IndexOf(' ');
+                            string name, value;
+                            if (space < 0)
+                            {
+                                name = rest;
+                                value = "1";
+                            }
+                            else
+                            {
+                                name = rest.Substring(0, space);
+                                value = rest.Substring(space + 1).Trim();
+                                if (value.Length == 0)
+                                    value = "1";
+                            }
+
+                            // Skip function-like macros: NAME(
+                            if (name.IndexOf('(') >= 0)
+                                continue;
+
+                            // Normalize whitespace in value
+                            value = System.Text.RegularExpressions.Regex.Replace(value, @"\s+", " ");
+                            result.Add($"{name}={value}");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceWarning($"[Sharpmake] Could not discover built-in defines for SDK '{sdkName}': {ex.Message}");
+                }
+
+                IReadOnlyList<string> readOnly = result.AsReadOnly();
+                s_clangBuiltinDefinesCache[cacheKey] = readOnly;
+                return readOnly;
+            }
+        }
+
         private static IReadOnlyList<string> GetClangSystemIncludePathsForSdk(string sdkName)
         {
             lock (s_clangSystemIncludeCacheLock)
@@ -1565,7 +1633,27 @@ namespace Sharpmake
 
         public virtual void SelectPreprocessorDefinitionsVcxproj(IVcxprojGenerationContext context)
         {
-            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            var defines = new Strings();
+            defines.AddRange(context.Options.ExplicitDefines);
+            defines.AddRange(context.Configuration.Defines);
+
+            // Extract -DFOO defines from AdditionalCompilerOptions
+            foreach (string compilerOption in context.Configuration.AdditionalCompilerOptions)
+            {
+                if (compilerOption.StartsWith("-D", StringComparison.Ordinal))
+                    defines.Add(compilerOption.Substring(2));
+            }
+
+            // Determine the C++ language standard flag (e.g. "-std=c++17") to pass to clang++
+            // so that built-in defines like __cplusplus reflect the correct value.
+            context.CommandLineOptions.TryGetValue("CppLanguageStd", out string cppStdFlag);
+            if (string.IsNullOrEmpty(cppStdFlag) || cppStdFlag == FileGeneratorUtilities.RemoveLineTag)
+                cppStdFlag = null;
+
+            // Add built-in compiler defines (clang++ -dM -E [-std=<cppStd>] -x c++ /dev/null) for IntelliSense
+            defines.AddRange(GetClangBuiltinDefinesForSdk(XcrunSdkName, cppStdFlag));
+
+            context.Options["PreprocessorDefinitions"] = defines.JoinStrings(";");
         }
 
         public bool HasPrecomp(IGenerationContext context)
@@ -1635,7 +1723,10 @@ namespace Sharpmake
 
         private const string _projectConfigurationsGeneral2 =
             @"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
+    <NMakePreprocessorDefinitions>[EscapeXML:options.PreprocessorDefinitions][EscapeXML:options.IntellisenseAdditionalDefines]</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>[options.NMakeIncludeSearchPath]</NMakeIncludeSearchPath>
+    <NMakeForcedIncludes>[options.ForcedIncludeFiles]</NMakeForcedIncludes>
+    <AdditionalOptions>[options.IntellisenseCommandLineOptions]</AdditionalOptions>
   </PropertyGroup>
 ";
 
