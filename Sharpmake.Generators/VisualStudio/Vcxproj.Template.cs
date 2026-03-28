@@ -88,9 +88,12 @@ namespace Sharpmake.Generators.VisualStudio
                 public static string ProjectEnd =
                 @"</Project>";
 
-                public static string ProjectAfterConfigurationsGeneral =
+                public static string MicrosoftCppProps =
 @"  <Import Project=""[vcTargetsPath]\Microsoft.Cpp.props"" />
-  <ImportGroup Label=""ExtensionSettings"">
+";
+
+                public static string ProjectAfterConfigurationsGeneral =
+@"  <ImportGroup Label=""ExtensionSettings"">
 ";
                 public static string ProjectAfterConfigurationsGeneralImportPropertySheets =
 @"  <ImportGroup Label=""PropertySheets"">
@@ -138,9 +141,12 @@ namespace Sharpmake.Generators.VisualStudio
                 @"  </ItemDefinitionGroup>
 ";
 
-                public static string ProjectTargetsBegin =
+                public static string ImportMicrosoftCppTargets =
 @"  <Import Project=""[vcTargetsPath]\Microsoft.Cpp.targets"" />
-  <ImportGroup Label=""ExtensionTargets"">
+";
+
+                public static string ProjectTargetsBegin =
+@"  <ImportGroup Label=""ExtensionTargets"">
 ";
 
                 public static string ProjectTargetsItem =

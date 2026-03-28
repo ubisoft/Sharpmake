@@ -467,7 +467,9 @@ namespace Sharpmake.Generators.VisualStudio
             foreach (var platform in context.PresentPlatforms.Values)
                 platform.GenerateProjectPlatformSdkDirectoryDescription(context, fileGenerator);
 
-            fileGenerator.Write(Template.Project.ImportCppDefaultProps);
+            bool isMSVC = context.PresentPlatforms.Values.Any(p => p.IsMSVC);
+            if (isMSVC)
+                fileGenerator.Write(Template.Project.ImportCppDefaultProps);
 
             foreach (var platform in context.PresentPlatforms.Values)
                 platform.GeneratePostDefaultPropsImport(context, fileGenerator);
@@ -495,6 +497,8 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             // .props files
+            if (isMSVC)
+                fileGenerator.Write(Template.Project.MicrosoftCppProps);
             fileGenerator.Write(Template.Project.ProjectAfterConfigurationsGeneral);
             if (context.Project.ContainsASM)
             {
@@ -671,10 +675,13 @@ namespace Sharpmake.Generators.VisualStudio
 
             // .targets files
             {
+                if (isMSVC)
+                    fileGenerator.Write(Template.Project.ImportMicrosoftCppTargets);
                 fileGenerator.Write(Template.Project.ProjectTargetsBegin);
                 if (context.Project.ContainsASM)
                 {
-                    fileGenerator.Write(Template.Project.ProjectMasmTargetsItem);
+                    if (isMSVC)
+                        fileGenerator.Write(Template.Project.ProjectMasmTargetsItem);
                 }
                 if (context.Project.ContainsNASM)
                 {
@@ -682,9 +689,12 @@ namespace Sharpmake.Generators.VisualStudio
                     {
                         throw new ArgumentNullException("NasmExePath not set and needed for NASM assembly files.");
                     }
-                    using (fileGenerator.Declare("importedNasmTargetsFile", context.Project.NasmTargetsFile))
+                    if (isMSVC)
                     {
-                        fileGenerator.Write(Template.Project.ProjectNasmTargetsItem);
+                        using (fileGenerator.Declare("importedNasmTargetsFile", context.Project.NasmTargetsFile))
+                        {
+                            fileGenerator.Write(Template.Project.ProjectNasmTargetsItem);
+                        }
                     }
                 }
 
@@ -780,7 +790,8 @@ namespace Sharpmake.Generators.VisualStudio
             context.Options["AdditionalPlatformIncludeDirectories"] = platformIncludePaths.Any() ? Util.PathGetRelative(context.ProjectDirectory, platformIncludePaths).JoinStrings(";") : FileGeneratorUtilities.RemoveLineTag;
 
             var nmakeIncludeSearchPath = includePaths.Concat(platformIncludePaths);
-            context.Options["NMakeIncludeSearchPath"] = nmakeIncludeSearchPath.Any() ? Util.PathGetRelative(context.ProjectDirectory, nmakeIncludeSearchPath).JoinStrings(";") : FileGeneratorUtilities.RemoveLineTag;
+            
+            context.Options["NMakeIncludeSearchPath"] = nmakeIncludeSearchPath.Any() ? string.Join(";", nmakeIncludeSearchPath) : FileGeneratorUtilities.RemoveLineTag;
 
             // Fill resource include dirs
             var resourceIncludePaths = platformVcxproj.GetResourceIncludePaths(context);

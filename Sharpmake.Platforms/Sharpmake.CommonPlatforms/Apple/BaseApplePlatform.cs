@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Sharpmake.Generators;
@@ -566,6 +567,100 @@ namespace Sharpmake
         public bool ExcludesPrecompiledHeadersFromBuild => false;
         public bool HasUserAccountControlSupport => false;
         public bool HasEditAndContinueDebuggingSupport => false;
+        public bool IsMSVC => false;
+
+        // The xcrun SDK name for this platform, e.g. "iphoneos", "macosx", "appletvos", "watchos"
+        protected abstract string XcrunSdkName { get; }
+
+        private static readonly Dictionary<string, IReadOnlyList<string>> s_clangSystemIncludeCache = new Dictionary<string, IReadOnlyList<string>>();
+        private static readonly object s_clangSystemIncludeCacheLock = new object();
+
+        private static IReadOnlyList<string> GetClangSystemIncludePathsForSdk(string sdkName)
+        {
+            lock (s_clangSystemIncludeCacheLock)
+            {
+                if (s_clangSystemIncludeCache.TryGetValue(sdkName, out var cached))
+                    return cached;
+
+                var result = new List<string>();
+                try
+                {
+                    // Get the SDK path via xcrun
+                    string sdkPath = RunProcessAndGetOutput("xcrun", $"--sdk {sdkName} --show-sdk-path").Trim();
+                    if (!string.IsNullOrEmpty(sdkPath))
+                    {
+                        // Run clang to get the system include paths
+                        string clangOutput = RunProcessAndGetOutput(
+                            "clang++",
+                            $"-v -E -x c++ /dev/null -isysroot \"{sdkPath}\"",
+                            redirectStdErr: true
+                        );
+
+                        bool inSearchList = false;
+                        foreach (string line in clangOutput.Split('\n'))
+                        {
+                            if (line.TrimEnd() == "#include <...> search starts here:")
+                            {
+                                inSearchList = true;
+                                continue;
+                            }
+                            if (line.TrimEnd() == "End of search list.")
+                            {
+                                inSearchList = false;
+                                continue;
+                            }
+                            if (inSearchList)
+                            {
+                                // Lines look like " /path/to/dir" or " /path/to/dir (framework directory)"
+                                string path = line.Trim();
+                                int parenIdx = path.IndexOf(" (", StringComparison.Ordinal);
+                                if (parenIdx >= 0)
+                                    path = path.Substring(0, parenIdx).TrimEnd();
+                                if (!string.IsNullOrEmpty(path))
+                                    result.Add(path);
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // If xcrun or clang++ is not available (e.g., not on macOS), return empty list
+                    Trace.TraceWarning($"[Sharpmake] Could not discover system include paths for SDK '{sdkName}': {ex.Message}");
+                }
+
+                IReadOnlyList<string> readOnly = result.AsReadOnly();
+                s_clangSystemIncludeCache[sdkName] = readOnly;
+                return readOnly;
+            }
+        }
+
+        private static string RunProcessAndGetOutput(string executable, string arguments, bool redirectStdErr = false)
+        {
+            var psi = new ProcessStartInfo
+            {
+                FileName = executable,
+                Arguments = arguments,
+                RedirectStandardOutput = true,
+                RedirectStandardError = redirectStdErr,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using (var process = Process.Start(psi))
+            {
+                if (process == null)
+                {
+                    Trace.TraceWarning($"[Sharpmake] Failed to start process: {executable} {arguments}");
+                    return string.Empty;
+                }
+
+                string output = process.StandardOutput.ReadToEnd();
+                string errOutput = redirectStdErr ? process.StandardError.ReadToEnd() : string.Empty;
+                process.WaitForExit();
+
+                return redirectStdErr ? output + errOutput : output;
+            }
+        }
 
         public IEnumerable<string> GetImplicitlyDefinedSymbols(IGenerationContext context)
         {
@@ -601,7 +696,8 @@ namespace Sharpmake
         }
         public IEnumerable<string> GetPlatformIncludePaths(IGenerationContext context)
         {
-            return GetPlatformIncludePathsWithPrefixImpl(context).Select(x => x.Path);
+            return GetPlatformIncludePathsWithPrefixImpl(context).Select(x => x.Path)
+                .Concat(GetClangSystemIncludePathsForSdk(XcrunSdkName));
         }
         public IEnumerable<IncludeWithPrefix> GetPlatformIncludePathsWithPrefix(IGenerationContext context)
         {
@@ -1537,9 +1633,15 @@ namespace Sharpmake
             // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
+        private const string _projectConfigurationsGeneral2 =
+            @"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
+    <NMakeIncludeSearchPath>[options.NMakeIncludeSearchPath]</NMakeIncludeSearchPath>
+  </PropertyGroup>
+";
+
         public void GenerateProjectConfigurationGeneral2(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            generator.Write(_projectConfigurationsGeneral2);
         }
 
         public void GenerateProjectConfigurationFastBuildMakeFile(IVcxprojGenerationContext context, IFileGenerator generator)
