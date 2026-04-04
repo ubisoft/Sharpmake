@@ -1605,6 +1605,9 @@ namespace Sharpmake.Generators.VisualStudio
             foreach (Project.Configuration conf in context.ProjectConfigurations)
                 configurationCompiledFiles.Add(new List<ProjectFile>());
 
+            // Collects files excluded from build on non-MSVC platforms; written as <ClCompile Remove> after the ItemGroup
+            var nonMSVCExcludedFiles = new List<(ProjectFile File, Project.Configuration Conf)>();
+
             bool hasCustomBuildForAllSources = context.ProjectConfigurations.First().CustomBuildForAllSources != null;
             if (hasCustomBuildForAllSources)
             {
@@ -1689,6 +1692,9 @@ namespace Sharpmake.Generators.VisualStudio
                             if (!isExcludeFromBuild && !isResource)
                                 compiledFiles.Add(file);
 
+                            if (isExcludeFromBuild && !platformVcxproj.IsMSVC && !isResource)
+                                nonMSVCExcludedFiles.Add((file, conf));
+
                             if (isCompileAsCLRFile || consumeWinRTExtensions || excludeWinRTExtensions)
                                 isDontUsePrecomp = true;
                             if (string.Compare(file.FileExtension, ".c", StringComparison.OrdinalIgnoreCase) == 0)
@@ -1711,7 +1717,7 @@ namespace Sharpmake.Generators.VisualStudio
                             bool hasExceptionSetting = !string.IsNullOrEmpty(exceptionSetting);
 
                             haveFileOptions = haveFileOptions ||
-                                              isExcludeFromBuild ||
+                                              (isExcludeFromBuild && platformVcxproj.IsMSVC) ||
                                               isPrecompSource ||
                                               (isDontUsePrecomp && hasPrecomp) ||
                                               hasForcedIncludes ||
@@ -1750,7 +1756,8 @@ namespace Sharpmake.Generators.VisualStudio
 
                                     if (isExcludeFromBuild)
                                     {
-                                        fileGenerator.Write(Template.Project.ProjectFilesSourceExcludeFromBuild);
+                                        if (platformVcxproj.IsMSVC) 
+                                            fileGenerator.Write(Template.Project.ProjectFilesSourceExcludeFromBuild);
                                     }
                                     else
                                     {
@@ -2009,6 +2016,20 @@ namespace Sharpmake.Generators.VisualStudio
                                 + Environment.NewLine + "{2}" + Environment.NewLine + "{3}.{4}",
                                 conf, l.FileNameWithoutExtension, l.FileNameProjectRelative, r.FileNameProjectRelative, plausibleCause);
                         throw new Error(message);
+                    }
+                }
+            }
+            
+            // Write <ClCompile Remove> entries for files excluded from build on non-MSVC platforms
+            if (nonMSVCExcludedFiles.Count > 0)
+            {
+                foreach (var (excludedFile, excludedConf) in nonMSVCExcludedFiles)
+                {
+                    using (fileGenerator.Declare("file", excludedFile))
+                    using (fileGenerator.Declare("conf", excludedConf))
+                    using (fileGenerator.Declare("platformName", Util.GetToolchainPlatformString(excludedConf.Platform, excludedConf.Project, excludedConf.Target)))
+                    {
+                        fileGenerator.Write(Template.Project.ProjectFilesSourceRemoveFromBuild);
                     }
                 }
             }

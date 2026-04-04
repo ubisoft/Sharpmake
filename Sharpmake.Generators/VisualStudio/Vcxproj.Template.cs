@@ -386,6 +386,9 @@ namespace Sharpmake.Generators.VisualStudio
                 public static string ProjectFilesSourceExcludeFromBuild =
                 @"      <ExcludedFromBuild Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">true</ExcludedFromBuild>
 ";
+                public static string ProjectFilesSourceRemoveFromBuild =
+                @"    <ClCompile Remove=""[file.FilePath]"" Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"" />
+";
                 public static string ProjectFilesSourceConsumeWinRTExtensions =
                 @"      <CompileAsWinRT Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">true</CompileAsWinRT>
 ";
