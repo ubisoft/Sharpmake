@@ -22,8 +22,7 @@ jobs:
       os: ${{ matrix.os }}
       framework: ${{ matrix.framework }}
       configuration: ${{ matrix.configuration }}
-      run_unit_tests: false
-      run_regression_tests: false
+      run_tests: false
 
   release:
     needs: [builds]

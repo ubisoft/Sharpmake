@@ -18,6 +18,8 @@ sharpmakeautocleanupdb*.bin
 *.user
 *.userosscache
 *.sln.docstates
+*.metaproj
+*.metaproj.tmp
 *.nuget.targets
 *.nuget.props
 
@@ -61,3 +63,6 @@ Sharpmake.Application.args.json
 
 # Claude and other AI localconfig files below
 .claude/settings.local.json
+
+# Verify snapshot files
+*.received.*

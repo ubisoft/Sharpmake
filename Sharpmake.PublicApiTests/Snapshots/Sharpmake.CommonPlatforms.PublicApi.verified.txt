@@ -1,0 +1,923 @@
+﻿[assembly: Sharpmake.SharpmakeExtension]
+[assembly: System.Runtime.Versioning.TargetFramework(".NETCoreApp,Version=v8.0", FrameworkDisplayName=".NET 8.0")]
+namespace Sharpmake
+{
+    public static class Android
+    {
+        public const Sharpmake.Platform SharpmakePlatform = 256;
+        [Sharpmake.PlatformImplementation(Sharpmake.Platform.agde, new System.Type[] {
+                typeof(Sharpmake.IPlatformDescriptor),
+                typeof(Sharpmake.IFastBuildCompilerSettings),
+                typeof(Sharpmake.Generators.FastBuild.IPlatformBff),
+                typeof(Sharpmake.Generators.FastBuild.IClangPlatformBff),
+                typeof(Sharpmake.Generators.VisualStudio.IPlatformVcxproj),
+                typeof(Sharpmake.Project.Configuration.IConfigurationTasks)})]
+        public sealed class AndroidAgdePlatform : Sharpmake.BasePlatform, Sharpmake.Generators.FastBuild.IClangPlatformBff, Sharpmake.Generators.FastBuild.IPlatformBff, Sharpmake.IFastBuildCompilerSettings, Sharpmake.Project.Configuration.IConfigurationTasks
+        {
+            public const string _compilerExtraOptionsTemplate = ("\\r\\n    .CompilerExtraOptions   = \'\'\\r\\n            // System options\\r\\n        " +
+                "    // -------------------------\\r\\n            + \' [cmdLineOptions.ClangDiagnos" +
+                "ticsFormat]\'\\r\\n            + \' [cmdLineOptions.ClangCompilerTarget]\'\\r\\n       " +
+                "     + \' [cmdLineOptions.LimitDebugInfo]\'\\r\\n            + \' [cmdLineOptions.Cla" +
+                "ngDebugInformationFormat]\'\\r\\n            + \' [cmdLineOptions.FloatABI]\'\\r\\n    " +
+                "        + \' [cmdLineOptions.AddressSignificanceTable]\'\\r\\n            // General" +
+                " options\\r\\n            // -------------------------\\r\\n            + \' [cmdLine" +
+                "Options.AdditionalIncludeDirectories]\'\\r\\n            + \' [cmdLineOptions.Additi" +
+                "onalUsingDirectories]\'\\r\\n            + \' [cmdLineOptions.PreprocessorDefinition" +
+                "s]\'\\r\\n            + \' [cmdLineOptions.UndefinePreprocessorDefinitions]\'\\r\\n    " +
+                "        + \' [cmdLineOptions.UndefineAllPreprocessorDefinitions]\'\\r\\n            " +
+                "+ \' [cmdLineOptions.WarningLevel]\'\\r\\n            + \' [cmdLineOptions.TreatWarni" +
+                "ngAsError]\'\\r\\n            + \' [cmdLineOptions.StackProtectionLevel]\'\\r\\n       " +
+                "     + \' [cmdLineOptions.EnableDataLevelLinking]\'\\r\\n            + \' [cmdLineOpt" +
+                "ions.EnableFunctionLevelLinking]\'\\r\\n            + \' [cmdLineOptions.OmitFramePo" +
+                "inters]\'\\r\\n            + \' [cmdLineOptions.LinkTimeOptimization]\'\\r\\n          " +
+                "  + \' [cmdLineOptions.RuntimeTypeInfo]\'\\r\\n            + \' [cmdLineOptions.Excep" +
+                "tionHandling]\'\\r\\n            + \' [cmdLineOptions.UnwindTables]\'\\r\\n            " +
+                "+ \' [cmdLineOptions.CppLanguageStd]\'\\r\\n            + \' [cmdLineOptions.CLanguag" +
+                "eStd]\'\\r\\n            + \' [cmdLineOptions.ThumbMode]\'\\r\\n            + \' [cmdLin" +
+                "eOptions.PositionIndependentCode]\'\\r\\n            // Additional compiler options" +
+                "\\r\\n            //--------------------------\\r\\n            + \' [options.Additio" +
+                "nalCompilerOptions]\'\\r\\n");
+            public const string _compilerOptimizationOptionsTemplate = ("\\r\\n    // Optimizations options\\r\\n    // ---------------------\\r\\n    .Compiler" +
+                "Optimizations = \'\'\\r\\n            + \' [cmdLineOptions.Optimization]\'\\r\\n        " +
+                "    + \' [options.AdditionalCompilerOptimizeOptions]\'\\r\\n");
+            public const string _linkerOptionsTemplate = ("\\r\\n    .LinkerOptions          = \'-o \"%2\" \"%1\"\'\\r\\n                            /" +
+                "/ System options\\r\\n                            // -------------------------\\r\\n" +
+                "                            + \' [cmdLineOptions.ClangCompilerTarget]\'\\r\\n       " +
+                "                     + \' [cmdLineOptions.GenerateSharedObject]\'\\r\\n             " +
+                "               + \' [cmdLineOptions.UseOfStl]\'\\r\\n                            // " +
+                "\\r\\n                            // Library Search Path\\r\\n                      " +
+                "      // ---------------------------\\r\\n                            + \' [cmdLine" +
+                "Options.AdditionalLibraryDirectories]\'\\r\\n                            // Librari" +
+                "es\\r\\n                            // ---------------------------\\r\\n            " +
+                "                + \' [cmdLineOptions.AdditionalDependencies]\'\\r\\n                " +
+                "            // Options\\r\\n                            //--------\\r\\n            " +
+                "                + \' [cmdLineOptions.ClangLinkType]\'\\r\\n                         " +
+                "   + \' [cmdLineOptions.DebuggerSymbolInformation]\'\\r\\n                          " +
+                "  + \' [cmdLineOptions.GenerateMapFile]\'\\r\\n                            + \' [cmdL" +
+                "ineOptions.LinkIncremental]\'\\r\\n                            + \' [cmdLineOptions." +
+                "FunctionBinding]\'\\r\\n                            + \' [cmdLineOptions.NoExecStack" +
+                "Required]\'\\r\\n                            + \' [cmdLineOptions.Relocation]\'\\r\\n  " +
+                "                          + \' [cmdLineOptions.UnresolvedSymbolReferences]\'\\r\\n  " +
+                "                          + \' [cmdLineOptions.BuildId]\'\\r\\n                     " +
+                "       // Additional linker options\\r\\n                            //-----------" +
+                "---------------\\r\\n                            + \' [options.AdditionalLinkerOpti" +
+                "ons]\'\\r\\n");
+            public AndroidAgdePlatform() { }
+            public override string BffPlatformDefine { get; }
+            public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, string> BinPath { get; set; }
+            public System.Collections.Generic.IDictionary<Sharpmake.IFastBuildCompilerKey, Sharpmake.CompilerFamily> CompilerFamily { get; set; }
+            public override string ExecutableFileFullExtension { get; }
+            public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, Sharpmake.Strings> ExtraFiles { get; set; }
+            public override bool HasDotNetSupport { get; }
+            public override bool HasPrecompiledHeaderSupport { get; }
+            public override bool HasSharedLibrarySupport { get; }
+            public override bool IsMicrosoftPlatform { get; }
+            public override bool IsPcPlatform { get; }
+            public override bool IsUsingClang { get; }
+            public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, string> LibrarianExe { get; set; }
+            public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, string> LinkerExe { get; set; }
+            public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, string> LinkerPath { get; set; }
+            public override string ProgramDatabaseFileFullExtension { get; }
+            public override string SharedLibraryFileFullExtension { get; }
+            public override string SimplePlatformString { get; }
+            public override string StaticLibraryFileFullExtension { get; }
+            public override bool IsLinkerInvokedViaCompiler { get; set; }
+            public override void AddCompilerSettings(System.Collections.Generic.IDictionary<string, Sharpmake.Generators.CompilerSettings> masterCompilerSettings, Sharpmake.Project.Configuration conf) { }
+            public override string CConfigName(Sharpmake.Configuration conf) { }
+            public override string CppConfigName(Sharpmake.Configuration conf) { }
+            public override void GeneratePlatformSpecificProjectDescription(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+            public override void GenerateProjectCompileVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+            public override void GenerateProjectConfigurationFastBuildMakeFile(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+            public override void GenerateProjectConfigurationGeneral(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+            public override void GenerateProjectConfigurationGeneral2(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+            public string GetDefaultOutputFullExtension(Sharpmake.Project.Configuration.OutputType outputType) { }
+            protected override System.Collections.Generic.IEnumerable<string> GetIncludePathsImpl(Sharpmake.Generators.IGenerationContext context) { }
+            public override System.Collections.Generic.IEnumerable<string> GetLibraryPaths(Sharpmake.Generators.IGenerationContext context) { }
+            public string GetOutputFileNamePrefix(Sharpmake.Project.Configuration.OutputType outputType) { }
+            public override Sharpmake.EnvironmentVariableResolver GetPlatformEnvironmentResolver(params Sharpmake.VariableAssignment[] parameters) { }
+            protected override System.Collections.Generic.IEnumerable<Sharpmake.Generators.VisualStudio.IncludeWithPrefix> GetPlatformIncludePathsWithPrefixImpl(Sharpmake.Generators.IGenerationContext context) { }
+            public System.Collections.Generic.IEnumerable<string> GetPlatformLibraryPaths(Sharpmake.Project.Configuration configuration) { }
+            protected override string GetProjectLinkSharedVcxprojTemplate() { }
+            protected override string GetProjectStaticLinkVcxprojTemplate() { }
+            public override string GetToolchainPlatformString(Sharpmake.ITarget target) { }
+            public override bool HasPrecomp(Sharpmake.Generators.IGenerationContext context) { }
+            public override void SelectCompilerOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public override void SelectLinkerOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public override void SelectPlatformAdditionalDependenciesOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public override void SelectPrecompiledHeaderOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public override void SelectPreprocessorDefinitionsVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context) { }
+            public void SetupClangOptions(Sharpmake.IFileGenerator generator) { }
+            public void SetupDynamicLibraryPaths(Sharpmake.Project.Configuration configuration, Sharpmake.DependencySetting dependencySetting, Sharpmake.Project.Configuration dependency) { }
+            public override void SetupExtraLinkerSettings(Sharpmake.IFileGenerator fileGenerator, Sharpmake.Project.Configuration outputType, string fastBuildOutputFile) { }
+            public override void SetupPlatformLibraryOptions(out string platformLibExtension, out string platformOutputLibExtension, out string platformPrefixExtension, out string platformLibPrefix) { }
+            public override void SetupSdkOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public void SetupStaticLibraryPaths(Sharpmake.Project.Configuration configuration, Sharpmake.DependencySetting dependencySetting, Sharpmake.Project.Configuration dependency) { }
+        }
+        [Sharpmake.Fragment]
+        [System.Flags]
+        public enum AndroidBuildTargets
+        {
+            armeabi_v7a = 1,
+            arm64_v8a = 2,
+            x86 = 4,
+            x86_64 = 8,
+        }
+        [Sharpmake.Fragment]
+        [System.Flags]
+        public enum AndroidBuildType
+        {
+            Ant = 1,
+            Gradle = 2,
+        }
+        [Sharpmake.PlatformImplementation(Sharpmake.Platform.android, new System.Type[] {
+                typeof(Sharpmake.IPlatformDescriptor),
+                typeof(Sharpmake.Generators.VisualStudio.IPlatformVcxproj),
+                typeof(Sharpmake.Project.Configuration.IConfigurationTasks)})]
+        public sealed class AndroidPlatform : Sharpmake.BasePlatform, Sharpmake.Project.Configuration.IConfigurationTasks
+        {
+            public AndroidPlatform() { }
+            public override string ExecutableFileFullExtension { get; }
+            public override bool HasDotNetSupport { get; }
+            public override bool HasPrecompiledHeaderSupport { get; }
+            public override bool HasSharedLibrarySupport { get; }
+            public override bool IsMicrosoftPlatform { get; }
+            public override bool IsPcPlatform { get; }
+            public override bool IsUsingClang { get; }
+            public override string ProgramDatabaseFileFullExtension { get; }
+            public override string SharedLibraryFileFullExtension { get; }
+            public override string SimplePlatformString { get; }
+            public override string StaticLibraryFileFullExtension { get; }
+            public override bool IsLinkerInvokedViaCompiler { get; set; }
+            public override void GeneratePlatformSpecificProjectDescription(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+            public override void GeneratePostDefaultPropsImport(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+            public override void GenerateProjectCompileVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+            public override void GenerateProjectConfigurationGeneral(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+            public override void GenerateProjectConfigurationGeneral2(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+            public override void GenerateProjectPlatformSdkDirectoryDescription(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+            public string GetDefaultOutputFullExtension(Sharpmake.Project.Configuration.OutputType outputType) { }
+            protected override System.Collections.Generic.IEnumerable<string> GetIncludePathsImpl(Sharpmake.Generators.IGenerationContext context) { }
+            public override System.Collections.Generic.IEnumerable<string> GetLibraryPaths(Sharpmake.Generators.IGenerationContext context) { }
+            public string GetOutputFileNamePrefix(Sharpmake.Project.Configuration.OutputType outputType) { }
+            public System.Collections.Generic.IEnumerable<string> GetPlatformLibraryPaths(Sharpmake.Project.Configuration configuration) { }
+            protected override string GetProjectLinkSharedVcxprojTemplate() { }
+            protected override string GetProjectStaticLinkVcxprojTemplate() { }
+            public override string GetToolchainPlatformString(Sharpmake.ITarget target) { }
+            public override bool HasPrecomp(Sharpmake.Generators.IGenerationContext context) { }
+            public override void SelectCompilerOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public override void SelectLinkerOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public override void SelectPlatformAdditionalDependenciesOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public override void SelectPrecompiledHeaderOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public override void SelectPreprocessorDefinitionsVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context) { }
+            public void SetupDynamicLibraryPaths(Sharpmake.Project.Configuration configuration, Sharpmake.DependencySetting dependencySetting, Sharpmake.Project.Configuration dependency) { }
+            public override void SetupPlatformLibraryOptions(out string platformLibExtension, out string platformOutputLibExtension, out string platformPrefixExtension, out string platformLibPrefix) { }
+            public override void SetupSdkOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public void SetupStaticLibraryPaths(Sharpmake.Project.Configuration configuration, Sharpmake.DependencySetting dependencySetting, Sharpmake.Project.Configuration dependency) { }
+        }
+        public static class GlobalSettings
+        {
+            public static string AndroidHome { get; set; }
+            public static string AntHome { get; set; }
+            public static string JavaHome { get; set; }
+            public static string NdkRoot { get; set; }
+        }
+        public static class Util
+        {
+            public static string FindLatestApiLevelInDirectory(string directory) { }
+            public static string FindLatestApiLevelStringBySdk(string lookupDirectory) { }
+            public static string GetAndroidApiLevelString(Sharpmake.Options.Android.General.AndroidAPILevel androidApiLevel) { }
+            public static Sharpmake.Android.AndroidBuildTargets GetAndroidBuildTarget(Sharpmake.Project.Configuration conf, Sharpmake.Android.AndroidBuildTargets defaultValue = 2) { }
+            public static string GetHostTag() { }
+            public static string GetNdkVersion(string ndkPath) { }
+            public static string GetPrebuildToolchainString() { }
+            public static string GetTargetTriple(Sharpmake.Android.AndroidBuildTargets buildTarget, bool forCompiler = false, string vendor = "") { }
+            public static string GetTargetTripleWithVersionSuffix(Sharpmake.Android.AndroidBuildTargets buildTarget, Sharpmake.Options.Android.General.AndroidAPILevel androidApiLevel) { }
+            public static string GetTargetTripleWithVersionSuffix(Sharpmake.Android.AndroidBuildTargets buildTarget, string androidMinApi) { }
+            public static bool TryParseAndroidApiValue(string apiString, out int apiValue) { }
+        }
+    }
+    public static class Apple
+    {
+        [Sharpmake.PlatformImplementation(Sharpmake.Platform.maccatalyst, new System.Type[] {
+                typeof(Sharpmake.IPlatformDescriptor),
+                typeof(Sharpmake.IFastBuildCompilerSettings),
+                typeof(Sharpmake.Generators.FastBuild.IPlatformBff),
+                typeof(Sharpmake.Generators.FastBuild.IClangPlatformBff),
+                typeof(Sharpmake.Generators.FastBuild.IApplePlatformBff),
+                typeof(Sharpmake.Generators.VisualStudio.IPlatformVcxproj),
+                typeof(Sharpmake.Project.Configuration.IConfigurationTasks)})]
+        public sealed class MacCatalystPlatform : Sharpmake.BaseApplePlatform
+        {
+            public MacCatalystPlatform() { }
+            public override string BffPlatformDefine { get; }
+            public override Sharpmake.Platform SharpmakePlatform { get; }
+            public override string SimplePlatformString { get; }
+            public override string CConfigName(Sharpmake.Configuration conf) { }
+            public override string CppConfigName(Sharpmake.Configuration conf) { }
+            public override void SelectCompilerOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public override void SelectLinkerOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public override string SwiftConfigName(Sharpmake.Configuration conf) { }
+        }
+        [Sharpmake.PlatformImplementation(Sharpmake.Platform.mac, new System.Type[] {
+                typeof(Sharpmake.IPlatformDescriptor),
+                typeof(Sharpmake.IFastBuildCompilerSettings),
+                typeof(Sharpmake.Generators.FastBuild.IPlatformBff),
+                typeof(Sharpmake.Generators.FastBuild.IClangPlatformBff),
+                typeof(Sharpmake.Generators.FastBuild.IApplePlatformBff),
+                typeof(Sharpmake.Generators.VisualStudio.IPlatformVcxproj),
+                typeof(Sharpmake.Project.Configuration.IConfigurationTasks)})]
+        public sealed class MacOsPlatform : Sharpmake.BaseApplePlatform
+        {
+            public MacOsPlatform() { }
+            public override string BffPlatformDefine { get; }
+            public override Sharpmake.Platform SharpmakePlatform { get; }
+            public override string SimplePlatformString { get; }
+            public override string CConfigName(Sharpmake.Configuration conf) { }
+            public override string CppConfigName(Sharpmake.Configuration conf) { }
+            public override void SelectCompilerOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public override void SelectLinkerOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public override string SwiftConfigName(Sharpmake.Configuration conf) { }
+        }
+        [Sharpmake.PlatformImplementation(Sharpmake.Platform.ios, new System.Type[] {
+                typeof(Sharpmake.IPlatformDescriptor),
+                typeof(Sharpmake.IFastBuildCompilerSettings),
+                typeof(Sharpmake.Generators.FastBuild.IPlatformBff),
+                typeof(Sharpmake.Generators.FastBuild.IClangPlatformBff),
+                typeof(Sharpmake.Generators.FastBuild.IApplePlatformBff),
+                typeof(Sharpmake.Generators.VisualStudio.IPlatformVcxproj),
+                typeof(Sharpmake.Project.Configuration.IConfigurationTasks)})]
+        public sealed class iOsPlatform : Sharpmake.BaseApplePlatform
+        {
+            public iOsPlatform() { }
+            public override string BffPlatformDefine { get; }
+            public override Sharpmake.Platform SharpmakePlatform { get; }
+            public override string SimplePlatformString { get; }
+            public override string CConfigName(Sharpmake.Configuration conf) { }
+            public override string CppConfigName(Sharpmake.Configuration conf) { }
+            public override void SelectCompilerOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public override void SelectLinkerOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public override string SwiftConfigName(Sharpmake.Configuration conf) { }
+        }
+        [Sharpmake.PlatformImplementation(Sharpmake.Platform.tvos, new System.Type[] {
+                typeof(Sharpmake.IPlatformDescriptor),
+                typeof(Sharpmake.IFastBuildCompilerSettings),
+                typeof(Sharpmake.Generators.FastBuild.IPlatformBff),
+                typeof(Sharpmake.Generators.FastBuild.IClangPlatformBff),
+                typeof(Sharpmake.Generators.FastBuild.IApplePlatformBff),
+                typeof(Sharpmake.Generators.VisualStudio.IPlatformVcxproj),
+                typeof(Sharpmake.Project.Configuration.IConfigurationTasks)})]
+        public sealed class tvOsPlatform : Sharpmake.BaseApplePlatform
+        {
+            public tvOsPlatform() { }
+            public override string BffPlatformDefine { get; }
+            public override Sharpmake.Platform SharpmakePlatform { get; }
+            public override string SimplePlatformString { get; }
+            public override string CConfigName(Sharpmake.Configuration conf) { }
+            public override string CppConfigName(Sharpmake.Configuration conf) { }
+            public override void SelectCompilerOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public override void SelectLinkerOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public override string SwiftConfigName(Sharpmake.Configuration conf) { }
+        }
+        [Sharpmake.PlatformImplementation(Sharpmake.Platform.watchos, new System.Type[] {
+                typeof(Sharpmake.IPlatformDescriptor),
+                typeof(Sharpmake.IFastBuildCompilerSettings),
+                typeof(Sharpmake.Generators.FastBuild.IPlatformBff),
+                typeof(Sharpmake.Generators.FastBuild.IClangPlatformBff),
+                typeof(Sharpmake.Generators.FastBuild.IApplePlatformBff),
+                typeof(Sharpmake.Generators.VisualStudio.IPlatformVcxproj),
+                typeof(Sharpmake.Project.Configuration.IConfigurationTasks)})]
+        public sealed class watchOsPlatform : Sharpmake.BaseApplePlatform
+        {
+            public watchOsPlatform() { }
+            public override string BffPlatformDefine { get; }
+            public override Sharpmake.Platform SharpmakePlatform { get; }
+            public override string SimplePlatformString { get; }
+            public override string CConfigName(Sharpmake.Configuration conf) { }
+            public override string CppConfigName(Sharpmake.Configuration conf) { }
+            public override void SelectCompilerOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public override void SelectLinkerOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public override string SwiftConfigName(Sharpmake.Configuration conf) { }
+        }
+    }
+    public static class ApplePlatform
+    {
+        public static class Settings
+        {
+            public static readonly string DefaultIPhoneOSSDKPath;
+            public static readonly string DefaultMacCatalystSDKPath;
+            public static readonly string DefaultMacOSSDKPath;
+            public static readonly string DefaultTVOSSDKPath;
+            public static readonly string DefaultWatchOSSDKPath;
+            public static string IPhoneOSSDKPath { get; set; }
+            public static string MacCatalystSDKPath { get; set; }
+            public static string MacOSSDKPath { get; set; }
+            public static string TVOSSDKPath { get; set; }
+            public static string WatchOSSDKPath { get; set; }
+            public static string XCodeDeveloperPath { get; set; }
+        }
+    }
+    public abstract class BaseApplePlatform : Sharpmake.Generators.FastBuild.IApplePlatformBff, Sharpmake.Generators.FastBuild.IClangPlatformBff, Sharpmake.Generators.FastBuild.IPlatformBff, Sharpmake.Generators.VisualStudio.IPlatformVcxproj, Sharpmake.IFastBuildCompilerSettings, Sharpmake.IPlatformDescriptor, Sharpmake.Project.Configuration.IConfigurationTasks
+    {
+        protected BaseApplePlatform() { }
+        public abstract string BffPlatformDefine { get; }
+        public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, string> BinPath { get; set; }
+        public System.Collections.Generic.IDictionary<Sharpmake.IFastBuildCompilerKey, Sharpmake.CompilerFamily> CompilerFamily { get; set; }
+        public bool ExcludesPrecompiledHeadersFromBuild { get; }
+        public string ExecutableFileFullExtension { get; }
+        public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, Sharpmake.Strings> ExtraFiles { get; set; }
+        public bool HasDotNetSupport { get; }
+        public bool HasEditAndContinueDebuggingSupport { get; }
+        public bool HasPrecompiledHeaderSupport { get; }
+        public bool HasSharedLibrarySupport { get; }
+        public bool HasUserAccountControlSupport { get; }
+        public bool IsLinkerInvokedViaCompiler { get; }
+        public bool IsMicrosoftPlatform { get; }
+        public bool IsPcPlatform { get; }
+        public bool IsUsingClang { get; }
+        public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, string> LibrarianExe { get; set; }
+        public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, string> LinkerExe { get; set; }
+        public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, bool> LinkerInvokedViaCompiler { get; set; }
+        public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, string> LinkerPath { get; set; }
+        public string PackageFileFullExtension { get; }
+        public string ProgramDatabaseFileFullExtension { get; }
+        public string SharedLibraryFileFullExtension { get; }
+        public abstract Sharpmake.Platform SharpmakePlatform { get; }
+        public abstract string SimplePlatformString { get; }
+        public string StaticLibraryFileFullExtension { get; }
+        public string StaticOutputLibraryFileFullExtension { get; }
+        public void AddCompilerSettings(System.Collections.Generic.IDictionary<string, Sharpmake.Generators.CompilerSettings> masterCompilerSettings, Sharpmake.Project.Configuration conf) { }
+        public abstract string CConfigName(Sharpmake.Configuration conf);
+        public abstract string CppConfigName(Sharpmake.Configuration conf);
+        protected void FixupPrecompiledHeaderOptions(Sharpmake.Generators.IGenerationContext context) { }
+        public void GenerateMakefileConfigurationVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public void GeneratePlatformReferences(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public void GeneratePlatformResourceFileList(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator, Sharpmake.Strings alreadyWrittenPriFiles, System.Collections.Generic.IList<Sharpmake.Generators.VisualStudio.Vcxproj.ProjectFile> resourceFiles, System.Collections.Generic.IList<Sharpmake.Generators.VisualStudio.Vcxproj.ProjectFile> imageResourceFiles) { }
+        public void GeneratePlatformSpecificProjectDescription(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public void GeneratePostDefaultPropsImport(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public void GenerateProjectCompileVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public void GenerateProjectConfigurationCustomMakeFile(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public void GenerateProjectConfigurationFastBuildMakeFile(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public void GenerateProjectConfigurationGeneral(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public void GenerateProjectConfigurationGeneral2(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public void GenerateProjectLinkVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public void GenerateProjectMasmVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public void GenerateProjectNasmVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public void GenerateProjectPlatformImportSheet(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public void GenerateProjectPlatformSdkDirectoryDescription(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public void GenerateRunFromPcDeployment(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public void GenerateSdkVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public void GenerateUserConfigurationFile(Sharpmake.Project.Configuration conf, Sharpmake.IFileGenerator generator) { }
+        public System.Collections.Generic.IEnumerable<string> GetAssemblyIncludePaths(Sharpmake.Generators.IGenerationContext context) { }
+        public System.Collections.Generic.IEnumerable<string> GetCxUsingPath(Sharpmake.Generators.IGenerationContext context) { }
+        public string GetDefaultOutputFullExtension(Sharpmake.Project.Configuration.OutputType outputType) { }
+        public string GetDeploymentTargetPrefix(Sharpmake.Project.Configuration conf) { }
+        public System.Collections.Generic.IEnumerable<Sharpmake.VariableAssignment> GetEnvironmentVariables(Sharpmake.Generators.IGenerationContext context) { }
+        public System.Collections.Generic.IEnumerable<Sharpmake.Project.Configuration.BuildStepBase> GetExtraPostBuildEvents(Sharpmake.Project.Configuration configuration, string fastBuildOutputFile) { }
+        public System.Collections.Generic.IEnumerable<Sharpmake.Project.Configuration.BuildStepExecutable> GetExtraStampEvents(Sharpmake.Project.Configuration configuration, string fastBuildOutputFile) { }
+        public System.Collections.Generic.IEnumerable<string> GetImplicitlyDefinedSymbols(Sharpmake.Generators.IGenerationContext context) { }
+        public System.Collections.Generic.IEnumerable<string> GetIncludePaths(Sharpmake.Generators.IGenerationContext context) { }
+        public System.Collections.Generic.IEnumerable<string> GetLibraryFiles(Sharpmake.Generators.IGenerationContext context) { }
+        public System.Collections.Generic.IEnumerable<string> GetLibraryPaths(Sharpmake.Generators.IGenerationContext context) { }
+        public string GetOutputFileNamePrefix(Sharpmake.Project.Configuration.OutputType outputType) { }
+        public string GetOutputFilename(Sharpmake.Project.Configuration.OutputType outputType, string fastBuildOutputFile) { }
+        public Sharpmake.EnvironmentVariableResolver GetPlatformEnvironmentResolver(params Sharpmake.VariableAssignment[] variables) { }
+        public System.Collections.Generic.IEnumerable<System.Tuple<string, System.Collections.Generic.List<Sharpmake.Generators.VisualStudio.Vcxproj.ProjectFile>>> GetPlatformFileLists(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context) { }
+        public System.Collections.Generic.IEnumerable<string> GetPlatformIncludePaths(Sharpmake.Generators.IGenerationContext context) { }
+        public System.Collections.Generic.IEnumerable<Sharpmake.Generators.VisualStudio.IncludeWithPrefix> GetPlatformIncludePathsWithPrefix(Sharpmake.Generators.IGenerationContext context) { }
+        public System.Collections.Generic.IEnumerable<string> GetPlatformLibraryFiles(Sharpmake.Generators.IGenerationContext context) { }
+        public System.Collections.Generic.IEnumerable<string> GetPlatformLibraryPaths(Sharpmake.Project.Configuration configuration) { }
+        public System.Collections.Generic.IEnumerable<string> GetResourceIncludePaths(Sharpmake.Generators.IGenerationContext context) { }
+        public string GetToolchainPlatformString(Sharpmake.ITarget target) { }
+        public bool HasPrecomp(Sharpmake.Generators.IGenerationContext context) { }
+        public bool IsSwiftSupported() { }
+        public virtual void SelectAdditionalCompilerOptionsBff(Sharpmake.Generators.FastBuild.IBffGenerationContext context) { }
+        public void SelectApplicationFormatOptions(Sharpmake.Generators.IGenerationContext context) { }
+        public void SelectBuildType(Sharpmake.Generators.IGenerationContext context) { }
+        public virtual void SelectCompilerOptions(Sharpmake.Generators.IGenerationContext context) { }
+        public void SelectCustomSysLibRoot(Sharpmake.Generators.IGenerationContext context, string defaultSdkRoot) { }
+        public virtual void SelectLinkerOptions(Sharpmake.Generators.IGenerationContext context) { }
+        public void SelectPlatformAdditionalDependenciesOptions(Sharpmake.Generators.IGenerationContext context) { }
+        public virtual void SelectPrecompiledHeaderOptions(Sharpmake.Generators.IGenerationContext context) { }
+        public virtual void SelectPreprocessorDefinitionsBff(Sharpmake.Generators.FastBuild.IBffGenerationContext context) { }
+        public virtual void SelectPreprocessorDefinitionsVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context) { }
+        public void SetupClangOptions(Sharpmake.IFileGenerator generator) { }
+        public void SetupDeleteExtensionsOnCleanOptions(Sharpmake.Generators.IGenerationContext context) { }
+        public void SetupDynamicLibraryPaths(Sharpmake.Project.Configuration configuration, Sharpmake.DependencySetting dependencySetting, Sharpmake.Project.Configuration dependency) { }
+        public void SetupExtraLinkerSettings(Sharpmake.IFileGenerator fileGenerator, Sharpmake.Project.Configuration configuration, string fastBuildOutputFile) { }
+        public void SetupPlatformLibraryOptions(out string platformLibExtension, out string platformOutputLibExtension, out string platformPrefixExtension, out string platformLibPrefix) { }
+        public void SetupPlatformTargetOptions(Sharpmake.Generators.IGenerationContext context) { }
+        public void SetupPlatformToolsetOptions(Sharpmake.Generators.IGenerationContext context) { }
+        public void SetupSdkOptions(Sharpmake.Generators.IGenerationContext context) { }
+        public void SetupStaticLibraryPaths(Sharpmake.Project.Configuration configuration, Sharpmake.DependencySetting dependencySetting, Sharpmake.Project.Configuration dependency) { }
+        public void SetupSwiftOptions(Sharpmake.IFileGenerator generator) { }
+        public abstract string SwiftConfigName(Sharpmake.Configuration conf);
+        public enum CompilerFlavor
+        {
+            C = 0,
+            Cpp = 1,
+            Swift = 2,
+        }
+    }
+    public abstract class BaseMicrosoftPlatform : Sharpmake.BasePlatform, Sharpmake.Generators.FastBuild.IMicrosoftPlatformBff, Sharpmake.Generators.FastBuild.IPlatformBff, Sharpmake.Generators.VisualStudio.IPlatformVcxproj, Sharpmake.Project.Configuration.IConfigurationTasks
+    {
+        protected BaseMicrosoftPlatform() { }
+        public override string ExecutableFileFullExtension { get; }
+        public override bool HasDotNetSupport { get; }
+        public override bool HasSharedLibrarySupport { get; }
+        public override bool IsMicrosoftPlatform { get; }
+        public override bool IsUsingClang { get; }
+        public override string ProgramDatabaseFileFullExtension { get; }
+        public override string SharedLibraryFileFullExtension { get; }
+        public override string StaticLibraryFileFullExtension { get; }
+        public virtual bool SupportsResourceFiles { get; }
+        public override bool IsLinkerInvokedViaCompiler { get; set; }
+        public override void GenerateProjectMasmVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        protected override System.Collections.Generic.IEnumerable<string> GetAssemblyIncludePathsImpl(Sharpmake.Generators.IGenerationContext context) { }
+        public string GetDefaultOutputFullExtension(Sharpmake.Project.Configuration.OutputType outputType) { }
+        protected void GetLinkerExecutableInfo(Sharpmake.Project.Configuration conf, out string linkerPathOverride, out string linkerExeOverride, out string librarianExeOverride) { }
+        public string GetOutputFileNamePrefix(Sharpmake.Project.Configuration.OutputType outputType) { }
+        public virtual System.Collections.Generic.IEnumerable<string> GetPlatformLibraryPaths(Sharpmake.Project.Configuration configuration) { }
+        public void SetupDynamicLibraryPaths(Sharpmake.Project.Configuration configuration, Sharpmake.DependencySetting dependencySetting, Sharpmake.Project.Configuration dependency) { }
+        public void SetupStaticLibraryPaths(Sharpmake.Project.Configuration configuration, Sharpmake.DependencySetting dependencySetting, Sharpmake.Project.Configuration dependency) { }
+        public static System.Collections.Generic.IEnumerable<string> GetUCRTLibs(Sharpmake.BaseMicrosoftPlatform.RuntimeLibrary runtime, bool debugVersion) { }
+        public enum RuntimeLibrary
+        {
+            Static = 0,
+            Dynamic = 1,
+        }
+    }
+    public abstract class BasePlatform : Sharpmake.Generators.FastBuild.IPlatformBff, Sharpmake.Generators.VisualStudio.IPlatformVcxproj, Sharpmake.IPlatformDescriptor
+    {
+        protected const string RemoveLineTag = "REMOVE_LINE_TAG";
+        protected BasePlatform() { }
+        public virtual string BffPlatformDefine { get; }
+        public virtual bool ExcludesPrecompiledHeadersFromBuild { get; }
+        public abstract string ExecutableFileFullExtension { get; }
+        public abstract bool HasDotNetSupport { get; }
+        public virtual bool HasEditAndContinueDebuggingSupport { get; }
+        public virtual bool HasPrecompiledHeaderSupport { get; }
+        public abstract bool HasSharedLibrarySupport { get; }
+        public virtual bool HasUserAccountControlSupport { get; }
+        public abstract bool IsMicrosoftPlatform { get; }
+        public abstract bool IsPcPlatform { get; }
+        public abstract bool IsUsingClang { get; }
+        public virtual string PackageFileFullExtension { get; }
+        public abstract string ProgramDatabaseFileFullExtension { get; }
+        public abstract string SharedLibraryFileFullExtension { get; }
+        public abstract string SimplePlatformString { get; }
+        public virtual string StaticLibraryFileFullExtension { get; }
+        public virtual string StaticOutputLibraryFileFullExtension { get; }
+        public abstract bool IsLinkerInvokedViaCompiler { get; set; }
+        public virtual void AddCompilerSettings(System.Collections.Generic.IDictionary<string, Sharpmake.Generators.CompilerSettings> masterCompilerSettings, Sharpmake.Project.Configuration conf) { }
+        public virtual string CConfigName(Sharpmake.Configuration conf) { }
+        public virtual string CppConfigName(Sharpmake.Configuration conf) { }
+        protected System.Collections.Generic.IEnumerable<string> EnumerateSemiColonSeparatedString(string str) { }
+        protected void FixupPrecompiledHeaderOptions(Sharpmake.Generators.IGenerationContext context) { }
+        public virtual void GenerateMakefileConfigurationVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public virtual void GeneratePlatformReferences(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public virtual void GeneratePlatformResourceFileList(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator, Sharpmake.Strings alreadyWrittenPriFiles, System.Collections.Generic.IList<Sharpmake.Generators.VisualStudio.Vcxproj.ProjectFile> resourceFiles, System.Collections.Generic.IList<Sharpmake.Generators.VisualStudio.Vcxproj.ProjectFile> imageResourceFiles) { }
+        public virtual void GeneratePlatformSpecificProjectDescription(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public virtual void GeneratePostDefaultPropsImport(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public virtual void GenerateProjectCompileVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public virtual void GenerateProjectConfigurationCustomMakeFile(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public virtual void GenerateProjectConfigurationFastBuildMakeFile(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public virtual void GenerateProjectConfigurationGeneral(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public virtual void GenerateProjectConfigurationGeneral2(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public virtual void GenerateProjectLinkVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public virtual void GenerateProjectMasmVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public virtual void GenerateProjectNasmVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public virtual void GenerateProjectPlatformImportSheet(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public virtual void GenerateProjectPlatformSdkDirectoryDescription(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public virtual void GenerateRunFromPcDeployment(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public virtual void GenerateSdkVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public virtual void GenerateUserConfigurationFile(Sharpmake.Project.Configuration conf, Sharpmake.IFileGenerator generator) { }
+        public System.Collections.Generic.IEnumerable<string> GetAssemblyIncludePaths(Sharpmake.Generators.IGenerationContext context) { }
+        protected virtual System.Collections.Generic.IEnumerable<string> GetAssemblyIncludePathsImpl(Sharpmake.Generators.IGenerationContext context) { }
+        public virtual System.Collections.Generic.IEnumerable<string> GetCxUsingPath(Sharpmake.Generators.IGenerationContext context) { }
+        public virtual System.Collections.Generic.IEnumerable<Sharpmake.VariableAssignment> GetEnvironmentVariables(Sharpmake.Generators.IGenerationContext context) { }
+        public virtual System.Collections.Generic.IEnumerable<Sharpmake.Project.Configuration.BuildStepBase> GetExtraPostBuildEvents(Sharpmake.Project.Configuration configuration, string fastBuildOutputFile) { }
+        public virtual System.Collections.Generic.IEnumerable<Sharpmake.Project.Configuration.BuildStepExecutable> GetExtraStampEvents(Sharpmake.Project.Configuration configuration, string fastBuildOutputFile) { }
+        public virtual System.Collections.Generic.IEnumerable<string> GetImplicitlyDefinedSymbols(Sharpmake.Generators.IGenerationContext context) { }
+        public System.Collections.Generic.IEnumerable<string> GetIncludePaths(Sharpmake.Generators.IGenerationContext context) { }
+        protected virtual System.Collections.Generic.IEnumerable<string> GetIncludePathsImpl(Sharpmake.Generators.IGenerationContext context) { }
+        public virtual System.Collections.Generic.IEnumerable<string> GetLibraryFiles(Sharpmake.Generators.IGenerationContext context) { }
+        public virtual System.Collections.Generic.IEnumerable<string> GetLibraryPaths(Sharpmake.Generators.IGenerationContext context) { }
+        public virtual string GetOutputFilename(Sharpmake.Project.Configuration.OutputType outputType, string fastBuildOutputFile) { }
+        public virtual Sharpmake.EnvironmentVariableResolver GetPlatformEnvironmentResolver(params Sharpmake.VariableAssignment[] parameters) { }
+        public virtual System.Collections.Generic.IEnumerable<System.Tuple<string, System.Collections.Generic.List<Sharpmake.Generators.VisualStudio.Vcxproj.ProjectFile>>> GetPlatformFileLists(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context) { }
+        public System.Collections.Generic.IEnumerable<string> GetPlatformIncludePaths(Sharpmake.Generators.IGenerationContext context) { }
+        public System.Collections.Generic.IEnumerable<Sharpmake.Generators.VisualStudio.IncludeWithPrefix> GetPlatformIncludePathsWithPrefix(Sharpmake.Generators.IGenerationContext context) { }
+        protected virtual System.Collections.Generic.IEnumerable<Sharpmake.Generators.VisualStudio.IncludeWithPrefix> GetPlatformIncludePathsWithPrefixImpl(Sharpmake.Generators.IGenerationContext context) { }
+        public virtual System.Collections.Generic.IEnumerable<string> GetPlatformLibraryFiles(Sharpmake.Generators.IGenerationContext context) { }
+        protected virtual string GetProjectLinkExecutableVcxprojTemplate() { }
+        protected virtual string GetProjectLinkSharedVcxprojTemplate() { }
+        protected virtual string GetProjectStaticLinkVcxprojTemplate() { }
+        public System.Collections.Generic.IEnumerable<string> GetResourceIncludePaths(Sharpmake.Generators.IGenerationContext context) { }
+        protected virtual System.Collections.Generic.IEnumerable<string> GetResourceIncludePathsImpl(Sharpmake.Generators.IGenerationContext context) { }
+        public abstract string GetToolchainPlatformString(Sharpmake.ITarget target);
+        public virtual bool HasPrecomp(Sharpmake.Generators.IGenerationContext context) { }
+        public virtual void SelectAdditionalCompilerOptionsBff(Sharpmake.Generators.FastBuild.IBffGenerationContext context) { }
+        public virtual void SelectApplicationFormatOptions(Sharpmake.Generators.IGenerationContext context) { }
+        public virtual void SelectBuildType(Sharpmake.Generators.IGenerationContext context) { }
+        public virtual void SelectCompilerOptions(Sharpmake.Generators.IGenerationContext context) { }
+        public virtual void SelectLinkerOptions(Sharpmake.Generators.IGenerationContext context) { }
+        public virtual void SelectPlatformAdditionalDependenciesOptions(Sharpmake.Generators.IGenerationContext context) { }
+        public virtual void SelectPrecompiledHeaderOptions(Sharpmake.Generators.IGenerationContext context) { }
+        public virtual void SelectPreprocessorDefinitionsBff(Sharpmake.Generators.FastBuild.IBffGenerationContext context) { }
+        public virtual void SelectPreprocessorDefinitionsVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context) { }
+        public virtual void SetupDeleteExtensionsOnCleanOptions(Sharpmake.Generators.IGenerationContext context) { }
+        public virtual void SetupExtraLinkerSettings(Sharpmake.IFileGenerator fileGenerator, Sharpmake.Project.Configuration configuration, string fastBuildOutputFile) { }
+        public virtual void SetupPlatformLibraryOptions(out string platformLibExtension, out string platformOutputLibExtension, out string platformPrefixExtension, out string platformLibPrefix) { }
+        public virtual void SetupPlatformTargetOptions(Sharpmake.Generators.IGenerationContext context) { }
+        public virtual void SetupPlatformToolsetOptions(Sharpmake.Generators.IGenerationContext context) { }
+        public virtual void SetupSdkOptions(Sharpmake.Generators.IGenerationContext context) { }
+        protected virtual void WriteWindowsKitsOverrides(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator fileGenerator) { }
+    }
+    public static class ClangForApple
+    {
+        public static string GetClangExecutablePath() { }
+        public static string GetClangIncludePath() { }
+        public static string GetClangLibraryPath() { }
+        public static class Settings
+        {
+            public static string ClangVersion { get; set; }
+            public static bool IsAppleClang { get; set; }
+            public static string LLVMInstallDir { get; set; }
+        }
+    }
+    public static class ClangForWindows
+    {
+        public static string GetLLVMOverridesSection(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.Resolver resolver) { }
+        public static string GetWindowsClangExecutablePath() { }
+        public static string GetWindowsClangExecutablePath(Sharpmake.DevEnv devEnv) { }
+        public static string GetWindowsClangIncludePath() { }
+        public static string GetWindowsClangIncludePath(Sharpmake.DevEnv devEnv) { }
+        public static string GetWindowsClangLibraryPath(string libFolderName = null) { }
+        public static string GetWindowsClangLibraryPath(Sharpmake.DevEnv devEnv, string libFolderName = null) { }
+        public static string GetWindowsClangLibraryPath(string llvmInstallDir, string clangVersion, string libFolderName = null) { }
+        public static void WriteLLVMOverrides(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+        public static class Settings
+        {
+            public static bool OverridenLLVMInstallDir { get; }
+            public static string ClangVersion { get; set; }
+            public static string LLVMInstallDir { get; set; }
+            public static string ClangVersionVsEmbedded(Sharpmake.DevEnv devEnv) { }
+            public static string LLVMInstallDirVsEmbedded(Sharpmake.DevEnv devEnv) { }
+        }
+    }
+    public sealed class DefaultPlatform
+    {
+        public DefaultPlatform() { }
+        public static void SetupLibraryPaths(Sharpmake.Project.Configuration configuration, Sharpmake.DependencySetting dependencySetting, Sharpmake.Project.Configuration dependency) { }
+    }
+    [Sharpmake.PlatformImplementation(Sharpmake.Platform.anycpu, new System.Type[] {
+            typeof(Sharpmake.IPlatformDescriptor),
+            typeof(Sharpmake.Project.Configuration.IConfigurationTasks)})]
+    public sealed class DotNetPlatform : Sharpmake.BasePlatform, Sharpmake.Project.Configuration.IConfigurationTasks
+    {
+        public DotNetPlatform() { }
+        public override string ExecutableFileFullExtension { get; }
+        public override bool HasDotNetSupport { get; }
+        public override bool HasSharedLibrarySupport { get; }
+        public override bool IsMicrosoftPlatform { get; }
+        public override bool IsPcPlatform { get; }
+        public override bool IsUsingClang { get; }
+        public override string ProgramDatabaseFileFullExtension { get; }
+        public override string SharedLibraryFileFullExtension { get; }
+        public override string SimplePlatformString { get; }
+        public override bool IsLinkerInvokedViaCompiler { get; set; }
+        public string GetDefaultOutputFullExtension(Sharpmake.Project.Configuration.OutputType outputType) { }
+        public string GetOutputFileNamePrefix(Sharpmake.Project.Configuration.OutputType outputType) { }
+        public System.Collections.Generic.IEnumerable<string> GetPlatformLibraryPaths(Sharpmake.Project.Configuration configuration) { }
+        public override string GetToolchainPlatformString(Sharpmake.ITarget target) { }
+        public void SetupDynamicLibraryPaths(Sharpmake.Project.Configuration configuration, Sharpmake.DependencySetting dependencySetting, Sharpmake.Project.Configuration dependency) { }
+        public void SetupStaticLibraryPaths(Sharpmake.Project.Configuration configuration, Sharpmake.DependencySetting dependencySetting, Sharpmake.Project.Configuration dependency) { }
+    }
+    public static class Linux
+    {
+        public interface ISystemPathProvider
+        {
+            System.Collections.Generic.IEnumerable<string> GetSystemIncludePaths(Sharpmake.Project.Configuration conf);
+            System.Collections.Generic.IEnumerable<string> GetSystemLibraryPaths(Sharpmake.Project.Configuration conf);
+        }
+        [Sharpmake.PlatformImplementation(Sharpmake.Platform.linux, new System.Type[] {
+                typeof(Sharpmake.IPlatformDescriptor),
+                typeof(Sharpmake.IFastBuildCompilerSettings),
+                typeof(Sharpmake.Generators.FastBuild.IPlatformBff),
+                typeof(Sharpmake.Generators.FastBuild.IClangPlatformBff),
+                typeof(Sharpmake.Generators.VisualStudio.IPlatformVcxproj),
+                typeof(Sharpmake.Project.Configuration.IConfigurationTasks)})]
+        public sealed class LinuxPlatform : Sharpmake.BasePlatform, Sharpmake.Generators.FastBuild.IClangPlatformBff, Sharpmake.Generators.FastBuild.IPlatformBff, Sharpmake.IFastBuildCompilerSettings, Sharpmake.Project.Configuration.IConfigurationTasks
+        {
+            public const string _compilerExtraOptions = @"\r\n    .CompilerExtraOptions   = ''\r\n            // General options\r\n            // -------------------------\r\n            + ' [cmdLineOptions.StdLib]'\r\n            + ' [cmdLineOptions.DebugInformationFormat]'\r\n            + ' [cmdLineOptions.AdditionalIncludeDirectories]'\r\n            + ' [cmdLineOptions.AdditionalUsingDirectories]'\r\n            + ' [cmdLineOptions.PreprocessorDefinitions]'\r\n            + ' [cmdLineOptions.UndefinePreprocessorDefinitions]'\r\n            + ' [cmdLineOptions.UndefineAllPreprocessorDefinitions]'\r\n            + ' [cmdLineOptions.Warnings]'\r\n            + ' [cmdLineOptions.ExtraWarnings]'\r\n            + ' [cmdLineOptions.WarningsAsErrors]'\r\n            + ' [cmdLineOptions.PositionIndependentCode]'\r\n            + ' [cmdLineOptions.FastMath]'\r\n            + ' [cmdLineOptions.NoStrictAliasing]'\r\n            + ' [cmdLineOptions.UnrollLoops]'\r\n            + ' [cmdLineOptions.LinkTimeOptimization]'\r\n            + ' [cmdLineOptions.AnsiCompliance]'\r\n            + ' [cmdLineOptions.RuntimeTypeInfo]'\r\n            + ' [cmdLineOptions.CharUnsigned]'\r\n            + ' [cmdLineOptions.MsExtensions]'\r\n            + ' [cmdLineOptions.CppLanguageStd]'\r\n            + ' [cmdLineOptions.CLanguageStd]'\r\n            + ' [cmdLineOptions.BffSysRoot]'\r\n            // Additional compiler options\r\n            //--------------------------\r\n            + ' [options.AdditionalCompilerOptions]'\r\n";
+            public const string _compilerOptimizationOptions = ("\\r\\n    // Optimizations options\\r\\n    // ---------------------\\r\\n    .Compiler" +
+                "Optimizations = \'\'\\r\\n            + \' [cmdLineOptions.OptimizationLevel]\'\\r\\n   " +
+                "         + \' [options.AdditionalCompilerOptimizeOptions]\'\\r\\n");
+            public const string _linkerOptionsTemplate = @"\r\n    .LinkerOptions          = '-o ""%2""'\r\n                            + ' [cmdLineOptions.WholeArchiveBegin]'\r\n                            + ' ""%1""'\r\n                            + ' [cmdLineOptions.WholeArchiveEnd]'\r\n                            + ' [sharedOption]'\r\n                            + ' [cmdLineOptions.BffSysRoot]'\r\n                            // Library Search Path\r\n                            // ---------------------------\r\n                            + ' [cmdLineOptions.AdditionalLibraryDirectories]'\r\n                            // Libraries\r\n                            // ---------------------------\r\n                            + ' [cmdLineOptions.AdditionalDependencies]'\r\n                            // Options\r\n                            //--------\r\n                            + ' [cmdLineOptions.StdLib]'\r\n                            + ' [cmdLineOptions.EditAndContinue]'\r\n                            + ' [cmdLineOptions.InfoStripping]'\r\n                            + ' [cmdLineOptions.DataStripping]'\r\n                            + ' [cmdLineOptions.DuplicateStripping]'\r\n                            + ' [cmdLineOptions.Addressing]'\r\n                            + ' [cmdLineOptions.GenerateMapFile]'\r\n                            // Additional linker options\r\n                            //--------------------------\r\n                            + ' [options.AdditionalLinkerOptions]'\r\n";
+            public LinuxPlatform() { }
+            public override string BffPlatformDefine { get; }
+            public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, string> BinPath { get; set; }
+            public System.Collections.Generic.IDictionary<Sharpmake.IFastBuildCompilerKey, Sharpmake.CompilerFamily> CompilerFamily { get; set; }
+            public override string ExecutableFileFullExtension { get; }
+            public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, Sharpmake.Strings> ExtraFiles { get; set; }
+            public override bool HasDotNetSupport { get; }
+            public override bool HasSharedLibrarySupport { get; }
+            public override bool IsMicrosoftPlatform { get; }
+            public override bool IsPcPlatform { get; }
+            public override bool IsUsingClang { get; }
+            public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, string> LibrarianExe { get; set; }
+            public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, string> LinkerExe { get; set; }
+            public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, bool> LinkerInvokedViaCompiler { get; set; }
+            public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, string> LinkerPath { get; set; }
+            public override string ProgramDatabaseFileFullExtension { get; }
+            public override string SharedLibraryFileFullExtension { get; }
+            public override string SimplePlatformString { get; }
+            public override string StaticLibraryFileFullExtension { get; }
+            public override string StaticOutputLibraryFileFullExtension { get; }
+            public override bool IsLinkerInvokedViaCompiler { get; set; }
+            public override void AddCompilerSettings(System.Collections.Generic.IDictionary<string, Sharpmake.Generators.CompilerSettings> masterCompilerSettings, Sharpmake.Project.Configuration conf) { }
+            public override string CConfigName(Sharpmake.Configuration conf) { }
+            public override string CppConfigName(Sharpmake.Configuration conf) { }
+            public override void GeneratePlatformSpecificProjectDescription(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+            public override void GenerateProjectCompileVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+            public override void GenerateProjectConfigurationFastBuildMakeFile(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+            public override void GenerateProjectConfigurationGeneral2(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+            public override void GenerateUserConfigurationFile(Sharpmake.Project.Configuration conf, Sharpmake.IFileGenerator generator) { }
+            public string GetDefaultOutputFullExtension(Sharpmake.Project.Configuration.OutputType outputType) { }
+            public override System.Collections.Generic.IEnumerable<Sharpmake.Project.Configuration.BuildStepBase> GetExtraPostBuildEvents(Sharpmake.Project.Configuration configuration, string fastBuildOutputFile) { }
+            public override System.Collections.Generic.IEnumerable<Sharpmake.Project.Configuration.BuildStepExecutable> GetExtraStampEvents(Sharpmake.Project.Configuration configuration, string fastBuildOutputFile) { }
+            public string GetOutputFileNamePrefix(Sharpmake.Project.Configuration.OutputType outputType) { }
+            public override Sharpmake.EnvironmentVariableResolver GetPlatformEnvironmentResolver(params Sharpmake.VariableAssignment[] parameters) { }
+            protected override System.Collections.Generic.IEnumerable<Sharpmake.Generators.VisualStudio.IncludeWithPrefix> GetPlatformIncludePathsWithPrefixImpl(Sharpmake.Generators.IGenerationContext context) { }
+            public System.Collections.Generic.IEnumerable<string> GetPlatformLibraryPaths(Sharpmake.Project.Configuration conf) { }
+            protected override string GetProjectLinkSharedVcxprojTemplate() { }
+            protected override string GetProjectStaticLinkVcxprojTemplate() { }
+            public override string GetToolchainPlatformString(Sharpmake.ITarget target) { }
+            public override void SelectCompilerOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public override void SelectPlatformAdditionalDependenciesOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public void SetupClangOptions(Sharpmake.IFileGenerator generator) { }
+            public void SetupDynamicLibraryPaths(Sharpmake.Project.Configuration configuration, Sharpmake.DependencySetting dependencySetting, Sharpmake.Project.Configuration dependency) { }
+            public override void SetupExtraLinkerSettings(Sharpmake.IFileGenerator fileGenerator, Sharpmake.Project.Configuration configuration, string fastBuildOutputFile) { }
+            public override void SetupPlatformLibraryOptions(out string platformLibExtension, out string platformOutputLibExtension, out string platformPrefixExtension, out string platformLibPrefix) { }
+            public override void SetupPlatformTargetOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public override void SetupPlatformToolsetOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public override void SetupSdkOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public void SetupStaticLibraryPaths(Sharpmake.Project.Configuration configuration, Sharpmake.DependencySetting dependencySetting, Sharpmake.Project.Configuration dependency) { }
+        }
+        public static class GlobalSettings
+        {
+            public static bool UseLlvmObjCopy;
+            public static Sharpmake.Linux.ISystemPathProvider SystemPathProvider { get; set; }
+        }
+        public static class Options
+        {
+            public static class Compiler
+            {
+                public enum CheckAnsiCompliance
+                {
+                    Enable = 0,
+                    Disable = 1,
+                }
+                public enum DebugInformationFormat
+                {
+                    None = 0,
+                    MinimalDebugInformation = 1,
+                    FullDebugInformation = 2,
+                }
+                public enum DefaultCharUnsigned
+                {
+                    Enable = 0,
+                    Disable = 1,
+                }
+                public enum Distributable
+                {
+                    Enable = 0,
+                    Disable = 1,
+                }
+                public enum ExtraWarnings
+                {
+                    Enable = 0,
+                    Disable = 1,
+                }
+                public enum FastMath
+                {
+                    Enable = 0,
+                    Disable = 1,
+                }
+                [System.Obsolete("Use DebugInformationFormat instead.")]
+                public enum GenerateDebugInformation
+                {
+                    Enable = 0,
+                    Disable = 1,
+                }
+                public enum InlineFunctionDebugInformation
+                {
+                    Enable = 0,
+                    Disable = 1,
+                }
+                public enum LinkTimeOptimization
+                {
+                    Enable = 0,
+                    Disable = 1,
+                }
+                public enum MsExtensions
+                {
+                    Enable = 0,
+                    Disable = 1,
+                }
+                public enum NoStrictAliasing
+                {
+                    Enable = 0,
+                    Disable = 1,
+                }
+                public enum OptimizationLevel
+                {
+                    Disable = 0,
+                    Standard = 1,
+                    Full = 2,
+                    FullWithInlining = 3,
+                    ForSize = 4,
+                }
+                public enum PositionIndependentCode
+                {
+                    Enable = 0,
+                    Disable = 1,
+                }
+                public class ProcessorNumber
+                {
+                    public int Value;
+                    public ProcessorNumber(int value) { }
+                }
+                public enum UnrollLoops
+                {
+                    Enable = 0,
+                    Disable = 1,
+                }
+                public enum Warnings
+                {
+                    NormalWarnings = 0,
+                    MoreWarnings = 1,
+                    Disable = 2,
+                }
+            }
+            public static class General
+            {
+                public enum CopySources
+                {
+                    Enable = 0,
+                    Disable = 1,
+                }
+                public enum PlatformRemoteTool
+                {
+                    Gpp = 0,
+                    Clang = 1,
+                    Clang38 = 2,
+                }
+                public enum StdLib
+                {
+                    Default = 0,
+                    LibCpp = 1,
+                    LibStdCpp = 2,
+                    Platform = 3,
+                }
+                public class SysRoot : Sharpmake.Options.PathOption
+                {
+                    public SysRoot(string path) { }
+                }
+                public enum VcPlatformToolset
+                {
+                    Default = 0,
+                    Remote_GCC_1_0 = 1,
+                    Remote_Clang_1_0 = 2,
+                    WSL_1_0 = 3,
+                    WSL_Clang_1_0 = 4,
+                    WSL2_1_0 = 5,
+                }
+            }
+            public static class Linker
+            {
+                public enum Addressing
+                {
+                    ASLR = 0,
+                    NonASLR = 1,
+                }
+                public enum DataStripping
+                {
+                    None = 0,
+                    StripFuncs = 1,
+                    StripFuncsAndData = 2,
+                }
+                public enum DuplicateStripping
+                {
+                    Enable = 0,
+                    Disable = 1,
+                }
+                public enum EditAndContinue
+                {
+                    Enable = 0,
+                    Disable = 1,
+                }
+                public enum InfoStripping
+                {
+                    None = 0,
+                    StripDebug = 1,
+                    StripSymsAndDebug = 2,
+                }
+                public enum ShouldStripDebugSymbols
+                {
+                    Enable = 0,
+                    Disable = 1,
+                }
+                public enum UseThinArchives
+                {
+                    Enable = 0,
+                    Disable = 1,
+                }
+                public enum WholeArchive
+                {
+                    Enable = 0,
+                    Disable = 1,
+                }
+            }
+        }
+    }
+    public static class SwiftForApple
+    {
+        public static string GetSwiftExecutablePath() { }
+        public static class Settings
+        {
+            public static bool SwiftSupportEnabled;
+            public static string SwiftClangVersion { get; set; }
+            public static string SwiftInstallDir { get; set; }
+        }
+    }
+    public static class Windows
+    {
+        public abstract class BaseWindowsPlatform : Sharpmake.BaseMicrosoftPlatform, Sharpmake.IFastBuildCompilerSettings, Sharpmake.IWindowsFastBuildCompilerSettings
+        {
+            protected BaseWindowsPlatform() { }
+            public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, string> BinPath { get; set; }
+            public System.Collections.Generic.IDictionary<Sharpmake.IFastBuildCompilerKey, Sharpmake.CompilerFamily> CompilerFamily { get; set; }
+            public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, Sharpmake.Strings> ExtraFiles { get; set; }
+            public override bool HasUserAccountControlSupport { get; }
+            public override bool IsPcPlatform { get; }
+            public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, string> LibrarianExe { get; set; }
+            public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, string> LinkerExe { get; set; }
+            public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, bool> LinkerInvokedViaCompiler { get; set; }
+            public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, string> LinkerPath { get; set; }
+            public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, string> ResCompiler { get; set; }
+            public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, string> ResxCompiler { get; set; }
+            public override System.Collections.Generic.IEnumerable<string> GetImplicitlyDefinedSymbols(Sharpmake.Generators.IGenerationContext context) { }
+            public override System.Collections.Generic.IEnumerable<string> GetPlatformLibraryFiles(Sharpmake.Generators.IGenerationContext context) { }
+            public override void SetupSdkOptions(Sharpmake.Generators.IGenerationContext context) { }
+        }
+        [Sharpmake.PlatformImplementation(Sharpmake.Platform.win32, new System.Type[] {
+                typeof(Sharpmake.IPlatformDescriptor),
+                typeof(Sharpmake.Project.Configuration.IConfigurationTasks),
+                typeof(Sharpmake.IFastBuildCompilerSettings),
+                typeof(Sharpmake.IWindowsFastBuildCompilerSettings),
+                typeof(Sharpmake.Generators.VisualStudio.IPlatformVcxproj)})]
+        public sealed class Win32Platform : Sharpmake.Windows.BaseWindowsPlatform
+        {
+            public Win32Platform() { }
+            public override string SimplePlatformString { get; }
+            public override System.Collections.Generic.IEnumerable<string> GetImplicitlyDefinedSymbols(Sharpmake.Generators.IGenerationContext context) { }
+            public override string GetToolchainPlatformString(Sharpmake.ITarget target) { }
+            public override void SelectPlatformAdditionalDependenciesOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public override void SetupPlatformTargetOptions(Sharpmake.Generators.IGenerationContext context) { }
+        }
+        public class Win64EnvironmentVariableResolver : Sharpmake.EnvironmentVariableResolver
+        {
+            public Win64EnvironmentVariableResolver() { }
+            public Win64EnvironmentVariableResolver(params Sharpmake.VariableAssignment[] assignments) { }
+            public static string DXSDK_DIR { get; }
+        }
+        [Sharpmake.PlatformImplementation(Sharpmake.Platform.win64, new System.Type[] {
+                typeof(Sharpmake.IPlatformDescriptor),
+                typeof(Sharpmake.Project.Configuration.IConfigurationTasks),
+                typeof(Sharpmake.IFastBuildCompilerSettings),
+                typeof(Sharpmake.IWindowsFastBuildCompilerSettings),
+                typeof(Sharpmake.Generators.FastBuild.IPlatformBff),
+                typeof(Sharpmake.Generators.FastBuild.IMicrosoftPlatformBff),
+                typeof(Sharpmake.Generators.VisualStudio.IPlatformVcxproj)})]
+        public sealed class Win64Platform : Sharpmake.Windows.BaseWindowsPlatform
+        {
+            public Win64Platform() { }
+            public override string BffPlatformDefine { get; }
+            public override bool HasEditAndContinueDebuggingSupport { get; }
+            public override string SimplePlatformString { get; }
+            public override bool SupportsResourceFiles { get; }
+            public override void AddCompilerSettings(System.Collections.Generic.IDictionary<string, Sharpmake.Generators.CompilerSettings> masterCompilerSettings, Sharpmake.Project.Configuration conf) { }
+            public override string CConfigName(Sharpmake.Configuration conf) { }
+            public override string CppConfigName(Sharpmake.Configuration conf) { }
+            public override void GeneratePlatformSpecificProjectDescription(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
+            public override System.Collections.Generic.IEnumerable<string> GetImplicitlyDefinedSymbols(Sharpmake.Generators.IGenerationContext context) { }
+            protected override System.Collections.Generic.IEnumerable<string> GetIncludePathsImpl(Sharpmake.Generators.IGenerationContext context) { }
+            public Sharpmake.Generators.CompilerSettings GetMasterCompilerSettings(System.Collections.Generic.IDictionary<string, Sharpmake.Generators.CompilerSettings> masterCompilerSettings, string compilerName, Sharpmake.DevEnv devEnv, string projectRootPath, Sharpmake.Options.Vc.General.PlatformToolset platformToolset, bool useCCompiler) { }
+            public override Sharpmake.EnvironmentVariableResolver GetPlatformEnvironmentResolver(params Sharpmake.VariableAssignment[] assignments) { }
+            protected override System.Collections.Generic.IEnumerable<Sharpmake.Generators.VisualStudio.IncludeWithPrefix> GetPlatformIncludePathsWithPrefixImpl(Sharpmake.Generators.IGenerationContext context) { }
+            public override string GetToolchainPlatformString(Sharpmake.ITarget target) { }
+            public override void SelectPlatformAdditionalDependenciesOptions(Sharpmake.Generators.IGenerationContext context) { }
+            public override void SetupPlatformTargetOptions(Sharpmake.Generators.IGenerationContext context) { }
+        }
+    }
+}

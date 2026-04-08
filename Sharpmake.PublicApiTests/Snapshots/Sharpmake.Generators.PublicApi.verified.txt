@@ -1,0 +1,976 @@
+﻿[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Sharpmake")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Sharpmake.UnitTests")]
+[assembly: System.Runtime.Versioning.TargetFramework(".NETCoreApp,Version=v8.0", FrameworkDisplayName=".NET 8.0")]
+namespace Sharpmake.Generators.Apple
+{
+    public class XCWorkspace : Sharpmake.ISolutionGenerator
+    {
+        public XCWorkspace() { }
+        public void Generate(Sharpmake.Builder builder, Sharpmake.Solution solution, System.Collections.Generic.List<Sharpmake.Solution.Configuration> configurations, string solutionFile, System.Collections.Generic.List<string> generatedFiles, System.Collections.Generic.List<string> skipFiles) { }
+    }
+    public class XCodeProj : Sharpmake.IProjectGenerator
+    {
+        public const string ProjectExtension = ".xcodeproj";
+        public const string RemoveLineTag = "REMOVE_LINE_TAG";
+        public static readonly char FolderSeparator;
+        public XCodeProj() { }
+        public void Generate(Sharpmake.Builder builder, Sharpmake.Project project, System.Collections.Generic.List<Sharpmake.Project.Configuration> configurations, string projectFile, System.Collections.Generic.List<string> generatedFiles, System.Collections.Generic.List<string> skipFiles) { }
+        public enum ItemSection
+        {
+            PBXBuildFile = 0,
+            PBXContainerItemProxy = 1,
+            PBXFileReference = 2,
+            PBXFrameworksBuildPhase = 3,
+            PBXGroup = 4,
+            PBXNativeTarget = 5,
+            PBXLegacyTarget = 6,
+            PBXProject = 7,
+            PBXReferenceProxy = 8,
+            PBXResourcesBuildPhase = 9,
+            PBXSourcesBuildPhase = 10,
+            PBXHeadersBuildPhase = 11,
+            PBXCopyFilesBuildPhase = 12,
+            PBXVariantGroup = 13,
+            PBXTargetDependency = 14,
+            XCBuildConfiguration_NativeTarget = 15,
+            XCBuildConfiguration_LegacyTarget = 16,
+            XCBuildConfiguration_UnitTestTarget = 17,
+            XCBuildConfiguration_Project = 18,
+            XCConfigurationList = 19,
+            PBXShellScriptBuildPhase = 20,
+        }
+        public abstract class ProjectItem : System.IComparable<Sharpmake.Generators.Apple.XCodeProj.ProjectItem>, System.IEquatable<Sharpmake.Generators.Apple.XCodeProj.ProjectItem>
+        {
+            public ProjectItem(Sharpmake.Generators.Apple.XCodeProj.ItemSection section, string identifier, string settings = "REMOVE_LINE_TAG") { }
+            public string Identifier { get; }
+            public Sharpmake.Generators.Apple.XCodeProj.ItemSection Section { get; }
+            public string SectionString { get; }
+            public string Settings { get; }
+            public string Uid { get; }
+            public int CompareTo(Sharpmake.Generators.Apple.XCodeProj.ProjectItem other) { }
+            protected virtual int CompareToInternal(Sharpmake.Generators.Apple.XCodeProj.ProjectItem other) { }
+            public bool Equals(Sharpmake.Generators.Apple.XCodeProj.ProjectItem other) { }
+            public override bool Equals(object obj) { }
+            public virtual void GetAdditionalResolverParameters(Sharpmake.Generators.Apple.XCodeProj.ProjectItem item, Sharpmake.Resolver resolver, ref System.Collections.Generic.Dictionary<string, string> resolverParameters) { }
+            public override int GetHashCode() { }
+            public override string ToString() { }
+            public static bool operator !=(Sharpmake.Generators.Apple.XCodeProj.ProjectItem left, Sharpmake.Generators.Apple.XCodeProj.ProjectItem right) { }
+            public static bool operator ==(Sharpmake.Generators.Apple.XCodeProj.ProjectItem left, Sharpmake.Generators.Apple.XCodeProj.ProjectItem right) { }
+        }
+    }
+    public static class XCodeUtil
+    {
+        public const string CustompropertiesFilename = "customproperties.xml";
+        public static void ResolveProjectPaths(Sharpmake.Project project, Sharpmake.OrderableStrings stringsToResolve) { }
+        public static void ResolveProjectPaths(Sharpmake.Project project, Sharpmake.Strings stringsToResolve) { }
+        public static string ResolveProjectPaths(Sharpmake.Project project, string stringToResolve) { }
+        public static string ResolveProjectVariable(Sharpmake.Project project, string stringToResolve) { }
+        public static string XCodeFormatList(System.Collections.Generic.IEnumerable<string> items, int nbIndent, bool forceQuotes = false) { }
+        public static string XCodeFormatSingleItem(string item, bool forceQuotes = false) { }
+    }
+}
+namespace Sharpmake.Generators
+{
+    public class CompilerSettings
+    {
+        public CompilerSettings(string compilerName, Sharpmake.CompilerFamily compilerFamily, Sharpmake.Platform platform, Sharpmake.Strings extraFiles, string executable, string rootPath, Sharpmake.DevEnv devEnv, System.Collections.Generic.IDictionary<string, Sharpmake.Generators.CompilerSettings.Configuration> configurations) { }
+        public string CompilerName { get; }
+        public System.Collections.Generic.IDictionary<string, Sharpmake.Generators.CompilerSettings.Configuration> Configurations { get; }
+        public Sharpmake.DevEnv DevEnv { get; set; }
+        public string Executable { get; }
+        public Sharpmake.Strings ExtraFiles { get; }
+        public Sharpmake.CompilerFamily FastBuildCompilerFamily { get; }
+        public Sharpmake.Platform PlatformFlags { get; set; }
+        public string RootPath { get; }
+        public class Configuration
+        {
+            public Configuration(Sharpmake.Platform platform, string binPath = "REMOVE_LINE_TAG", string linkerPath = "REMOVE_LINE_TAG", string resourceCompiler = "REMOVE_LINE_TAG", string embeddedResourceCompiler = "REMOVE_LINE_TAG", string compiler = "REMOVE_LINE_TAG", string librarian = "REMOVE_LINE_TAG", string linker = "REMOVE_LINE_TAG", string executable = "REMOVE_LINE_TAG", string usingOtherConfiguration = "REMOVE_LINE_TAG", Sharpmake.Generators.CompilerSettings.LinkerType fastBuildLinkerType = 0) { }
+            public string BinPath { get; set; }
+            public string Compiler { get; set; }
+            public string EmbeddedResourceCompiler { get; set; }
+            public string Executable { get; set; }
+            public Sharpmake.Generators.CompilerSettings.LinkerType FastBuildLinkerType { get; set; }
+            public string Librarian { get; set; }
+            public string Linker { get; set; }
+            public string LinkerPath { get; set; }
+            public string Masm { get; set; }
+            public string Nasm { get; set; }
+            public Sharpmake.Platform Platform { get; }
+            public string PlatformLibPaths { get; set; }
+            public string ResourceCompiler { get; set; }
+            public string UsingOtherConfiguration { get; set; }
+        }
+        public enum LinkerType
+        {
+            Auto = 0,
+            MSVC = 1,
+            GCC = 2,
+            SNCPS3 = 3,
+            ClangOrbis = 4,
+            GreenHillsExlr = 5,
+            CodeWarriorLd = 6,
+        }
+    }
+    public class FileGenerator : Sharpmake.IFileGenerator
+    {
+        public FileGenerator() { }
+        public FileGenerator(Sharpmake.Resolver resolver) { }
+        public FileGenerator(System.Text.Encoding encoding) { }
+        public FileGenerator(System.Text.Encoding encoding, Sharpmake.Resolver resolver) { }
+        public Sharpmake.Resolver Resolver { get; }
+        public void Clear() { }
+        public System.IDisposable Declare(params Sharpmake.VariableAssignment[] variables) { }
+        public bool FileWriteIfDifferent(System.IO.FileInfo file, bool bypassAutoCleanupDatabase = false) { }
+        public void Flush() { }
+        public bool IsEmpty() { }
+        public bool IsFileDifferent(System.IO.FileInfo file) { }
+        public void RemoveTaggedLines() { }
+        public void ResolveEnvironmentVariables(Sharpmake.Platform platform, params Sharpmake.VariableAssignment[] variables) { }
+        [System.Obsolete("Can\'t use this anymore. Please use IsFileDifferent or FileWriteIfDifferent")]
+        public System.IO.MemoryStream ToMemoryStream() { }
+        public void Write(string text) { }
+        public void Write(string text, string fallbackValue) { }
+        public void WriteLine(string text) { }
+        public void WriteLine(string text, string fallbackValue) { }
+        public void WriteLineVerbatim(string text) { }
+        public void WriteTo(Sharpmake.IFileGenerator generator) { }
+        public void WriteVerbatim(string text) { }
+    }
+    public static class FileGeneratorUtilities
+    {
+        public const string RemoveLineTag = "REMOVE_LINE_TAG";
+    }
+    public class GeneratorManager : Sharpmake.IGeneratorManager, Sharpmake.IProjectGenerator, Sharpmake.ISolutionGenerator
+    {
+        public GeneratorManager() { }
+        public Sharpmake.Generators.VisualStudio.Androidproj AndroidprojGenerator { get; }
+        public Sharpmake.Generators.FastBuild.Bff BffGenerator { get; }
+        public Sharpmake.Generators.VisualStudio.CSproj CsprojGenerator { get; }
+        public Sharpmake.Generators.Generic.MakeApplication MakeApplicationGenerator { get; }
+        public Sharpmake.Generators.Generic.MakeProject MakeProjectGenerator { get; }
+        public Sharpmake.Generators.Generic.Makefile MakefileGenerator { get; }
+        public Sharpmake.Generators.FastBuild.MasterBff MasterBffGenerator { get; }
+        public Sharpmake.Generators.VisualStudio.Pyproj PyprojGenerator { get; }
+        public Sharpmake.Generators.VisualStudio.Sln SlnGenerator { get; }
+        public Sharpmake.Generators.VisualStudio.Vcxproj VcxprojGenerator { get; }
+        public Sharpmake.Generators.Apple.XCWorkspace XCWorkspaceGenerator { get; }
+        public Sharpmake.Generators.Apple.XCodeProj XCodeProjectGenerator { get; }
+        public void BeforeGenerate() { }
+        public void Generate(Sharpmake.Builder builder, Sharpmake.Project project, System.Collections.Generic.List<Sharpmake.Project.Configuration> configurations, string projectFile, System.Collections.Generic.List<string> generatedFiles, System.Collections.Generic.List<string> skipFiles) { }
+        public void Generate(Sharpmake.Builder builder, Sharpmake.Solution solution, System.Collections.Generic.List<Sharpmake.Solution.Configuration> configurations, string solutionFile, System.Collections.Generic.List<string> generatedFiles, System.Collections.Generic.List<string> skipFiles) { }
+        public void InitializeBuilder(Sharpmake.Builder builder) { }
+    }
+    public interface IGenerationContext
+    {
+        Sharpmake.Builder Builder { get; }
+        System.Collections.Generic.IDictionary<string, string> CommandLineOptions { get; }
+        Sharpmake.Project.Configuration Configuration { get; }
+        Sharpmake.DevEnv DevelopmentEnvironment { get; }
+        Sharpmake.Options.ExplicitOptions Options { get; }
+        bool PlainOutput { get; }
+        Sharpmake.Project Project { get; }
+        string ProjectDirectory { get; }
+        string ProjectDirectoryCapitalized { get; }
+        string ProjectSourceCapitalized { get; }
+        void SelectOption(params Sharpmake.Options.OptionAction[] options);
+        void SelectOptionWithFallback(System.Action fallbackAction, params Sharpmake.Options.OptionAction[] options);
+    }
+}
+namespace Sharpmake.Generators.FastBuild
+{
+    public class Bff : Sharpmake.IProjectGenerator
+    {
+        public static readonly string CurrentBffPathKey;
+        public static Sharpmake.Generators.FastBuild.Bff.IUnityResolver UnityResolver;
+        public Bff() { }
+        public void Generate(Sharpmake.Builder builder, Sharpmake.Project project, System.Collections.Generic.List<Sharpmake.Project.Configuration> configurations, string projectFile, System.Collections.Generic.List<string> generatedFiles, System.Collections.Generic.List<string> skipFiles) { }
+        public static string CurrentBffPathKeyCombine(string relativePath) { }
+        public static string GetCommandLineArguments(Sharpmake.Project.Configuration conf) { }
+        public static string GetPlatformSpecificDefine(Sharpmake.Platform platform) { }
+        public static string GetShortProjectName(Sharpmake.Project project, Sharpmake.Project.Configuration conf) { }
+        public static void InitializeBuilder(Sharpmake.Builder builder) { }
+        public class FastBuildDefaultCommandGenerator : Sharpmake.FastBuildMakeCommandGenerator
+        {
+            public FastBuildDefaultCommandGenerator() { }
+            public override string GetArguments(Sharpmake.FastBuildMakeCommandGenerator.BuildType buildType, Sharpmake.Project.Configuration conf, string fastbuildArguments) { }
+            public override string GetExecutablePath(Sharpmake.Project.Configuration conf) { }
+            public override string GetTargetIdentifier(Sharpmake.Project.Configuration conf) { }
+        }
+        public class FragmentHashUnityResolver : Sharpmake.Generators.FastBuild.Bff.IUnityResolver
+        {
+            public FragmentHashUnityResolver() { }
+            public void ResolveUnities(Sharpmake.Project project, string projectPath, ref System.Collections.Generic.Dictionary<Sharpmake.Generators.FastBuild.Bff.Unity, System.Collections.Generic.List<Sharpmake.Project.Configuration>> unities) { }
+        }
+        public class FragmentUnityResolver : Sharpmake.Generators.FastBuild.Bff.IUnityResolver
+        {
+            public FragmentUnityResolver() { }
+            public void ResolveUnities(Sharpmake.Project project, string projectPath, ref System.Collections.Generic.Dictionary<Sharpmake.Generators.FastBuild.Bff.Unity, System.Collections.Generic.List<Sharpmake.Project.Configuration>> unities) { }
+        }
+        public class HashUnityResolver : Sharpmake.Generators.FastBuild.Bff.IUnityResolver
+        {
+            public HashUnityResolver() { }
+            public void ResolveUnities(Sharpmake.Project project, string projectPath, ref System.Collections.Generic.Dictionary<Sharpmake.Generators.FastBuild.Bff.Unity, System.Collections.Generic.List<Sharpmake.Project.Configuration>> unities) { }
+        }
+        public interface IUnityResolver
+        {
+            void ResolveUnities(Sharpmake.Project project, string projectPath, ref System.Collections.Generic.Dictionary<Sharpmake.Generators.FastBuild.Bff.Unity, System.Collections.Generic.List<Sharpmake.Project.Configuration>> unities);
+        }
+        public class Unity
+        {
+            public const string DefaultUnityInputPatternExtension = ".cpp";
+            public const string DefaultUnityOutputPatternExtension = "Unity*.cpp";
+            public string UnityInputExcludePath;
+            public string UnityInputExcludePattern;
+            public string UnityInputExcludedFiles;
+            public string UnityInputFiles;
+            public string UnityInputIsolateListFile;
+            public string UnityInputIsolateWritableFiles;
+            public string UnityInputIsolateWritableFilesLimit;
+            public string UnityInputObjectLists;
+            public string UnityInputPath;
+            public string UnityInputPathRecurse;
+            public string UnityInputPattern;
+            public string UnityName;
+            public string UnityNumFiles;
+            public string UnityOutputPath;
+            public string UnityOutputPattern;
+            public string UnityPCH;
+            public byte UnitySectionBucket;
+            public string UseRelativePaths;
+            public Unity() { }
+            public override bool Equals(object obj) { }
+            public override int GetHashCode() { }
+        }
+        public static class Template
+        {
+            public static class ConfigurationFile
+            {
+                public const string ClangCompilerOptionsDeoptimize = @"\r\n    .CompilerOptionsDeoptimized = '[fastBuildClangFileLanguage]""%1"" -o ""%2"" -c'\r\n                            + ' [fastBuildCompilerPCHOptionsClang]'\r\n                            + ' $CompilerExtraOptions$'\r\n                            + ' [fastBuildCompilerDeoptimizeOptionClang]'\r\n";
+                public const string LinuxEnvironment = ("    .Environment =\\r\\n    {\\r\\n        \"PATH=[fastBuildPATH]\"\\r\\n[envAdditionalVa" +
+                    "riables]\\r\\n    }\\r\\n");
+                public const string OsxEnvironment = ("    #import TMPDIR\\r\\n    .Environment =\\r\\n    {\\r\\n        \"TMPDIR=$TMPDIR$\",\\r" +
+                    "\\n        \"PATH=[fastBuildPATH]\"\\r\\n[envAdditionalVariables]\\r\\n    }\\r\\n");
+                public const string WinEnvironment = @"    #import TMP\r\n    #import TEMP\r\n    #import USERPROFILE\r\n    #import COMSPEC\r\n    .Environment =\r\n    {\r\n        ""TMP=$TMP$"",\r\n        ""TEMP=$TEMP$"",\r\n        ""USERPROFILE=$USERPROFILE$"",\r\n        ""COMSPEC=$COMSPEC$"",\r\n        ""SystemRoot=[fastBuildSystemRoot]""\r\n        ""PATH=[fastBuildPATH]""\r\n[envAdditionalVariables]\r\n    }\r\n";
+                public static string AllConfigsSection;
+                public static string AllowCaching;
+                public static string CPPCompilerExtraOptions;
+                public static string CPPCompilerOptimizationOptions;
+                public static string CPPCompilerOptionsDeoptimize;
+                public static string CompilerConfiguration;
+                public static string CompilerOptionsCPP;
+                public static string CompilerOptionsClang;
+                public static string CompilerOptionsCommon;
+                public static string CompilerOptionsMasm;
+                public static string CompilerOptionsNasm;
+                public static string CompilerSetting;
+                public static string ConcurrencyGroup;
+                public static string CopyDirSection;
+                public static string CopyFileSection;
+                public static string CustomSectionHeader;
+                public static string DeOptimizeOption;
+                public static string Define;
+                public static string EmbeddedResourceCompilerOptions;
+                public static string EmbeddedResourcesBeginSection;
+                public static string EndSection;
+                public static string ExeDllBeginSection;
+                public static string GenericExecutableSection;
+                public static string GlobalConfigurationInclude;
+                public static string GlobalSettings;
+                public static string HeaderFile;
+                public static string IncludeMasterBff;
+                public static string Includes;
+                public static string LibBeginSection;
+                public static string LibrarianAdditionalInputs;
+                public static string LibrarianOptions;
+                public static string LibrarianOptionsClang;
+                public static string LinkerOptions;
+                public static string MasmCompilerExtraOptions;
+                public static string MasmConfigNameSuffix;
+                public static string NasmCompilerExtraOptions;
+                public static string NasmConfigNameSuffix;
+                public static string ObjectListBeginSection;
+                public static string PCHOptions;
+                public static string PCHOptionsClang;
+                public static string PCHOptionsDeoptimize;
+                public static string PlatformBeginSection;
+                public static string PlatformEndSection;
+                public static string PreBuildDependencies;
+                public static string ResourceCompilerExtraOptions;
+                public static string ResourceCompilerOptions;
+                public static string ResourcesBeginSection;
+                public static string TargetForLibraryDependencySection;
+                public static string TargetSection;
+                public static string TestSection;
+                public static string UnityBeginSection;
+                public static string UnitySection;
+                public static string UsePrecomp;
+                public static string UsePrecompClang;
+                public static string Win64ConfigName;
+            }
+        }
+    }
+    public interface IApplePlatformBff : Sharpmake.Generators.FastBuild.IClangPlatformBff, Sharpmake.Generators.FastBuild.IPlatformBff
+    {
+        bool IsSwiftSupported();
+        void SetupSwiftOptions(Sharpmake.IFileGenerator generator);
+        string SwiftConfigName(Sharpmake.Configuration conf);
+    }
+    public interface IBffGenerationContext : Sharpmake.Generators.IGenerationContext
+    {
+        System.Collections.Generic.IReadOnlyList<Sharpmake.Project.Configuration> ProjectConfigurations { get; }
+    }
+    public interface IClangPlatformBff : Sharpmake.Generators.FastBuild.IPlatformBff
+    {
+        void SetupClangOptions(Sharpmake.IFileGenerator generator);
+    }
+    public interface IMicrosoftPlatformBff : Sharpmake.Generators.FastBuild.IPlatformBff
+    {
+        bool SupportsResourceFiles { get; }
+    }
+    public interface IPlatformBff
+    {
+        string BffPlatformDefine { get; }
+        void AddCompilerSettings(System.Collections.Generic.IDictionary<string, Sharpmake.Generators.CompilerSettings> masterCompilerSettings, Sharpmake.Project.Configuration conf);
+        string CConfigName(Sharpmake.Configuration conf);
+        string CppConfigName(Sharpmake.Configuration conf);
+        System.Collections.Generic.IEnumerable<Sharpmake.Project.Configuration.BuildStepBase> GetExtraPostBuildEvents(Sharpmake.Project.Configuration configuration, string fastBuildOutputFile);
+        System.Collections.Generic.IEnumerable<Sharpmake.Project.Configuration.BuildStepExecutable> GetExtraStampEvents(Sharpmake.Project.Configuration configuration, string fastBuildOutputFile);
+        string GetOutputFilename(Sharpmake.Project.Configuration.OutputType outputType, string fastBuildOutputFile);
+        void SelectAdditionalCompilerOptionsBff(Sharpmake.Generators.FastBuild.IBffGenerationContext context);
+        void SelectPreprocessorDefinitionsBff(Sharpmake.Generators.FastBuild.IBffGenerationContext context);
+        void SetupExtraLinkerSettings(Sharpmake.IFileGenerator fileGenerator, Sharpmake.Project.Configuration configuration, string fastBuildOutputFile);
+    }
+    public class MasterBff : Sharpmake.ISolutionGenerator
+    {
+        public MasterBff() { }
+        public void Generate(Sharpmake.Builder builder, Sharpmake.Solution solution, System.Collections.Generic.List<Sharpmake.Solution.Configuration> solutionConfigurations, string solutionFile, System.Collections.Generic.List<string> generatedFiles, System.Collections.Generic.List<string> skipFiles) { }
+    }
+    public static class UtilityMethods
+    {
+        public static string FBuildFormatList(System.Collections.Generic.List<string> items, int spaceLength, Sharpmake.Generators.FastBuild.UtilityMethods.FBuildFormatListOptions options = 7) { }
+        public enum FBuildFormatListOptions
+        {
+            None = 0,
+            QuoteItems = 1,
+            UseSingleElementShortFormat = 2,
+            UseCommaBetweenElements = 4,
+        }
+    }
+}
+namespace Sharpmake.Generators.Generic
+{
+    public class MakeApplication : Sharpmake.ISolutionGenerator
+    {
+        public MakeApplication() { }
+        public void Generate(Sharpmake.Builder builder, Sharpmake.Solution solution, System.Collections.Generic.List<Sharpmake.Solution.Configuration> configurations, string solutionFile, System.Collections.Generic.List<string> generatedFiles, System.Collections.Generic.List<string> skipFiles) { }
+    }
+    public class MakeProject : Sharpmake.IProjectGenerator
+    {
+        public MakeProject() { }
+        public void Generate(Sharpmake.Builder builder, Sharpmake.Project project, System.Collections.Generic.List<Sharpmake.Project.Configuration> configurations, string projectFile, System.Collections.Generic.List<string> generatedFiles, System.Collections.Generic.List<string> skipFiles) { }
+        public string GenerateProject(Sharpmake.Project project, System.Collections.Generic.List<Sharpmake.Project.Configuration> configurations, string projectPath, string projectFileName, out bool updated) { }
+    }
+    public class Makefile : Sharpmake.IProjectGenerator, Sharpmake.ISolutionGenerator
+    {
+        public Makefile() { }
+        public void Generate(Sharpmake.Builder builder, Sharpmake.Project project, System.Collections.Generic.List<Sharpmake.Project.Configuration> configurations, string projectFile, System.Collections.Generic.List<string> generatedFiles, System.Collections.Generic.List<string> skipFiles) { }
+        public void Generate(Sharpmake.Builder builder, Sharpmake.Solution solution, System.Collections.Generic.List<Sharpmake.Solution.Configuration> configurations, string solutionFile, System.Collections.Generic.List<string> generatedFiles, System.Collections.Generic.List<string> skipFiles) { }
+        public static class Template
+        {
+            public static class Project
+            {
+                public static string Footer;
+                public static string Header;
+                public static string LinkCommandDll;
+                public static string LinkCommandExe;
+                public static string LinkCommandLib;
+                public static readonly string ObjectRuleC;
+                public static readonly string ObjectRuleCxx;
+                public static string ObjectsVariableBegin;
+                public static string ObjectsVariableElement;
+                public static string ObjectsVariableEnd;
+                public static string ProjectConfigurationVariables;
+                public static string ProjectRulesGeneral;
+            }
+            public static class Solution
+            {
+                public static string AllRule;
+                public static string CleanRuleBegin;
+                public static string CleanRuleEnd;
+                public static string CleanRuleProject;
+                public static string Header;
+                public static string HelpRuleBegin;
+                public static string HelpRuleConfiguration;
+                public static string HelpRuleEnd;
+                public static string HelpRuleTarget;
+                public static string HelpRuleTargetsBegin;
+                public static string PhonyTargets;
+                public static string ProjectRuleBegin;
+                public static string ProjectRuleDependency;
+                public static string ProjectRuleEnd;
+                public static string ProjectsVariableBegin;
+                public static string ProjectsVariableElement;
+                public static string ProjectsVariableEnd;
+            }
+        }
+    }
+}
+namespace Sharpmake.Generators.JsonCompilationDatabase
+{
+    public class CompileCommand
+    {
+        public CompileCommand() { }
+        public System.Collections.Generic.List<string> Arguments { get; set; }
+        public string Command { get; set; }
+        public string Directory { get; set; }
+        public string File { get; set; }
+    }
+    public enum CompileCommandFormat
+    {
+        Command = 0,
+        Arguments = 1,
+    }
+    public class JsonCompilationDatabase
+    {
+        public const string FileName = "compile_commands.json";
+        public JsonCompilationDatabase() { }
+        public event System.Action<Sharpmake.Generators.IGenerationContext, Sharpmake.Generators.JsonCompilationDatabase.CompileCommand> CompileCommandGenerated;
+        public void Generate(Sharpmake.Builder builder, string path, System.Collections.Generic.IEnumerable<Sharpmake.Project.Configuration> projectConfigurations, Sharpmake.Generators.JsonCompilationDatabase.CompileCommandFormat format, System.Collections.Generic.List<string> generatedFiles, System.Collections.Generic.List<string> skipFiles) { }
+    }
+}
+namespace Sharpmake.Generators.VisualStudio
+{
+    public class Androidproj : Sharpmake.IProjectGenerator
+    {
+        public const string ProjectExtension = ".androidproj";
+        public Androidproj() { }
+        public void Generate(Sharpmake.Builder builder, Sharpmake.Project project, System.Collections.Generic.List<Sharpmake.Project.Configuration> configurations, string projectFile, System.Collections.Generic.List<string> generatedFiles, System.Collections.Generic.List<string> skipFiles) { }
+    }
+    public class CSproj : Sharpmake.IProjectGenerator
+    {
+        public const string ProjectExtension = ".csproj";
+        public CSproj() { }
+        public static System.Collections.Concurrent.ConcurrentBag<Sharpmake.Generators.VisualStudio.CSproj.CsProjSubTypesInfos> AllCsProjSubTypesInfos { get; }
+        public void AddPreImportCustomProperties(System.Collections.Generic.Dictionary<string, string> properties, Sharpmake.CSharpProject cSharpProject, string projectPath) { }
+        public void Generate(Sharpmake.Builder builder, Sharpmake.Project project, System.Collections.Generic.List<Sharpmake.Project.Configuration> configurations, string projectFile, System.Collections.Generic.List<string> generatedFiles, System.Collections.Generic.List<string> skipFiles) { }
+        [System.Serializable]
+        public class CsProjSubTypesInfos
+        {
+            public CsProjSubTypesInfos() { }
+            public string CsProjFullPath { get; set; }
+            public System.DateTime LastWriteTime { get; set; }
+            public System.Collections.Generic.List<Sharpmake.Generators.VisualStudio.CSproj.CsProjSubTypesInfos.SubTypeInfo> SubTypeInfos { get; set; }
+            [System.Serializable]
+            public class SubTypeInfo
+            {
+                public SubTypeInfo() { }
+                public string FileName { get; set; }
+                public System.DateTime LastWriteTime { get; set; }
+                public string SubType { get; set; }
+            }
+        }
+        public class ProjectFile
+        {
+            public string DirectorySourceRelative;
+            public string FileName;
+            public string FileNameProjectRelative;
+            public string FileNameSourceRelative;
+            public ProjectFile(string fileName, string projectPathCapitalized, string projectSourceCapitalized) { }
+        }
+        public static class Template
+        {
+            public static string ApplicationIcon;
+            public static string ApplicationManifest;
+            public static string COMReference;
+            public static string CachedAppSettingsObjectName;
+            public static string CachedDynamicPropName;
+            public static string CachedSettingsPropName;
+            public static string MSBuild14PropertyGroup;
+            public static string NoWin32Manifest;
+            public static string ProjectExtensionsAspNetMvc5;
+            public static string ProjectExtensionsVsto;
+            public static string ProjectExtensionsWcf;
+            public static string PropertyGroupWithConditionStart;
+            public static string RelPath;
+            public static string StartupObject;
+            public static string UpdateFromURL;
+            public static string UrlBehavior;
+            public static string WebReferenceUrlBegin;
+            public static string WebReferenceUrlEnd;
+            public static class ItemGroups
+            {
+                public static string Analyzer;
+                public static string ApplicationDefinitionBegin;
+                public static string ApplicationDefinitionEnd;
+                public static string AutoGen;
+                public static string BootstrapperPackage;
+                public static string ChooseBegin;
+                public static string ChooseConditionBegin;
+                public static string ChooseConditionEnd;
+                public static string ChooseEnd;
+                public static string CompileBegin;
+                public static string CompileBeginWithExclude;
+                public static string CompileEnd;
+                public static string ContentBegin;
+                public static string ContentEnd;
+                public static string ContentSimple;
+                public static string CopyToOutputDirectory;
+                public static string DependentUpon;
+                public static string DesignTime;
+                public static string DesignTimeSharedInput;
+                public static string EmbedInteropTypes;
+                public static string EmbeddedResourceBegin;
+                public static string EmbeddedResourceEnd;
+                public static string EntityDeployBegin;
+                public static string EntityDeployEnd;
+                public static string FileAssociationItem;
+                public static string Folder;
+                public static string FrameworkReference;
+                public static string Generator;
+                public static string HintPath;
+                public static string IncludeInVsix;
+                public static string IncludeOutputGroupsInVSIX;
+                public static string ItemGroupBegin;
+                public static string ItemGroupConditionalBegin;
+                public static string ItemGroupEnd;
+                public static string ItemGroupTargetFrameworkCondition;
+                public static string LastGenOutput;
+                public static string Link;
+                public static string MergeWithCto;
+                public static string NoneItemGroupBegin;
+                public static string NoneItemGroupEnd;
+                public static string PageBegin;
+                public static string PageEnd;
+                public static string Private;
+                public static string ProjectGUID;
+                public static string ProjectRefName;
+                public static string ProjectReferenceBegin;
+                public static string ProjectReferenceEnd;
+                public static string Protobuf;
+                public static string PublishFile;
+                public static string ReferenceBegin;
+                public static string ReferenceEnd;
+                public static string ReferenceOutputAssembly;
+                public static string ResourceBegin;
+                public static string ResourceEnd;
+                public static string ResourceName;
+                public static string Service;
+                public static string SimpleCompile;
+                public static string SimpleCompileWithExclude;
+                public static string SimpleEmbeddedResource;
+                public static string SimpleNone;
+                public static string SimpleReference;
+                public static string SimpleResource;
+                public static string SimpleWebReference;
+                public static string SpecificVersion;
+                public static string SplashScreen;
+                public static string SubType;
+                public static string VSIXSourceItem;
+                public static string VsctCompileBegin;
+                public static string VsctCompileEnd;
+                public static string VsdConfigXmlSimple;
+                public static string WCFMetadata;
+                public static string WCFMetadataStorage;
+            }
+            public static class Project
+            {
+                public const string DefaultProjectConfigurationCondition = "\'$(Configuration)|$(Platform)\'==\'[conf.Name]|[platformName]\'";
+                public const string MultiFrameworkProjectConfigurationCondition = ("\'$(Configuration)|$(Platform)|$(TargetFramework)\'==\'[conf.Name]|[platformName]|[t" +
+                    "argetFramework]\'");
+                public static string ImportProjectItem;
+                public static string ImportProjectItemSimple;
+                public static string ImportProjectSdkItem;
+                public static string ProjectAspNetMvcDescription;
+                public static string ProjectBegin;
+                public static string ProjectBeginNetCore;
+                public static string ProjectBeginVs2017;
+                public static string ProjectConfigurationsGeneral;
+                public static string ProjectConfigurationsPostBuildEvent;
+                public static string ProjectConfigurationsPostBuildEventConditional;
+                public static string ProjectConfigurationsPreBuildEvent;
+                public static string ProjectConfigurationsPreBuildEventConditional;
+                public static string ProjectConfigurationsRunPostBuildEvent;
+                public static string ProjectDescription;
+                public static string ProjectEnd;
+                public static string VsixConfiguration;
+            }
+            public static class TargetElement
+            {
+                public static string CustomTarget;
+                public static string CustomTargetNoParameters;
+            }
+            public static class UserFile
+            {
+                public static readonly string DebugUnmanaged;
+                public static readonly string StartWithProgram;
+                public static readonly string StartWithProject;
+                public static readonly string StartWithUrl;
+            }
+            public static class UsingTaskElement
+            {
+                public static string UsingTask;
+            }
+        }
+    }
+    public interface IPlatformVcxproj
+    {
+        bool ExcludesPrecompiledHeadersFromBuild { get; }
+        string ExecutableFileFullExtension { get; }
+        bool HasEditAndContinueDebuggingSupport { get; }
+        bool HasUserAccountControlSupport { get; }
+        string PackageFileFullExtension { get; }
+        string ProgramDatabaseFileFullExtension { get; }
+        string SharedLibraryFileFullExtension { get; }
+        string StaticLibraryFileFullExtension { get; }
+        string StaticOutputLibraryFileFullExtension { get; }
+        void GenerateMakefileConfigurationVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator);
+        void GeneratePlatformReferences(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator);
+        void GeneratePlatformResourceFileList(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator, Sharpmake.Strings alreadyWrittenPriFiles, System.Collections.Generic.IList<Sharpmake.Generators.VisualStudio.Vcxproj.ProjectFile> resourceFiles, System.Collections.Generic.IList<Sharpmake.Generators.VisualStudio.Vcxproj.ProjectFile> imageResourceFiles);
+        void GeneratePlatformSpecificProjectDescription(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator);
+        void GeneratePostDefaultPropsImport(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator);
+        void GenerateProjectCompileVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator);
+        void GenerateProjectConfigurationCustomMakeFile(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator);
+        void GenerateProjectConfigurationFastBuildMakeFile(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator);
+        void GenerateProjectConfigurationGeneral(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator);
+        void GenerateProjectConfigurationGeneral2(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator);
+        void GenerateProjectLinkVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator);
+        void GenerateProjectMasmVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator);
+        void GenerateProjectNasmVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator);
+        void GenerateProjectPlatformImportSheet(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator);
+        void GenerateProjectPlatformSdkDirectoryDescription(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator);
+        void GenerateRunFromPcDeployment(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator);
+        void GenerateSdkVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator);
+        void GenerateUserConfigurationFile(Sharpmake.Project.Configuration conf, Sharpmake.IFileGenerator generator);
+        System.Collections.Generic.IEnumerable<string> GetAssemblyIncludePaths(Sharpmake.Generators.IGenerationContext context);
+        System.Collections.Generic.IEnumerable<string> GetCxUsingPath(Sharpmake.Generators.IGenerationContext context);
+        System.Collections.Generic.IEnumerable<Sharpmake.VariableAssignment> GetEnvironmentVariables(Sharpmake.Generators.IGenerationContext context);
+        System.Collections.Generic.IEnumerable<string> GetImplicitlyDefinedSymbols(Sharpmake.Generators.IGenerationContext context);
+        System.Collections.Generic.IEnumerable<string> GetIncludePaths(Sharpmake.Generators.IGenerationContext context);
+        System.Collections.Generic.IEnumerable<string> GetLibraryFiles(Sharpmake.Generators.IGenerationContext context);
+        System.Collections.Generic.IEnumerable<string> GetLibraryPaths(Sharpmake.Generators.IGenerationContext context);
+        System.Collections.Generic.IEnumerable<System.Tuple<string, System.Collections.Generic.List<Sharpmake.Generators.VisualStudio.Vcxproj.ProjectFile>>> GetPlatformFileLists(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context);
+        System.Collections.Generic.IEnumerable<string> GetPlatformIncludePaths(Sharpmake.Generators.IGenerationContext context);
+        System.Collections.Generic.IEnumerable<Sharpmake.Generators.VisualStudio.IncludeWithPrefix> GetPlatformIncludePathsWithPrefix(Sharpmake.Generators.IGenerationContext context);
+        System.Collections.Generic.IEnumerable<string> GetPlatformLibraryFiles(Sharpmake.Generators.IGenerationContext context);
+        System.Collections.Generic.IEnumerable<string> GetResourceIncludePaths(Sharpmake.Generators.IGenerationContext context);
+        bool HasPrecomp(Sharpmake.Generators.IGenerationContext context);
+        void SelectApplicationFormatOptions(Sharpmake.Generators.IGenerationContext context);
+        void SelectBuildType(Sharpmake.Generators.IGenerationContext context);
+        void SelectCompilerOptions(Sharpmake.Generators.IGenerationContext context);
+        void SelectLinkerOptions(Sharpmake.Generators.IGenerationContext context);
+        void SelectPlatformAdditionalDependenciesOptions(Sharpmake.Generators.IGenerationContext context);
+        void SelectPrecompiledHeaderOptions(Sharpmake.Generators.IGenerationContext context);
+        void SelectPreprocessorDefinitionsVcxproj(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context);
+        void SetupDeleteExtensionsOnCleanOptions(Sharpmake.Generators.IGenerationContext context);
+        void SetupPlatformLibraryOptions(out string platformLibExtension, out string platformOutputLibExtension, out string platformPrefixExtension, out string platformLibPrefix);
+        void SetupPlatformTargetOptions(Sharpmake.Generators.IGenerationContext context);
+        void SetupPlatformToolsetOptions(Sharpmake.Generators.IGenerationContext context);
+        void SetupSdkOptions(Sharpmake.Generators.IGenerationContext context);
+    }
+    public interface IVcxprojGenerationContext : Sharpmake.Generators.IGenerationContext
+    {
+        Sharpmake.DevEnvRange DevelopmentEnvironmentsRange { get; }
+        Sharpmake.Resolver EnvironmentVariableResolver { get; }
+        System.Collections.Generic.IReadOnlyDictionary<Sharpmake.Platform, Sharpmake.Generators.VisualStudio.IPlatformVcxproj> PresentPlatforms { get; }
+        System.Collections.Generic.IReadOnlyDictionary<Sharpmake.Project.Configuration, Sharpmake.Options.ExplicitOptions> ProjectConfigurationOptions { get; }
+        System.Collections.Generic.IReadOnlyList<Sharpmake.Project.Configuration> ProjectConfigurations { get; }
+        string ProjectFileName { get; }
+        string ProjectPath { get; }
+    }
+    public class IncludeWithPrefix
+    {
+        public IncludeWithPrefix(string cmdLinePrefix, string includePath) { }
+        public string CmdLinePrefix { get; }
+        public string Path { get; }
+    }
+    public class ProjectOptionsGenerator
+    {
+        public ProjectOptionsGenerator() { }
+        public static string AppleAppBinaryRootFolder(Sharpmake.Platform platform) { }
+        public static System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, string>> ConvertPostBuildCopiesToRelative(Sharpmake.Project.Configuration conf, string relativeTo) { }
+        public static string MakeBuildStepName(Sharpmake.Project.Configuration conf, Sharpmake.Project.Configuration.BuildStepBase eventBuildStep, Sharpmake.Generators.VisualStudio.Vcxproj.BuildStep buildStep, string projectRootPath, string projectPath) { }
+        public static class Template
+        {
+            public static class Manifest
+            {
+                public const string DPIAwarenessSettings = ("\\r\\n      <dpiAware xmlns=\"http://schemas.microsoft.com/SMI/2005/WindowsSettings\"" +
+                    ">true/PM</dpiAware>\\r\\n      <dpiAwareness xmlns=\"http://schemas.microsoft.com/S" +
+                    "MI/2016/WindowsSettings\">PerMonitorV2,PerMonitor</dpiAwareness>\\r\\n");
+                public const string FileBegin = ("<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\\r\\n<assembly xmlns=\"urn:s" +
+                    "chemas-microsoft-com:asm.v1\" manifestVersion=\"1.0\">\\r\\n  <application xmlns=\"urn" +
+                    ":schemas-microsoft-com:asm.v3\">\\r\\n    <windowsSettings>");
+                public const string FileEnd = "    </windowsSettings>\\r\\n  </application>\\r\\n</assembly>";
+            }
+        }
+    }
+    public static class ProjectTypeGuids
+    {
+        public static System.Guid Android;
+        public static System.Guid AspNet5;
+        public static System.Guid AspNetMvc1;
+        public static System.Guid AspNetMvc2;
+        public static System.Guid AspNetMvc3;
+        public static System.Guid AspNetMvc4;
+        public static System.Guid AspNetMvc5;
+        public static System.Guid[] AspNetMvc5Project;
+        public static System.Guid[] CSharpTestProject;
+        public static System.Guid Database;
+        public static System.Guid DatabaseOtherProjectTypes;
+        public static System.Guid DeploymentCab;
+        public static System.Guid DeploymentMergeModule;
+        public static System.Guid DeploymentSetup;
+        public static System.Guid DeploymentSmartDeviceCab;
+        public static System.Guid DistributedSystem;
+        public static System.Guid Extensibility;
+        public static System.Guid Legacy2003SmartDeviceCSharp;
+        public static System.Guid Legacy2003SmartDeviceVB;
+        public static System.Guid Python;
+        public static System.Guid SharePointCSharp;
+        public static System.Guid SharePointVB;
+        public static System.Guid SharePointWorkflow;
+        public static System.Guid Silverlight;
+        public static System.Guid SmartDeviceCSharp;
+        public static System.Guid SmartDeviceVB;
+        public static System.Guid Test;
+        public static System.Guid VisualDatabaseTools;
+        public static System.Guid VisualStudioToolsForApplications;
+        public static System.Guid VisualStudioToolsForOffice;
+        public static System.Guid[] VsixProject;
+        public static System.Guid[] VstoProject;
+        public static System.Guid[] WcfProject;
+        public static System.Guid WebApplication;
+        public static System.Guid WebSite;
+        public static System.Guid WindowsCSharp;
+        public static System.Guid WindowsCommunicationFoundation;
+        public static System.Guid WindowsPresentationFoundation;
+        public static System.Guid WindowsVB;
+        public static System.Guid WindowsVisualCpp;
+        public static System.Guid WorkflowCSharp;
+        public static System.Guid WorkflowVB;
+        public static System.Guid[] WpfProject;
+        public static System.Guid XNAWindows;
+        public static System.Guid XNAXBox;
+        public static System.Guid XNAZune;
+        public static string ToOption(System.Guid[] projectTypes) { }
+    }
+    public class Pyproj : Sharpmake.IProjectGenerator
+    {
+        public const string ProjectExtension = ".pyproj";
+        public Pyproj() { }
+        public void Generate(Sharpmake.Builder builder, Sharpmake.Project project, System.Collections.Generic.List<Sharpmake.Project.Configuration> configurations, string projectFile, System.Collections.Generic.List<string> generatedFiles, System.Collections.Generic.List<string> skipFiles) { }
+    }
+    public class Sln : Sharpmake.ISolutionGenerator
+    {
+        public const string SolutionExtension = ".sln";
+        public Sln() { }
+        public void Generate(Sharpmake.Builder builder, Sharpmake.Solution solution, System.Collections.Generic.List<Sharpmake.Solution.Configuration> configurations, string solutionFile, System.Collections.Generic.List<string> generatedFiles, System.Collections.Generic.List<string> skipFiles) { }
+        public static string ReadGuidFromProjectFile(string projectFile) { }
+        public static string ReadTypeGuidFromProjectFile(string projectFile) { }
+        public static class Template
+        {
+            public static class Solution
+            {
+                public static string GlobalBegin;
+                public static string GlobalEnd;
+                public static string GlobalSectionProjectConfigurationActive;
+                public static string GlobalSectionProjectConfigurationBegin;
+                public static string GlobalSectionProjectConfigurationBuild;
+                public static string GlobalSectionProjectConfigurationDeploy;
+                public static string GlobalSectionProjectConfigurationEnd;
+                public static string GlobalSectionSolutionConfiguration;
+                public static string GlobalSectionSolutionConfigurationBegin;
+                public static string GlobalSectionSolutionConfigurationEnd;
+                [System.Obsolete(("This property is deprecated, scc info shouldn\'t be stored in the solution files a" +
+                    "nymore"), true)]
+                public static string GlobalSectionSolutionSourceCodeControlBegin;
+                [System.Obsolete(("This property is deprecated, scc info shouldn\'t be stored in the solution files a" +
+                    "nymore"), true)]
+                public static string GlobalSectionSolutionSourceCodeControlEnd;
+                [System.Obsolete(("This property is deprecated, scc info shouldn\'t be stored in the solution files a" +
+                    "nymore"), true)]
+                public static string GlobalSectionSolutionSourceCodeControlProject;
+                [System.Obsolete("Sharpmake doesn\'t support vs2010 anymore.")]
+                public static string HeaderBeginVs2010;
+                [System.Obsolete("Sharpmake doesn\'t support vs2012 anymore.")]
+                public static string HeaderBeginVs2012;
+                [System.Obsolete("Sharpmake doesn\'t support vs2013 anymore.")]
+                public static string HeaderBeginVs2013;
+                public static string HeaderBeginVs2015;
+                public static string HeaderBeginVs2017;
+                public static string HeaderBeginVs2019;
+                public static string HeaderBeginVs2022;
+                public static string HeaderBeginVs2026;
+                public static string HeaderEnd;
+                public static string NestedProjectBegin;
+                public static string NestedProjectEnd;
+                public static string NestedProjectItem;
+                public static string ProjectBegin;
+                public static string ProjectDependency;
+                public static string ProjectDependencyBegin;
+                public static string ProjectEnd;
+                public static string ProjectFolder;
+                public static string ProjectSectionEnd;
+                public static string SolutionItem;
+                public static string SolutionItemBegin;
+                public static string SolutionProperties;
+            }
+        }
+    }
+    public abstract class UserFileBase
+    {
+        protected const string RemoveLineTag = "REMOVE_LINE_TAG";
+        protected const string UserFileExtension = ".user";
+        protected UserFileBase(string projectFilePath) { }
+        protected abstract void GenerateConfigurationContent(Sharpmake.IFileGenerator fileGenerator, Sharpmake.Project.Configuration conf);
+        public void GenerateUserFile(Sharpmake.Builder builder, Sharpmake.Project project, System.Collections.Generic.IEnumerable<Sharpmake.Project.Configuration> configurations, System.Collections.Generic.IList<string> generatedFiles, System.Collections.Generic.IList<string> skipFiles) { }
+        protected abstract bool HasContentForConfiguration(Sharpmake.Project.Configuration conf, out bool overwrite);
+        public static class Template
+        {
+            public static readonly string PropertyGroupFooter;
+            public static readonly string PropertyGroupHeader;
+            public static readonly string UserFileFooter;
+            public static readonly string UserFileHeader;
+        }
+    }
+    public class Vcxproj : Sharpmake.IProjectGenerator
+    {
+        public const string EventSeparator = "&#x0D;&#x0A;";
+        public const string ProjectExtension = ".vcxproj";
+        public Vcxproj() { }
+        public string FileName { get; }
+        [System.Obsolete("Deprecated. Use `FastBuildSettings.FastBuildCustomArguments` instead.", false)]
+        public static string FastBuildCustomArguments { get; set; }
+        public void Generate(Sharpmake.Builder builder, Sharpmake.Project project, System.Collections.Generic.List<Sharpmake.Project.Configuration> configurations, string projectFile, System.Collections.Generic.List<string> generatedFiles, System.Collections.Generic.List<string> skipFiles) { }
+        public static System.Collections.Generic.Dictionary<string, Sharpmake.Generators.VisualStudio.Vcxproj.CombinedCustomFileBuildStep> CombineCustomFileBuildSteps(string referencePath, Sharpmake.Resolver resolver, System.Collections.Generic.IEnumerable<Sharpmake.Project.Configuration.CustomFileBuildStep> buildSteps) { }
+        public enum BuildStep
+        {
+            PreBuild = 1,
+            PreBuildCustomAction = 2,
+            PostBuild = 3,
+            PostBuildCustomAction = 4,
+        }
+        public class CombinedCustomFileBuildStep
+        {
+            public string AdditionalInputs;
+            public string Commands;
+            public string Description;
+            public string OutputItemType;
+            public string Outputs;
+            public CombinedCustomFileBuildStep() { }
+        }
+        public class ProjectFile
+        {
+            public string FileExtension;
+            public string FileName;
+            public string FileNameProjectRelative;
+            public string FileNameSourceRelative;
+            public string FileNameWithoutExtension;
+            public string FilePath;
+            public string FilterPath;
+            public ProjectFile(Sharpmake.Generators.IGenerationContext context, string fileName) { }
+            public override string ToString() { }
+        }
+        public static class Template
+        {
+            public static class Project
+            {
+                public const string AdditionalVCTargetsPath = ("    <AdditionalVCTargetsPath>[additionalVCTargetsPath]</AdditionalVCTargetsPath>\\" +
+                    "r\\n    <_VCTargetsPathForToolset>$(AdditionalVCTargetsPath)</_VCTargetsPathForTo" +
+                    "olset>\\r\\n");
+                public const string DisableRegistryUse = "    <DisableRegistryUse>true</DisableRegistryUse>\\r\\n";
+                public const string PlatformFolderOverride = "    <_PlatformFolder>[platformFolder]</_PlatformFolder>\\r\\n";
+                public static string CustomProperty;
+                public static string ImportCppDefaultProps;
+                public static string ItemGroupBegin;
+                public static string ItemGroupEnd;
+                public static string ProjectAfterConfigurationsGeneral;
+                public static string ProjectAfterConfigurationsGeneralImportPropertySheets;
+                public static string ProjectAfterImportedProps;
+                public static string ProjectBegin;
+                public static string ProjectBeginConfigurationDescription;
+                public static string ProjectBuildMacroEnvironmentVariable;
+                public static string ProjectConfigurationBeginItemDefinition;
+                public static string ProjectConfigurationDescription;
+                public static string ProjectConfigurationEndItemDefinition;
+                public static string ProjectConfigurationImportedProps;
+                public static string ProjectConfigurationImportedTargets;
+                public static string ProjectConfigurationsCustomBuildEvent;
+                public static string ProjectConfigurationsCustomBuildStep;
+                public static string ProjectConfigurationsManifestTool;
+                public static string ProjectConfigurationsPostBuildEvent;
+                public static string ProjectConfigurationsPreBuildEvent;
+                public static string ProjectConfigurationsPreLinkEvent;
+                public static string ProjectConfigurationsPrePostLinkEvent;
+                public static string ProjectConfigurationsResourceCompile;
+                public static string ProjectCustomTargetsBegin;
+                public static string ProjectCustomTargetsEnd;
+                public static string ProjectDescription;
+                public static string ProjectDescriptionEnd;
+                public static string ProjectDescriptionStartPlatformConditional;
+                public static string ProjectEnd;
+                public static string ProjectEndConfigurationDescription;
+                public static string ProjectFilesAdditionalForcedInclude;
+                public static string ProjectFilesAdditionalForcedIncludeVanilla;
+                public static string ProjectFilesBegin;
+                public static string ProjectFilesCustomBuildBegin;
+                public static string ProjectFilesCustomBuildCommand;
+                public static string ProjectFilesCustomBuildDescription;
+                public static string ProjectFilesCustomBuildEnd;
+                public static string ProjectFilesCustomBuildInputs;
+                public static string ProjectFilesCustomBuildLinkObject;
+                public static string ProjectFilesCustomBuildOutputItemType;
+                public static string ProjectFilesCustomBuildOutputs;
+                public static string ProjectFilesCustomSourceBegin;
+                public static string ProjectFilesCustomSourceBeginOptions;
+                public static string ProjectFilesCustomSourceEnd;
+                public static string ProjectFilesCustomSourceEndOptions;
+                public static string ProjectFilesEnd;
+                public static string ProjectFilesFastBuildFile;
+                public static string ProjectFilesForcedIncludeVanilla;
+                public static string ProjectFilesHeader;
+                public static string ProjectFilesNatvis;
+                public static string ProjectFilesNone;
+                public static string ProjectFilesPRIResources;
+                public static string ProjectFilesResourceBegin;
+                public static string ProjectFilesResourceEnd;
+                public static string ProjectFilesSourceBegin;
+                public static string ProjectFilesSourceBeginOptions;
+                public static string ProjectFilesSourceCompileAsC;
+                public static string ProjectFilesSourceCompileAsCLR;
+                public static string ProjectFilesSourceCompileAsCPP;
+                public static string ProjectFilesSourceConsumeWinRTExtensions;
+                public static string ProjectFilesSourceDefine;
+                public static string ProjectFilesSourceDoNotCompileAsCLR;
+                public static string ProjectFilesSourceEnableExceptions;
+                public static string ProjectFilesSourceEnd;
+                public static string ProjectFilesSourceEndOptions;
+                public static string ProjectFilesSourceExcludeFromBuild;
+                public static string ProjectFilesSourceExcludeGenerateXmlDocumentation;
+                public static string ProjectFilesSourceExcludeWinRTExtensions;
+                public static string ProjectFilesSourceObjectFileName;
+                public static string ProjectFilesSourcePrecompCreate;
+                public static string ProjectFilesSourcePrecompNotUsing;
+                public static string ProjectImportedMasmProps;
+                public static string ProjectImportedNasmProps;
+                public static string ProjectImportedProps;
+                public static string ProjectImportedPropsEnd;
+                public static string ProjectMasmTargetsItem;
+                public static string ProjectNasmTargetsItem;
+                public static string ProjectNugetReferenceError;
+                public static string ProjectNugetReferenceImport;
+                public static string ProjectReference;
+                public static string ProjectTargetsBegin;
+                public static string ProjectTargetsEnd;
+                public static string ProjectTargetsItem;
+                public static string PropertyGroupEnd;
+                public static string PropertyGroupStart;
+                public static string ReferenceByName;
+                public static string ReferenceByPath;
+                public static string SingleReferenceByName;
+                public static string VCOverridesProperties;
+                public static string VCTargetsPathOverride;
+                public static string VCTargetsPathOverrideConditional;
+            }
+        }
+    }
+}

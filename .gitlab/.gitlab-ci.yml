@@ -8,26 +8,28 @@ include:
   - project: 'ubi/runner/ci/templates'
     file: 'ubi_runner.yml'
     ref: '1.0.7'
+
 stages:
   - build
   - test
   - validation
   - deploy
 
-
 default:
   tags:
-  - square_windows
+    - square_windows
+
+variables:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "true"
+  DOTNET_NOLOGO: "true"
+  DOTNET_CLI_UI_LANGUAGE: "en"
 
 #############
 # Stage Build: compile sharpmake solution on all targets, keep the binaries for further steps.
 
 .compilation:base:
   stage: build
-  variables:
-    DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "true"
-    DOTNET_NOLOGO: "true"
-    DOTNET_CLI_UI_LANGUAGE: "en"
+  
   parallel:
     matrix:
     - configuration: [debug, release]
@@ -63,58 +65,58 @@ generate_samples_pipeline:
     expire_in: 1 day
 
 #############
-# Unit tests
-#############
-.unit_test:base:
+# Stage Tests: run unit, regression, functional, and public API tests.
+
+.test_base:
   stage: test
-  script:
-    - dotnet test Sharpmake.sln -c $configuration --no-build
   artifacts:
     when: on_failure
     untracked: true
     expire_in: 1 day
 
+# Unit tests
+.unit_test_base:
+  extends: .test_base
+  script:
+    - dotnet test Sharpmake.UnitTests\Sharpmake.UnitTests.csproj --no-build -c $configuration
+
 unit_test:debug:
-  extends: .unit_test:base
+  extends: .unit_test_base
   needs:
   - "compilation:windows: [debug]"
   variables:
     configuration: "debug"
 
 unit_test:release:
-  extends: .unit_test:base
+  extends: .unit_test_base
   needs:
     - "compilation:windows: [release]"
   variables:
     configuration: "release"
 
-#############
 # Regression tests
-#############
 regression_test:
-  stage: test
+  extends: .test_base
   script:
   - python regression_test.py
   needs:
   - "compilation:windows: [release]"
-  artifacts:
-    when: on_failure
-    untracked: true
-    expire_in: 1 day
 
-#############
 # Functional tests
-#############
 functional_test:
-  stage: test
+  extends: .test_base
   script:
   - python functional_test.py
   needs:
   - "compilation:windows: [release]"
-  artifacts:
-    when: on_failure
-    untracked: true
-    expire_in: 1 day
+
+# Public API tests
+public_api_test:
+  extends: .test_base
+  script:
+  - dotnet test Sharpmake.PublicApiTests/Sharpmake.PublicApiTests.csproj --no-build -c release
+  needs:
+  - "compilation:windows: [release]"
 
 #############
 # Samples
