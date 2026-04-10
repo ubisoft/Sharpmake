@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Sharpmake.Generators;
@@ -566,6 +567,168 @@ namespace Sharpmake
         public bool ExcludesPrecompiledHeadersFromBuild => false;
         public bool HasUserAccountControlSupport => false;
         public bool HasEditAndContinueDebuggingSupport => false;
+        public bool IsMSVC => false;
+
+        // The xcrun SDK name for this platform, e.g. "iphoneos", "macosx", "appletvos", "watchos"
+        protected abstract string XcrunSdkName { get; }
+
+        private static readonly Dictionary<string, IReadOnlyList<string>> s_clangSystemIncludeCache = new Dictionary<string, IReadOnlyList<string>>();
+        private static readonly object s_clangSystemIncludeCacheLock = new object();
+
+        private static readonly Dictionary<string, IReadOnlyList<string>> s_clangBuiltinDefinesCache = new Dictionary<string, IReadOnlyList<string>>();
+        private static readonly object s_clangBuiltinDefinesCacheLock = new object();
+
+        // Returns "NAME=VALUE" strings for all non-function-like built-in macros reported by
+        //   clang++ -dM -E -x c++ /dev/null [-std=<stdFlag>] -isysroot <sdk-path>
+        private static IReadOnlyList<string> GetClangBuiltinDefinesForSdk(string sdkName, string stdFlag = null)
+        {
+            string cacheKey = string.IsNullOrEmpty(stdFlag) ? sdkName : $"{sdkName}|{stdFlag}";
+            lock (s_clangBuiltinDefinesCacheLock)
+            {
+                if (s_clangBuiltinDefinesCache.TryGetValue(cacheKey, out var cached))
+                    return cached;
+
+                var result = new List<string>();
+                try
+                {
+                    string sdkPath = RunProcessAndGetOutput("xcrun", $"--sdk {sdkName} --show-sdk-path").Trim();
+                    if (!string.IsNullOrEmpty(sdkPath))
+                    {
+                        string stdArg = string.IsNullOrEmpty(stdFlag) ? string.Empty : $"{stdFlag} ";
+                        string clangOutput = RunProcessAndGetOutput(
+                            "clang++",
+                            $"-dM -E -x c++ /dev/null {stdArg}-isysroot \"{sdkPath}\""
+                        );
+
+                        foreach (string line in clangOutput.Split('\n'))
+                        {
+                            string trimmed = line.Trim();
+                            if (!trimmed.StartsWith("#define ", StringComparison.Ordinal))
+                                continue;
+
+                            string rest = trimmed.Substring(8).Trim();
+                            int space = rest.IndexOf(' ');
+                            string name, value;
+                            if (space < 0)
+                            {
+                                name = rest;
+                                value = "1";
+                            }
+                            else
+                            {
+                                name = rest.Substring(0, space);
+                                value = rest.Substring(space + 1).Trim();
+                                if (value.Length == 0)
+                                    value = "1";
+                            }
+
+                            // Skip function-like macros: NAME(
+                            if (name.IndexOf('(') >= 0)
+                                continue;
+
+                            // Normalize whitespace in value
+                            value = System.Text.RegularExpressions.Regex.Replace(value, @"\s+", " ");
+                            result.Add($"{name}={value}");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceWarning($"[Sharpmake] Could not discover built-in defines for SDK '{sdkName}': {ex.Message}");
+                }
+
+                IReadOnlyList<string> readOnly = result.AsReadOnly();
+                s_clangBuiltinDefinesCache[cacheKey] = readOnly;
+                return readOnly;
+            }
+        }
+
+        private static IReadOnlyList<string> GetClangSystemIncludePathsForSdk(string sdkName)
+        {
+            lock (s_clangSystemIncludeCacheLock)
+            {
+                if (s_clangSystemIncludeCache.TryGetValue(sdkName, out var cached))
+                    return cached;
+
+                var result = new List<string>();
+                try
+                {
+                    // Get the SDK path via xcrun
+                    string sdkPath = RunProcessAndGetOutput("xcrun", $"--sdk {sdkName} --show-sdk-path").Trim();
+                    if (!string.IsNullOrEmpty(sdkPath))
+                    {
+                        // Run clang to get the system include paths
+                        string clangOutput = RunProcessAndGetOutput(
+                            "clang++",
+                            $"-v -E -x c++ /dev/null -isysroot \"{sdkPath}\"",
+                            redirectStdErr: true
+                        );
+
+                        bool inSearchList = false;
+                        foreach (string line in clangOutput.Split('\n'))
+                        {
+                            if (line.TrimEnd() == "#include <...> search starts here:")
+                            {
+                                inSearchList = true;
+                                continue;
+                            }
+                            if (line.TrimEnd() == "End of search list.")
+                            {
+                                inSearchList = false;
+                                continue;
+                            }
+                            if (inSearchList)
+                            {
+                                // Lines look like " /path/to/dir" or " /path/to/dir (framework directory)"
+                                string path = line.Trim();
+                                int parenIdx = path.IndexOf(" (", StringComparison.Ordinal);
+                                if (parenIdx >= 0)
+                                    path = path.Substring(0, parenIdx).TrimEnd();
+                                if (!string.IsNullOrEmpty(path))
+                                    result.Add(path);
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // If xcrun or clang++ is not available (e.g., not on macOS), return empty list
+                    Trace.TraceWarning($"[Sharpmake] Could not discover system include paths for SDK '{sdkName}': {ex.Message}");
+                }
+
+                IReadOnlyList<string> readOnly = result.AsReadOnly();
+                s_clangSystemIncludeCache[sdkName] = readOnly;
+                return readOnly;
+            }
+        }
+
+        private static string RunProcessAndGetOutput(string executable, string arguments, bool redirectStdErr = false)
+        {
+            var psi = new ProcessStartInfo
+            {
+                FileName = executable,
+                Arguments = arguments,
+                RedirectStandardOutput = true,
+                RedirectStandardError = redirectStdErr,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using (var process = Process.Start(psi))
+            {
+                if (process == null)
+                {
+                    Trace.TraceWarning($"[Sharpmake] Failed to start process: {executable} {arguments}");
+                    return string.Empty;
+                }
+
+                string output = process.StandardOutput.ReadToEnd();
+                string errOutput = redirectStdErr ? process.StandardError.ReadToEnd() : string.Empty;
+                process.WaitForExit();
+
+                return redirectStdErr ? output + errOutput : output;
+            }
+        }
 
         public IEnumerable<string> GetImplicitlyDefinedSymbols(IGenerationContext context)
         {
@@ -601,7 +764,8 @@ namespace Sharpmake
         }
         public IEnumerable<string> GetPlatformIncludePaths(IGenerationContext context)
         {
-            return GetPlatformIncludePathsWithPrefixImpl(context).Select(x => x.Path);
+            return GetPlatformIncludePathsWithPrefixImpl(context).Select(x => x.Path)
+                .Concat(GetClangSystemIncludePathsForSdk(XcrunSdkName));
         }
         public IEnumerable<IncludeWithPrefix> GetPlatformIncludePathsWithPrefix(IGenerationContext context)
         {
@@ -1456,7 +1620,7 @@ namespace Sharpmake
 
         public void SelectPlatformAdditionalDependenciesOptions(IGenerationContext context)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void SelectApplicationFormatOptions(IGenerationContext context)
@@ -1469,7 +1633,27 @@ namespace Sharpmake
 
         public virtual void SelectPreprocessorDefinitionsVcxproj(IVcxprojGenerationContext context)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            var defines = new Strings();
+            defines.AddRange(context.Options.ExplicitDefines);
+            defines.AddRange(context.Configuration.Defines);
+
+            // Extract -DFOO defines from AdditionalCompilerOptions
+            foreach (string compilerOption in context.Configuration.AdditionalCompilerOptions)
+            {
+                if (compilerOption.StartsWith("-D", StringComparison.Ordinal))
+                    defines.Add(compilerOption.Substring(2));
+            }
+
+            // Determine the C++ language standard flag (e.g. "-std=c++17") to pass to clang++
+            // so that built-in defines like __cplusplus reflect the correct value.
+            context.CommandLineOptions.TryGetValue("CppLanguageStd", out string cppStdFlag);
+            if (string.IsNullOrEmpty(cppStdFlag) || cppStdFlag == FileGeneratorUtilities.RemoveLineTag)
+                cppStdFlag = null;
+
+            // Add built-in compiler defines (clang++ -dM -E [-std=<cppStd>] -x c++ /dev/null) for IntelliSense
+            defines.AddRange(GetClangBuiltinDefinesForSdk(XcrunSdkName, cppStdFlag));
+
+            context.Options["PreprocessorDefinitions"] = defines.JoinStrings(";");
         }
 
         public bool HasPrecomp(IGenerationContext context)
@@ -1479,92 +1663,128 @@ namespace Sharpmake
 
         public void GenerateSdkVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GenerateMakefileConfigurationVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GenerateProjectCompileVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GenerateProjectLinkVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GenerateProjectMasmVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GenerateProjectNasmVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GenerateUserConfigurationFile(Project.Configuration conf, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GenerateRunFromPcDeployment(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GeneratePlatformSpecificProjectDescription(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GenerateProjectPlatformSdkDirectoryDescription(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GeneratePostDefaultPropsImport(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GenerateProjectConfigurationGeneral(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
+
+        private const string _projectConfigurationsGeneral2 =
+            @"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
+    <NMakePreprocessorDefinitions>[EscapeXML:options.PreprocessorDefinitions][EscapeXML:options.IntellisenseAdditionalDefines]</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>[options.NMakeIncludeSearchPath]</NMakeIncludeSearchPath>
+    <NMakeForcedIncludes>[options.ForcedIncludeFiles]</NMakeForcedIncludes>
+    <AdditionalOptions>[options.IntellisenseCommandLineOptions]</AdditionalOptions>
+  </PropertyGroup>
+";
+
+        private const string _projectConfigurationsFastBuildMakefile =
+            @"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
+    <NMakeBuildCommandLine>cd [fastBuildWorkingDirectory]
+[conf.FastBuildCustomActionsBeforeBuildCommand]
+[fastBuildMakeCommandBuild] </NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>cd [fastBuildWorkingDirectory]
+[conf.FastBuildCustomActionsBeforeBuildCommand]
+[fastBuildMakeCommandRebuild] </NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions>[EscapeXML:options.PreprocessorDefinitions][EscapeXML:options.IntellisenseAdditionalDefines]</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>[options.NMakeIncludeSearchPath]</NMakeIncludeSearchPath>
+    <NMakeForcedIncludes>[options.ForcedIncludeFiles]</NMakeForcedIncludes>
+    <AdditionalOptions>[options.IntellisenseCommandLineOptions]</AdditionalOptions>
+  </PropertyGroup>
+";
+
+        private const string _projectConfigurationsCustomMakefile =
+            @"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
+    <NMakeBuildCommandLine>[conf.CustomBuildSettings.BuildCommand]</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>[conf.CustomBuildSettings.RebuildCommand]</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>[conf.CustomBuildSettings.CleanCommand]</NMakeCleanCommandLine>
+    <NMakePreprocessorDefinitions>[EscapeXML:options.PreprocessorDefinitions][EscapeXML:options.IntellisenseAdditionalDefines]</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>[options.NMakeIncludeSearchPath]</NMakeIncludeSearchPath>
+    <NMakeForcedIncludes>[options.ForcedIncludeFiles]</NMakeForcedIncludes>
+    <AdditionalOptions>[options.IntellisenseCommandLineOptions]</AdditionalOptions>
+  </PropertyGroup>
+";
 
         public void GenerateProjectConfigurationGeneral2(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            generator.Write(_projectConfigurationsGeneral2);
         }
 
         public void GenerateProjectConfigurationFastBuildMakeFile(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            generator.Write(_projectConfigurationsFastBuildMakefile);
         }
 
         public void GenerateProjectConfigurationCustomMakeFile(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            generator.Write(_projectConfigurationsCustomMakefile);
         }
 
         public void GenerateProjectPlatformImportSheet(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GeneratePlatformResourceFileList(IVcxprojGenerationContext context, IFileGenerator generator, Strings alreadyWrittenPriFiles, IList<Vcxproj.ProjectFile> resourceFiles, IList<Vcxproj.ProjectFile> imageResourceFiles)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public void GeneratePlatformReferences(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         // type -> files

@@ -41,6 +41,9 @@ namespace Sharpmake.Generators.VisualStudio
         bool HasUserAccountControlSupport { get; }
         bool HasEditAndContinueDebuggingSupport { get; }
 
+        // When false, the generator will skip the standard Microsoft.Cpp.*.props/targets imports.
+        bool IsMSVC { get; }
+
         IEnumerable<string> GetImplicitlyDefinedSymbols(IGenerationContext context);
 
         IEnumerable<string> GetLibraryPaths(IGenerationContext context);
