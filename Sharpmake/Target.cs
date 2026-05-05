@@ -40,7 +40,7 @@ namespace Sharpmake
         vs2022 = 1 << 6,
 
         /// <summary>
-        /// Visual Studio 2022
+        /// Visual Studio 2026
         /// </summary>
         vs2026 = 1 << 10,
 

@@ -290,12 +290,20 @@ namespace Sharpmake.Generators.VisualStudio
                 Options.Option(Options.Clang.Compiler.CppLanguageStandard.Cpp11, () => { context.Options["ClangCppLanguageStandard"] = "-std=c++11"; context.Options["CppLanguageStandard"] = "c++11"; }),
                 Options.Option(Options.Clang.Compiler.CppLanguageStandard.Cpp14, () => { context.Options["ClangCppLanguageStandard"] = "-std=c++14"; context.Options["CppLanguageStandard"] = "c++14"; }),
                 Options.Option(Options.Clang.Compiler.CppLanguageStandard.Cpp17, () => { context.Options["ClangCppLanguageStandard"] = "-std=c++17"; context.Options["CppLanguageStandard"] = "c++17"; }),
+#pragma warning disable 612, 618 //Suppress Obsolete warnings for C++2a
                 Options.Option(Options.Clang.Compiler.CppLanguageStandard.Cpp2a, () => { context.Options["ClangCppLanguageStandard"] = "-std=c++2a"; context.Options["CppLanguageStandard"] = "c++2a"; }),
+#pragma warning restore 612, 618
+                Options.Option(Options.Clang.Compiler.CppLanguageStandard.Cpp20, () => { context.Options["ClangCppLanguageStandard"] = "-std=c++20"; context.Options["CppLanguageStandard"] = "c++20"; }),
+                Options.Option(Options.Clang.Compiler.CppLanguageStandard.Cpp23, () => { context.Options["ClangCppLanguageStandard"] = "-std=c++23"; context.Options["CppLanguageStandard"] = "c++23"; }),
                 Options.Option(Options.Clang.Compiler.CppLanguageStandard.GnuCpp98, () => { context.Options["ClangCppLanguageStandard"] = "-std=gnu++98"; context.Options["CppLanguageStandard"] = "gnu++98"; }),
                 Options.Option(Options.Clang.Compiler.CppLanguageStandard.GnuCpp11, () => { context.Options["ClangCppLanguageStandard"] = "-std=gnu++11"; context.Options["CppLanguageStandard"] = "gnu++11"; }),
                 Options.Option(Options.Clang.Compiler.CppLanguageStandard.GnuCpp14, () => { context.Options["ClangCppLanguageStandard"] = "-std=gnu++14"; context.Options["CppLanguageStandard"] = "gnu++14"; }),
                 Options.Option(Options.Clang.Compiler.CppLanguageStandard.GnuCpp17, () => { context.Options["ClangCppLanguageStandard"] = "-std=gnu++17"; context.Options["CppLanguageStandard"] = "gnu++17"; }),
-                Options.Option(Options.Clang.Compiler.CppLanguageStandard.GnuCpp2a, () => { context.Options["ClangCppLanguageStandard"] = "-std=gnu++2a"; context.Options["CppLanguageStandard"] = "gnu++2a"; })
+#pragma warning disable 612, 618 //Suppress Obsolete warning for GNU C++2a
+                Options.Option(Options.Clang.Compiler.CppLanguageStandard.GnuCpp2a, () => { context.Options["ClangCppLanguageStandard"] = "-std=gnu++2a"; context.Options["CppLanguageStandard"] = "gnu++2a"; }),
+#pragma warning restore 612, 618
+                Options.Option(Options.Clang.Compiler.CppLanguageStandard.GnuCpp20, () => { context.Options["ClangCppLanguageStandard"] = "-std=gnu++20"; context.Options["CppLanguageStandard"] = "gnu++20"; }),
+                Options.Option(Options.Clang.Compiler.CppLanguageStandard.GnuCpp23, () => { context.Options["ClangCppLanguageStandard"] = "-std=gnu++23"; context.Options["CppLanguageStandard"] = "gnu++23"; })
                 );
 
                 context.SelectOption
@@ -337,6 +345,8 @@ namespace Sharpmake.Generators.VisualStudio
                 //    CPP11                                   LanguageStandard=""
                 //    CPP14                                   LanguageStandard="stdcpp14"                                    /std:c++14
                 //    CPP17                                   LanguageStandard="stdcpp17"                                    /std:c++17
+                //    CPP20                                   LanguageStandard="stdcpp20"                                    /std:c++20
+                //    CPP23Preview                            LanguageStandard="stdcpp23"                             /std:c++23preview
                 //    GNU98                                   LanguageStandard=""
                 //    GNU11                                   LanguageStandard=""
                 //    GNU14                                   LanguageStandard="stdcpp14"                                    /std:c++14
@@ -349,6 +359,7 @@ namespace Sharpmake.Generators.VisualStudio
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP14, () => { context.Options["LanguageStandard"] = "stdcpp14"; context.CommandLineOptions["LanguageStandard"] = "/std:c++14"; }),
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP17, () => { context.Options["LanguageStandard"] = "stdcpp17"; context.CommandLineOptions["LanguageStandard"] = "/std:c++17"; }),
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP20, () => { context.Options["LanguageStandard"] = "stdcpp20"; context.CommandLineOptions["LanguageStandard"] = "/std:c++20"; }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP23Preview, () => { context.Options["LanguageStandard"] = "stdcpp23"; context.CommandLineOptions["LanguageStandard"] = "/std:c++23preview"; }),
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU98, () => { context.Options["LanguageStandard"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["LanguageStandard"] = FileGeneratorUtilities.RemoveLineTag; }),
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU11, () => { context.Options["LanguageStandard"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["LanguageStandard"] = FileGeneratorUtilities.RemoveLineTag; }),
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU14, () => { context.Options["LanguageStandard"] = "stdcpp14"; context.CommandLineOptions["LanguageStandard"] = "/std:c++14"; }),
@@ -1240,6 +1251,8 @@ namespace Sharpmake.Generators.VisualStudio
                 if (useClangCl || useClang)
                 {
                     // need to use a special syntax when compiler is clang/clangcl or Visual Studio will generate intellisense errors
+                    // preview suffixes are not valid Clang IntelliSense flags, strip them before converting
+                    intellisenseCppLanguageStandard = intellisenseCppLanguageStandard.Replace("preview", "");
                     intellisenseCppLanguageStandard = intellisenseCppLanguageStandard.Replace("/std:c++", "/Clangstdc++");
                     intellisenseCppLanguageStandard = intellisenseCppLanguageStandard.Replace("-std=c++", "/Clangstdc++");
                 }

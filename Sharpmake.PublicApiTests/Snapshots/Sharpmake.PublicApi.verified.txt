@@ -2335,12 +2335,18 @@ namespace Sharpmake
                     Cpp11 = 2,
                     Cpp14 = 3,
                     Cpp17 = 4,
+                    [System.Obsolete("Use Cpp20 instead.")]
                     Cpp2a = 5,
-                    GnuCpp98 = 6,
-                    GnuCpp11 = 7,
-                    GnuCpp14 = 8,
-                    GnuCpp17 = 9,
-                    GnuCpp2a = 10,
+                    Cpp20 = 6,
+                    Cpp23 = 7,
+                    GnuCpp98 = 8,
+                    GnuCpp11 = 9,
+                    GnuCpp14 = 10,
+                    GnuCpp17 = 11,
+                    [System.Obsolete("Use GnuCpp20 instead.")]
+                    GnuCpp2a = 12,
+                    GnuCpp20 = 13,
+                    GnuCpp23 = 14,
                 }
                 public enum Exceptions
                 {
@@ -2430,11 +2436,15 @@ namespace Sharpmake
                     Cpp14 = 3,
                     Cpp17 = 4,
                     Cpp2a = 5,
-                    GnuCpp98 = 6,
-                    GnuCpp11 = 7,
-                    GnuCpp14 = 8,
-                    GnuCpp17 = 9,
-                    GnuCpp2a = 10,
+                    Cpp20 = 6,
+                    Cpp23 = 7,
+                    GnuCpp98 = 8,
+                    GnuCpp11 = 9,
+                    GnuCpp14 = 10,
+                    GnuCpp17 = 11,
+                    GnuCpp2a = 12,
+                    GnuCpp20 = 13,
+                    GnuCpp23 = 14,
                 }
                 public enum Exceptions
                 {
@@ -2592,11 +2602,12 @@ namespace Sharpmake
                     CPP14 = 2,
                     CPP17 = 3,
                     CPP20 = 4,
-                    GNU98 = 5,
-                    GNU11 = 6,
-                    GNU14 = 7,
-                    GNU17 = 8,
-                    Latest = 9,
+                    CPP23Preview = 5,
+                    GNU98 = 6,
+                    GNU11 = 7,
+                    GNU14 = 8,
+                    GNU17 = 9,
+                    Latest = 10,
                 }
                 public enum CreateHotPatchableCode
                 {
