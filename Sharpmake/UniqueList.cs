@@ -408,9 +408,11 @@ namespace Sharpmake
 
         #region IEnumerable
 
-        public IEnumerator<T> GetEnumerator()
+        public List<T>.Enumerator GetEnumerator()
         {
-            return Values.GetEnumerator();
+            if (IsDirty)
+                UpdateValues();
+            return _values.GetEnumerator();
         }
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator()
