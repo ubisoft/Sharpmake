@@ -116,7 +116,7 @@ namespace Sharpmake
         {
             if (!oldValue.Equals(newValue))
             {
-                IsDirty = _hash.Remove(oldValue) | _hash.Add(newValue);
+                IsDirty |= _hash.Remove(oldValue) | _hash.Add(newValue);
             }
         }
 
@@ -134,7 +134,7 @@ namespace Sharpmake
         {
             ValidateReadOnly();
             bool added = AddCore(value1);
-            IsDirty = added;
+            IsDirty |= added;
             return added;
         }
 
@@ -142,7 +142,7 @@ namespace Sharpmake
         {
             ValidateReadOnly();
             bool added = AddCore(value1) | AddCore(value2);
-            IsDirty = added;
+            IsDirty |= added;
             return added;
         }
 
@@ -150,7 +150,7 @@ namespace Sharpmake
         {
             ValidateReadOnly();
             bool added = AddCore(value1) | AddCore(value2) | AddCore(value3);
-            IsDirty = added;
+            IsDirty |= added;
             return added;
         }
 
@@ -158,7 +158,7 @@ namespace Sharpmake
         {
             ValidateReadOnly();
             bool added = AddCore(value1) | AddCore(value2) | AddCore(value3) | AddCore(value4);
-            IsDirty = added;
+            IsDirty |= added;
             return added;
         }
 
@@ -166,7 +166,7 @@ namespace Sharpmake
         {
             ValidateReadOnly();
             bool added = AddCore(value1) | AddCore(value2) | AddCore(value3) | AddCore(value4) | AddCore(value5);
-            IsDirty = added;
+            IsDirty |= added;
             return added;
         }
 
@@ -185,7 +185,7 @@ namespace Sharpmake
             int countBeforeUnion = _hash.Count;
             _hash.UnionWith(collection);
             if (_hash.Count != countBeforeUnion)
-                IsDirty = true;
+                IsDirty |= true;
         }
 
         public bool AddRange(UniqueList<T> other)
@@ -201,7 +201,7 @@ namespace Sharpmake
                     dirty |= AddCore(value);
                 }
 
-                IsDirty = dirty;
+                IsDirty |= dirty;
                 return dirty;
             }
 
@@ -221,7 +221,7 @@ namespace Sharpmake
                     dirty |= AddCore(collection[i]);
                 }
 
-                IsDirty = dirty;
+                IsDirty |= dirty;
                 return dirty;
             }
 
@@ -243,7 +243,7 @@ namespace Sharpmake
                 }
             }
             _hash = intersect;
-            IsDirty = true;
+            IsDirty |= true;
         }
 
         /// <param name="otherList">the other container to intersect with</param>
@@ -276,7 +276,7 @@ namespace Sharpmake
 
 
             _hash = intersect;
-            IsDirty = true;
+            IsDirty |= true;
         }
 
 
@@ -460,7 +460,7 @@ namespace Sharpmake
         public bool Remove(T item)
         {
             bool removed = _hash.Remove(item);
-            IsDirty = removed;
+            IsDirty |= removed;
             return removed;
         }
 
