@@ -15,7 +15,7 @@ namespace Sharpmake
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [DebuggerDisplay("Size: {_hash.Count}")]
-    public class UniqueList<T> : IEnumerable<T>
+    public class UniqueList<T> : ICollection<T>, IReadOnlyCollection<T>
     {
         private HashSet<T> _hash; // key is the string
         private List<T> _values = new List<T>();  // Sorted keys are sorted on demand.
@@ -130,42 +130,53 @@ namespace Sharpmake
             _hash.EnsureCapacity(_hash.Count + by);
         }
 
-        public void Add(T value1)
+        public bool Add(T value1)
         {
             ValidateReadOnly();
-            IsDirty = AddCore(value1);
+            bool added = AddCore(value1);
+            IsDirty = added;
+            return added;
         }
 
-        public void Add(T value1, T value2)
+        public bool Add(T value1, T value2)
         {
             ValidateReadOnly();
-            IsDirty = AddCore(value1) | AddCore(value2);
+            bool added = AddCore(value1) | AddCore(value2);
+            IsDirty = added;
+            return added;
         }
 
-        public void Add(T value1, T value2, T value3)
+        public bool Add(T value1, T value2, T value3)
         {
             ValidateReadOnly();
-            IsDirty = AddCore(value1) | AddCore(value2) | AddCore(value3);
+            bool added = AddCore(value1) | AddCore(value2) | AddCore(value3);
+            IsDirty = added;
+            return added;
         }
 
-        public void Add(T value1, T value2, T value3, T value4)
+        public bool Add(T value1, T value2, T value3, T value4)
         {
             ValidateReadOnly();
-            IsDirty = AddCore(value1) | AddCore(value2) | AddCore(value3) | AddCore(value4);
+            bool added = AddCore(value1) | AddCore(value2) | AddCore(value3) | AddCore(value4);
+            IsDirty = added;
+            return added;
         }
 
-        public void Add(T value1, T value2, T value3, T value4, T value5)
+        public bool Add(T value1, T value2, T value3, T value4, T value5)
         {
             ValidateReadOnly();
-            IsDirty = AddCore(value1) | AddCore(value2) | AddCore(value3) | AddCore(value4) | AddCore(value5);
+            bool added = AddCore(value1) | AddCore(value2) | AddCore(value3) | AddCore(value4) | AddCore(value5);
+            IsDirty = added;
+            return added;
         }
 
-        public void Add(params T[] values)
+        public bool Add(params T[] values)
         {
             if (values.Length > 0)
             {
-                AddRange(values);
+                return AddRange(values);
             }
+            return false;
         }
 
         public void AddRange(IEnumerable<T> collection)
@@ -177,7 +188,7 @@ namespace Sharpmake
                 IsDirty = true;
         }
 
-        public void AddRange(UniqueList<T> other)
+        public bool AddRange(UniqueList<T> other)
         {
             ValidateReadOnly();
             if (other.Count > 0)
@@ -191,10 +202,13 @@ namespace Sharpmake
                 }
 
                 IsDirty = dirty;
+                return dirty;
             }
+
+            return false;
         }
 
-        public void AddRange(IReadOnlyList<T> collection)
+        public bool AddRange(IReadOnlyList<T> collection)
         {
             ValidateReadOnly();
             if (collection.Count > 0)
@@ -208,7 +222,10 @@ namespace Sharpmake
                 }
 
                 IsDirty = dirty;
+                return dirty;
             }
+
+            return false;
         }
 
         public void IntersectWith(UniqueList<T> otherList)
@@ -409,6 +426,18 @@ namespace Sharpmake
         #endregion
 
         #region ICollection
+
+        void ICollection<T>.Add(T item)
+        {
+            Add(item);
+        }
+
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            if (IsDirty)
+                UpdateValues();
+            _values.CopyTo(array, arrayIndex);
+        }
 
         public void Clear()
         {

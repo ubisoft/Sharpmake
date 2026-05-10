@@ -499,6 +499,24 @@ namespace Sharpmake.UnitTests
             Assert.That(uniqueList.Contains("HHH"), Is.False);
         }
 
+        /// <summary>
+        ///     Verify that CopyTo copies the elements to the array
+        /// </summary>
+        [Test]
+        public static void TestCopyTo()
+        {
+            UniqueList<string> uniqueList = new UniqueList<string>
+            {
+                "AA",
+                "BBB",
+                "CC",
+                "DDD"
+            };
+            string[] array = new string[4];
+            uniqueList.CopyTo(array, 0);
+            Assert.That(array, Is.EqualTo(new string[] { "AA", "BBB", "CC", "DDD" }));
+        }
+
         private class ListContainer
         {
             public ListContainer()
