@@ -468,7 +468,7 @@ namespace Sharpmake
         {
             StringBuilder builder = new StringBuilder(Count * 128);
             bool first = true;
-            foreach (T value in _hash)
+            foreach (T value in Values)
             {
                 if (!first)
                     builder.Append(',');
