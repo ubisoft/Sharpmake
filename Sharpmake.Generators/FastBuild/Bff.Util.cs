@@ -808,7 +808,7 @@ namespace Sharpmake.Generators.FastBuild
         /// <param name="spaceLength">The indentation size, in spaces, in case multiple lines are generated.</param>
         /// <param name="options">output options</param>
         /// <returns>The formatted string, or <see cref="FileGeneratorUtilities.RemoveLineTag"/> if the list is empty.</returns>
-        public static string FBuildFormatList(List<string> items, int spaceLength, FBuildFormatListOptions options = FBuildFormatListOptions.QuoteItems | FBuildFormatListOptions.UseSingleElementShortFormat | FBuildFormatListOptions.UseCommaBetweenElements)
+        public static string FBuildFormatList(IReadOnlyList<string> items, int spaceLength, FBuildFormatListOptions options = FBuildFormatListOptions.QuoteItems | FBuildFormatListOptions.UseSingleElementShortFormat | FBuildFormatListOptions.UseCommaBetweenElements)
         {
             if (items.Count == 0)
                 return FileGeneratorUtilities.RemoveLineTag;

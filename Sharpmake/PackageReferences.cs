@@ -226,7 +226,7 @@ namespace Sharpmake
             return _packageReferences.GetEnumerator();
         }
 
-        public List<PackageReference> SortedValues => _packageReferences.SortedValues;
+        public IReadOnlyList<PackageReference> SortedValues => _packageReferences.SortedValues;
 
         [Flags]
         public enum AssetsDependency : uint

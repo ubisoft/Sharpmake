@@ -544,7 +544,7 @@ namespace Sharpmake
 
         public static void ResolvePath(string root, ref Strings paths)
         {
-            List<string> sortedPaths = paths.Values;
+            IReadOnlyList<string> sortedPaths = paths.Values;
             foreach (string path in sortedPaths)
             {
                 string resolvedPath = ResolvePath(root, path);
@@ -554,7 +554,7 @@ namespace Sharpmake
 
         internal static void ResolvePathAndFixCase(string root, ref Strings paths)
         {
-            List<string> sortedPaths = paths.Values;
+            IReadOnlyList<string> sortedPaths = paths.Values;
             foreach (string path in sortedPaths)
             {
                 string fixedCase = ResolvePathAndFixCase(root, path);

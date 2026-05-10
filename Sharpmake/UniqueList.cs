@@ -358,7 +358,7 @@ namespace Sharpmake
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public List<T> Values
+        public IReadOnlyList<T> Values
         {
             get
             {
@@ -369,7 +369,7 @@ namespace Sharpmake
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public List<T> SortedValues
+        public IReadOnlyList<T> SortedValues
         {
             get
             {
@@ -406,7 +406,7 @@ namespace Sharpmake
 
         #region IEnumerable
 
-        public List<T>.Enumerator GetEnumerator()
+        public IEnumerator<T> GetEnumerator()
         {
             return Values.GetEnumerator();
         }

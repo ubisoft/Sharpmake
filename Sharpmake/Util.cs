@@ -826,17 +826,17 @@ namespace Sharpmake
             }
         }
 
-        public static string JoinStrings(ICollection<string> container, string separator, bool escapeXml = false)
+        public static string JoinStrings(IReadOnlyCollection<string> container, string separator, bool escapeXml = false)
         {
             return JoinStrings(container, separator, "", "", escapeXml);
         }
 
-        public static string JoinStrings(ICollection<string> container, string separator, string prefix, bool escapeXml = false)
+        public static string JoinStrings(IReadOnlyCollection<string> container, string separator, string prefix, bool escapeXml = false)
         {
             return JoinStrings(container, separator, prefix, "", escapeXml);
         }
 
-        public static string JoinStrings(ICollection<string> container, string separator, string prefix, string suffix, bool escapeXml = false)
+        public static string JoinStrings(IReadOnlyCollection<string> container, string separator, string prefix, string suffix, bool escapeXml = false)
         {
             int count = container.Count;
             StringBuilder builder = new StringBuilder(count * 128);
