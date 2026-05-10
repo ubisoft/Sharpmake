@@ -427,7 +427,7 @@ namespace QTFileCustomBuild
             confIncludes.AddRange(conf.DependenciesIncludePaths);
             confIncludes.AddRange(conf.IncludePrivatePaths);
             // Quote the include strings, if need be.
-            List<string> includeValues = confIncludes.Values;
+            var includeValues = confIncludes.Values;
             foreach (string path in includeValues)
             {
                 if (path.Contains(' '))
