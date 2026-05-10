@@ -66,7 +66,7 @@ namespace Sharpmake
                 }
                 else
                 {
-                    Interlocked.And(ref _modifierBits, ~(Int64)ModifierBits.DirtyBit);
+                    Interlocked.And(ref _modifierBits, ~(Int64)ModifierBits.SortedBit);
                 }
             }
         }
