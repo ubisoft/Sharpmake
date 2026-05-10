@@ -29,7 +29,7 @@ namespace Sharpmake
         }
 
         // Note: Sadly we have to use Int64 because Interlocked.Read only accepts a 64 bits value
-        private Int64 _modifierBits = (Int64) ModifierBits.SortedBit; 
+        private Int64 _modifierBits = (Int64)ModifierBits.SortedBit;
 
         private bool IsDirty
         {
@@ -116,15 +116,13 @@ namespace Sharpmake
         {
             if (!oldValue.Equals(newValue))
             {
-                _hash.Remove(oldValue);
-                _hash.Add(newValue);
-                IsDirty = true;
+                IsDirty = _hash.Remove(oldValue) | _hash.Add(newValue);
             }
         }
 
-        private void AddCore(T value)
+        private bool AddCore(T value)
         {
-            _hash.Add(value);
+            return _hash.Add(value);
         }
 
         private void GrowCapacity(int by)
@@ -135,46 +133,31 @@ namespace Sharpmake
         public void Add(T value1)
         {
             ValidateReadOnly();
-            AddCore(value1);
-            IsDirty = true;
+            IsDirty = AddCore(value1);
         }
 
         public void Add(T value1, T value2)
         {
             ValidateReadOnly();
-            AddCore(value1);
-            AddCore(value2);
-            IsDirty = true;
+            IsDirty = AddCore(value1) | AddCore(value2);
         }
 
         public void Add(T value1, T value2, T value3)
         {
             ValidateReadOnly();
-            AddCore(value1);
-            AddCore(value2);
-            AddCore(value3);
-            IsDirty = true;
+            IsDirty = AddCore(value1) | AddCore(value2) | AddCore(value3);
         }
 
         public void Add(T value1, T value2, T value3, T value4)
         {
             ValidateReadOnly();
-            AddCore(value1);
-            AddCore(value2);
-            AddCore(value3);
-            AddCore(value4);
-            IsDirty = true;
+            IsDirty = AddCore(value1) | AddCore(value2) | AddCore(value3) | AddCore(value4);
         }
 
         public void Add(T value1, T value2, T value3, T value4, T value5)
         {
             ValidateReadOnly();
-            AddCore(value1);
-            AddCore(value2);
-            AddCore(value3);
-            AddCore(value4);
-            AddCore(value5);
-            IsDirty = true;
+            IsDirty = AddCore(value1) | AddCore(value2) | AddCore(value3) | AddCore(value4) | AddCore(value5);
         }
 
         public void Add(params T[] values)
@@ -201,12 +184,13 @@ namespace Sharpmake
             {
                 GrowCapacity(other.Count);
 
+                bool dirty = false;
                 foreach (T value in other._hash)
                 {
-                    AddCore(value);
+                    dirty |= AddCore(value);
                 }
 
-                IsDirty = true;
+                IsDirty = dirty;
             }
         }
 
@@ -217,12 +201,13 @@ namespace Sharpmake
             {
                 GrowCapacity(collection.Count);
 
+                bool dirty = false;
                 for (int i = 0; i < collection.Count; i++)
                 {
-                    AddCore(collection[i]);
+                    dirty |= AddCore(collection[i]);
                 }
 
-                IsDirty = true;
+                IsDirty = dirty;
             }
         }
 
@@ -339,9 +324,9 @@ namespace Sharpmake
                 {
                     modifiers &= ~(Int64)ModifierBits.SortedBit; // Clear sorted bits locally
                     if (_values.Count > 0)
-                       _values.Clear();
+                        _values.Clear();
                     if (_hash.Count > 0)
-                       _values.AddRange(_hash);
+                        _values.AddRange(_hash);
                 }
 
                 if ((modifiers & (Int64)ModifierBits.SortedBit) == 0)
@@ -443,8 +428,9 @@ namespace Sharpmake
 
         public bool Remove(T item)
         {
-            IsDirty = true;
-            return _hash.Remove(item);
+            bool removed = _hash.Remove(item);
+            IsDirty = removed;
+            return removed;
         }
 
         public int Count
