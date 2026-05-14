@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Ubisoft. All Rights Reserved.
 // Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 
 namespace Sharpmake
@@ -42,12 +43,18 @@ namespace Sharpmake
                     Cpp11,
                     Cpp14,
                     Cpp17,
+                    [Obsolete("Use Cpp20 instead.")]
                     Cpp2a,
+                    Cpp20,
+                    Cpp23,
                     GnuCpp98,
                     GnuCpp11,
                     GnuCpp14,
                     GnuCpp17,
-                    GnuCpp2a
+                    [Obsolete("Use GnuCpp20 instead.")]
+                    GnuCpp2a,
+                    GnuCpp20,
+                    GnuCpp23,
                 }
 
                 public enum CLanguageStandard
