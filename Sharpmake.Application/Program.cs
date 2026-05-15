@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -43,27 +42,31 @@ namespace Sharpmake.Application
         public static bool DebugEnable = false;
         private static int s_errorCount = 0;
         private static int s_warningCount = 0;
+        private static bool s_errorsToStderr = false;
+        private static bool s_prefixAllOutputLines = false;
 
         public static void LogWrite(string format, params object[] args)
         {
             LogWrite(string.Format(format, args));
         }
 
-        public static void LogWrite(string message)
+        public static void LogWrite(string message) => LogWrite(message, isError: false);
+
+        private static void LogWrite(string message, bool isError)
         {
             string prefix = string.Empty;
 
             if (DebugEnable)
             {
                 TimeSpan span = DateTime.Now - Util.ProgramStartTime;
-                prefix = string.Format("[{0:00}:{1:00}] ", span.Minutes, span.Seconds);
-                message = prefix + message;
+                prefix = $"[{span:mm\\:ss}] ";
+                message = s_prefixAllOutputLines ? PrefixAllLines(message, prefix) : $"{prefix}{message}";
             }
 
-            Console.Write(message);
+            (isError && s_errorsToStderr ? Console.Error : Console.Out).Write(message);
             if (Debugger.IsAttached)
             {
-                message = message.Replace(prefix + Util.CallerInfoTag, string.Empty);
+                message = message.Replace($"{prefix}{Util.CallerInfoTag}", string.Empty);
                 Trace.Write(message);
             }
         }
@@ -110,7 +113,7 @@ namespace Sharpmake.Application
         public static void WarningWrite(string msg)
         {
             Interlocked.Increment(ref s_warningCount);
-            LogWrite("[WARNING]" + msg);
+            LogWrite(s_prefixAllOutputLines ? PrefixAllLines(msg, "[WARNING]") : $"[WARNING]{msg}");
         }
 
         public static void WarningWriteLine(string format, params object[] args)
@@ -131,7 +134,7 @@ namespace Sharpmake.Application
         public static void ErrorWrite(string msg)
         {
             Interlocked.Increment(ref s_errorCount);
-            LogWrite("[ERROR]" + msg);
+            LogWrite(s_prefixAllOutputLines ? PrefixAllLines(msg, "[ERROR]") : $"[ERROR]{msg}", isError: true);
         }
 
         public static void ErrorWriteLine(string format, params object[] args)
@@ -169,6 +172,8 @@ namespace Sharpmake.Application
             try
             {
                 DebugEnable = CommandLine.ContainParameter("verbose") || CommandLine.ContainParameter("debug") || CommandLine.ContainParameter("diagnostics");
+                s_errorsToStderr = CommandLine.ContainParameter("errorsToStderr");
+                s_prefixAllOutputLines = CommandLine.ContainParameter("prefixAllOutputLines");
 
                 GetAssemblyInfo(Assembly.GetExecutingAssembly(), out var _, out var version, out var versionString, out var _);
   
@@ -328,29 +333,22 @@ namespace Sharpmake.Application
                     GlobalRegexMatchCache.UnInit();
                 }
             }
-            catch (Error e)
-            {
-                // Log error message
-                Exception innerException = e;
-                while (innerException.InnerException != null)
-                    innerException = innerException.InnerException;
-                ErrorWriteLine(Environment.NewLine + "Error:" + Environment.NewLine + innerException.Message);
-
-                // Then log details
-                LogWriteLine(Util.GetCompleteExceptionMessage(e, "\t"));
-                exitCode = ExitCode.Error;
-            }
-            catch (InternalError e)
-            {
-                ErrorWriteLine(Environment.NewLine + "Internal Error:");
-                LogWriteLine(Util.GetCompleteExceptionMessage(e, "\t"));
-                exitCode = ExitCode.InternalError;
-            }
             catch (Exception e)
             {
-                LogWriteLine(Environment.NewLine + "Exception Error:");
-                LogWriteLine(Util.GetCompleteExceptionMessage(e, "\t"));
-                exitCode = ExitCode.UnknownError;
+                (string label, ExitCode code) = e switch
+                {
+                    Error => ("Error", ExitCode.Error),
+                    InternalError => ("Internal Error", ExitCode.InternalError),
+                    _ => ("Exception Error", ExitCode.UnknownError)
+                };
+
+                string innermostExceptionMessage = e.GetBaseException().Message;
+                string messageSuffix = string.IsNullOrEmpty(innermostExceptionMessage)
+                    ? string.Empty
+                    : $"{Environment.NewLine}{innermostExceptionMessage}";
+                ErrorWriteLine($"{label}:{messageSuffix}");
+                ErrorWriteLine(Util.GetCompleteExceptionMessage(e, "\t"));
+                exitCode = code;
             }
             finally
             {
@@ -708,6 +706,22 @@ namespace Sharpmake.Application
                 builder.Dispose();
                 throw;
             }
+        }
+
+        private static string PrefixAllLines(string message, string prefix)
+        {
+            if (message is null)
+                return prefix;
+
+            var lines = message.Split(["\r\n", "\n"], StringSplitOptions.None);
+            // Skip only the trailing empty string produced by a terminal newline
+            int count = lines[^1].Length == 0 ? lines.Length - 1 : lines.Length;
+            for (int i = 0; i < count; i++)
+            {
+                lines[i] = $"{prefix}{lines[i]}";
+            }
+
+            return string.Join(Environment.NewLine, lines);
         }
 
         private static void RecursivePrintMethodInfo(Analyzer.ConfigureMethodInfo method, ISet<string> set, int nested = 0)
