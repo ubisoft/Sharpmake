@@ -364,6 +364,18 @@ ex: /forcecleanup( ""sharpmakeautocleanupdb.bin"" ")]
                 Exit = true;
             }
 
+            [CommandLine.Option("errorsToStderr", @"Route error output to stderr instead of stdout (warnings remain on stdout): ex: /errorsToStderr")]
+            public void CommandLineErrorsToStderr()
+            {
+                // Validated in the main for priority
+            }
+
+            [CommandLine.Option("prefixAllOutputLines", @"Prefix every line in multi-line warning/error/debug messages, not just the first: ex: /prefixAllOutputLines")]
+            public void CommandLinePrefixAllOutputLines()
+            {
+                // Validated in the main for priority
+            }
+
             public void Validate()
             {
                 if (Assemblies.Length == 0 && Sources.Length == 0)
