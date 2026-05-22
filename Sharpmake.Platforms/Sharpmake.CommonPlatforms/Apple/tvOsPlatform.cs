@@ -25,6 +25,8 @@ namespace Sharpmake
             public override string SimplePlatformString => "tvOS";
             #endregion
 
+            protected override string XcrunSdkName => "appletvos";
+
             #region IPlatformBff implementation
             public override string BffPlatformDefine => "_TVOS";
 
