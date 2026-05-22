@@ -1,0 +1,31 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MainProject", "mainproject_vs2022_win64.vcxproj", "{56A3D9AE-B19C-91EF-7C11-FD0A7F9A27D1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DependantProject", "dependantproject_vs2022_win64.vcxproj", "{09E017FE-C28E-E929-9607-E0ECFBF61EAE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FooBarProject", "foobarproject_vs2022_win64.vcxproj", "{45D32931-E284-AE61-F9BA-FFDD70A2BD5F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{56A3D9AE-B19C-91EF-7C11-FD0A7F9A27D1}.Debug|x64.ActiveCfg = Debug|x64
+		{56A3D9AE-B19C-91EF-7C11-FD0A7F9A27D1}.Debug|x64.Build.0 = Debug|x64
+		{56A3D9AE-B19C-91EF-7C11-FD0A7F9A27D1}.Release|x64.ActiveCfg = Release|x64
+		{56A3D9AE-B19C-91EF-7C11-FD0A7F9A27D1}.Release|x64.Build.0 = Release|x64
+		{09E017FE-C28E-E929-9607-E0ECFBF61EAE}.Debug|x64.ActiveCfg = Debug|x64
+		{09E017FE-C28E-E929-9607-E0ECFBF61EAE}.Debug|x64.Build.0 = Debug|x64
+		{09E017FE-C28E-E929-9607-E0ECFBF61EAE}.Release|x64.ActiveCfg = Release|x64
+		{09E017FE-C28E-E929-9607-E0ECFBF61EAE}.Release|x64.Build.0 = Release|x64
+		{45D32931-E284-AE61-F9BA-FFDD70A2BD5F}.Debug|x64.ActiveCfg = Debug|x64
+		{45D32931-E284-AE61-F9BA-FFDD70A2BD5F}.Debug|x64.Build.0 = Debug|x64
+		{45D32931-E284-AE61-F9BA-FFDD70A2BD5F}.Release|x64.ActiveCfg = Release|x64
+		{45D32931-E284-AE61-F9BA-FFDD70A2BD5F}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
