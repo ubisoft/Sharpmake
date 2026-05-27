@@ -191,6 +191,14 @@ namespace Sharpmake
             /// </summary>
             public Strings ProjectReferencesByPath { get; } = new Strings();
 
+            /// <summary>
+            /// Optional solution folder (e.g. "Tools/Glasses/Engine") for each path in
+            /// ProjectReferencesByPath. Keys are matched case-insensitively against the
+            /// resolved absolute path. Projects without an entry appear at the root.
+            /// </summary>
+            public Dictionary<string, string> ProjectReferencesByPathFolders { get; }
+                = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
             public List<IncludedProjectInfo> IncludedProjectInfos = new List<IncludedProjectInfo>();
 
             public IncludedProjectInfo GetProject(Type projectType)

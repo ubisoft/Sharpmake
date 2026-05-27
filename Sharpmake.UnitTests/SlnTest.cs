@@ -48,7 +48,7 @@ namespace Sharpmake.UnitTests
 
                 var guid = Sln.ReadGuidFromProjectFile(path);
 
-                Assert.AreEqual("1A2B3C4D-1234-5678-ABCD-EF0123456789", guid);
+                Assert.That(guid, Is.EqualTo("1A2B3C4D-1234-5678-ABCD-EF0123456789"));
             }
 
             [Test]
@@ -61,7 +61,7 @@ namespace Sharpmake.UnitTests
 
                 var guid = Sln.ReadGuidFromProjectFile(path);
 
-                Assert.AreEqual("AABBCCDD-AABB-CCDD-EEFF-001122334455", guid);
+                Assert.That(guid, Is.EqualTo("AABBCCDD-AABB-CCDD-EEFF-001122334455"));
             }
 
             [Test]
@@ -78,7 +78,7 @@ namespace Sharpmake.UnitTests
 
                 var guid = Sln.ReadGuidFromProjectFile(path);
 
-                Assert.IsNull(guid, "SDK-style csproj without <ProjectGuid> should return null");
+                Assert.That(guid, Is.Null, "SDK-style csproj without <ProjectGuid> should return null");
             }
 
             [Test]
@@ -97,7 +97,7 @@ namespace Sharpmake.UnitTests
                 var guid1 = Sln.ReadOrGenerateGuidFromProjectFile(path);
                 var guid2 = Sln.ReadOrGenerateGuidFromProjectFile(path);
 
-                Assert.AreEqual(guid1, guid2, "deterministic GUID must be stable across calls");
+                Assert.That(guid2, Is.EqualTo(guid1), "deterministic GUID must be stable across calls");
             }
 
             [Test]
@@ -109,7 +109,7 @@ namespace Sharpmake.UnitTests
                 var guid1 = Sln.ReadOrGenerateGuidFromProjectFile(path1);
                 var guid2 = Sln.ReadOrGenerateGuidFromProjectFile(path2);
 
-                Assert.AreNotEqual(guid1, guid2, "different files must get different GUIDs");
+                Assert.That(guid2, Is.Not.EqualTo(guid1), "different files must get different GUIDs");
             }
 
             [Test]
@@ -120,7 +120,7 @@ namespace Sharpmake.UnitTests
 
                 var guidStr = Sln.ReadOrGenerateGuidFromProjectFile(path);
 
-                Assert.IsTrue(Guid.TryParse(guidStr, out _),
+                Assert.That(Guid.TryParse(guidStr, out _), Is.True,
                     $"Generated value '{guidStr}' must be a valid GUID");
             }
 
@@ -133,8 +133,55 @@ namespace Sharpmake.UnitTests
 
                 var guid = Sln.ReadOrGenerateGuidFromProjectFile(path);
 
-                Assert.AreEqual(expected, guid,
+                Assert.That(guid, Is.EqualTo(expected),
                     "should return the file's own GUID, not generate a new one");
+            }
+        }
+
+        // -------------------------------------------------------------------------
+        // ProjectReferencesByPathFolders
+        // -------------------------------------------------------------------------
+
+        [TestFixture]
+        public class ProjectReferencesByPathFoldersTests
+        {
+            [Test]
+            public void DictionaryIsCaseInsensitive()
+            {
+                var conf = new Solution.Configuration();
+                conf.ProjectReferencesByPathFolders[@"C:\Foo\Bar.vcxproj"] = "Engine";
+
+                Assert.That(conf.ProjectReferencesByPathFolders.ContainsKey(@"c:\foo\bar.vcxproj"), Is.True);
+                Assert.That(conf.ProjectReferencesByPathFolders[@"C:\FOO\BAR.VCXPROJ"], Is.EqualTo("Engine"));
+            }
+
+            [Test]
+            public void DictionaryIsInitiallyEmpty()
+            {
+                var conf = new Solution.Configuration();
+                Assert.That(conf.ProjectReferencesByPathFolders.Count, Is.EqualTo(0));
+            }
+
+            [Test]
+            public void ProjectReferencesByPathIsIndependentOfFolders()
+            {
+                var conf = new Solution.Configuration();
+                conf.ProjectReferencesByPath.Add(@"C:\Foo\A.vcxproj");
+                conf.ProjectReferencesByPathFolders[@"C:\Foo\B.vcxproj"] = "Engine";
+
+                Assert.That(conf.ProjectReferencesByPath.Count, Is.EqualTo(1));
+                Assert.That(conf.ProjectReferencesByPathFolders.Count, Is.EqualTo(1));
+                Assert.That(conf.ProjectReferencesByPathFolders.ContainsKey(@"C:\Foo\A.vcxproj"), Is.False);
+            }
+
+            [Test]
+            public void UnmappedProjectHasNoFolderEntry()
+            {
+                var conf = new Solution.Configuration();
+                conf.ProjectReferencesByPath.Add(@"C:\Foo\A.vcxproj");
+
+                Assert.That(conf.ProjectReferencesByPathFolders.TryGetValue(@"C:\Foo\A.vcxproj", out _), Is.False,
+                    "a project not added to the folder dict should have no folder");
             }
         }
     }
