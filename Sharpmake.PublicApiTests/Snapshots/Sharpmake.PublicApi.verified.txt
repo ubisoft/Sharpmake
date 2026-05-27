@@ -5227,6 +5227,7 @@ namespace Sharpmake
             public string MasterBffFilePath { get; }
             public string PlatformName { get; set; }
             public Sharpmake.Strings ProjectReferencesByPath { get; }
+            public System.Collections.Generic.Dictionary<string, string> ProjectReferencesByPathFolders { get; }
             public Sharpmake.Solution Solution { get; }
             public string SolutionFilePath { get; }
             public Sharpmake.Solution.Configuration.IncludedProjectInfo StartupProject { get; set; }
