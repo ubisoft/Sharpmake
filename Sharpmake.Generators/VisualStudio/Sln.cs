@@ -290,7 +290,7 @@ namespace Sharpmake.Generators.VisualStudio
                 return solutionFileInfo.FullName;
             }
 
-            List<Solution.ResolvedProject> resolvedPathReferences = ResolveReferencesByPath(solutionProjects, solutionConfigurations[0].ProjectReferencesByPath);
+            List<Solution.ResolvedProject> resolvedPathReferences = ResolveReferencesByPath(solutionProjects, solutionConfigurations[0].ProjectReferencesByPath, solutionConfigurations[0].ProjectReferencesByPathFolders);
 
             var guidlist = solutionProjects.Select(p => p.UserData["Guid"]);
             resolvedPathReferences = resolvedPathReferences.Where(r => !guidlist.Contains(r.UserData["Guid"])).ToList();
@@ -842,7 +842,7 @@ namespace Sharpmake.Generators.VisualStudio
             };
         }
 
-        private List<Solution.ResolvedProject> ResolveReferencesByPath(List<Solution.ResolvedProject> solutionProjects, Strings referencedProjectPaths)
+        private List<Solution.ResolvedProject> ResolveReferencesByPath(List<Solution.ResolvedProject> solutionProjects, Strings referencedProjectPaths, Dictionary<string, string> pathFolders = null)
         {
             // solution's referenced projects
             var resolvedPathReferences = GetResolvedProjectsFromPaths(referencedProjectPaths).ToList();
@@ -851,6 +851,8 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 resolvedProject.UserData["Guid"] = ReadOrGenerateGuidFromProjectFile(resolvedProject.ProjectFile);
                 resolvedProject.UserData["TypeGuid"] = ReadTypeGuidFromProjectFile(resolvedProject.ProjectFile);
+                if (pathFolders != null && pathFolders.TryGetValue(resolvedProject.ProjectFile, out string folder))
+                    resolvedProject.SolutionFolder = folder;
                 resolvedProject.UserData["Folder"] = GetSolutionFolder(resolvedProject.SolutionFolder);
             }
 
