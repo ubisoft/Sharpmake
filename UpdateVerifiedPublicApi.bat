@@ -18,6 +18,7 @@ shift /2
 goto collect_projects
 
 :build_projects
+:: Sets DiffEngine_Disabled=true to prevent blocking diff popups during tests.
 set "DiffEngine_Disabled=true"
 for %%p in ("%BUILD_PROJECTS:;=" "%") do (
     dotnet build "%%~p" -c Release
