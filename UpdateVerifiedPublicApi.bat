@@ -7,6 +7,26 @@ if "%~1"=="" (cd /d "%~dp0") else (cd /d "%~1")
 :: Define ESC character for ANSI color codes
 for /f %%a in ('echo prompt $E^| cmd') do set "ESC=%%a"
 
+set "PROJ=%~dp0Sharpmake.PublicApiTests\Sharpmake.PublicApiTests.csproj"
+
+:: Build a list of projects to build and test (seeded with PROJ, then any extra args from %2 onward)
+set "BUILD_PROJECTS=%PROJ%"
+:collect_projects
+if "%~2"=="" goto build_projects
+set "BUILD_PROJECTS=%BUILD_PROJECTS%;%~2"
+shift /2
+goto collect_projects
+
+:build_projects
+:: Sets DiffEngine_Disabled=true to prevent blocking diff popups during tests.
+set "DiffEngine_Disabled=true"
+for %%p in ("%BUILD_PROJECTS:;=" "%") do (
+    dotnet build "%%~p" -c Release
+    if errorlevel 1 goto error
+    :: Test failures are intentionally ignored: failure = API changed = what we want to accept
+    dotnet test "%%~p" -c Release --no-build
+)
+
 :: Make sure verify.tool is available
 dotnet tool restore
 if %errorlevel% NEQ 0 goto error
