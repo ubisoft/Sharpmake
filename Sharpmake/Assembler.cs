@@ -10,8 +10,10 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
 #if NET6_0
@@ -562,10 +564,13 @@ namespace Sharpmake
                 );
 
                 bool throwErrorException = builderContext == null || builderContext.CompileErrorBehavior == BuilderCompileErrorBehavior.ThrowException;
-                LogCompilationResult(result, throwErrorException);
+                LogDiagnostics(result.Diagnostics, throwErrorException);
 
                 if (result.Success)
                 {
+                    var analyzerDiagnostics = RunAnalyzers(compilation, fileReferences);
+                    LogDiagnostics(analyzerDiagnostics, throwErrorException);
+
                     if (libraryFile != null)
                     {
                         dllStream.Seek(0, SeekOrigin.Begin);
@@ -586,22 +591,48 @@ namespace Sharpmake
             return null;
         }
 
-        private void LogCompilationResult(EmitResult result, bool throwErrorException)
+        private void LogDiagnostics(IEnumerable<Diagnostic> diagnostics, bool throwErrorException)
         {
             string errorMessage = "";
+            bool hasErrors = false;
 
-            foreach (var diagnostic in result.Diagnostics)
+            foreach (var diagnostic in diagnostics)
             {
                 if (diagnostic.Severity == DiagnosticSeverity.Error)
+                {
                     EventOutputError?.Invoke("{0}" + Environment.NewLine, diagnostic.ToString());
+                    hasErrors = true;
+                }
                 else // catch everything else as warning
+                {
                     EventOutputWarning?.Invoke("{0}" + Environment.NewLine, diagnostic.ToString());
+                }
 
                 errorMessage += diagnostic + Environment.NewLine;
             }
 
-            if (!result.Success && throwErrorException)
+            if (hasErrors && throwErrorException)
                 throw new Error(errorMessage);
+        }
+
+        private static ImmutableArray<Diagnostic> RunAnalyzers(Compilation compilation, HashSet<string> fileReferences)
+        {
+            var analyzers = new List<DiagnosticAnalyzer>();
+            foreach (var reference in fileReferences.Where(r => !string.IsNullOrEmpty(r) && File.Exists(r)))
+            {
+                var assembly = Assembly.LoadFrom(reference);
+                foreach (var type in assembly.GetExportedTypes())
+                {
+                    if (!type.IsAbstract && typeof(DiagnosticAnalyzer).IsAssignableFrom(type))
+                        analyzers.Add((DiagnosticAnalyzer)Activator.CreateInstance(type));
+                }
+            }
+
+            if (analyzers.Count == 0)
+                return ImmutableArray<Diagnostic>.Empty;
+
+            var compilationWithAnalyzers = compilation.WithAnalyzers(ImmutableArray.CreateRange(analyzers));
+            return compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync().GetAwaiter().GetResult();
         }
 
         private List<ISourceAttributeParser> ComputeParsers()
