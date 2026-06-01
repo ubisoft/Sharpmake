@@ -7,7 +7,7 @@ namespace Sharpmake
     {
         public sealed partial class AndroidAgdePlatform
         {
-            public const string _linkerOptionsTemplate = @"
+            public static readonly string _linkerOptionsTemplate = @"
     .LinkerOptions          = '-o ""%2"" ""%1""'
                             // System options
                             // -------------------------
@@ -37,7 +37,7 @@ namespace Sharpmake
                             + ' [options.AdditionalLinkerOptions]'
 ";
 
-            public const string _compilerExtraOptionsTemplate = @"
+            public static readonly string _compilerExtraOptionsTemplate = @"
     .CompilerExtraOptions   = ''
             // System options
             // -------------------------
@@ -73,7 +73,7 @@ namespace Sharpmake
             + ' [options.AdditionalCompilerOptions]'
 ";
 
-            public const string _compilerOptimizationOptionsTemplate =
+            public static readonly string _compilerOptimizationOptionsTemplate =
                     @"
     // Optimizations options
     // ---------------------

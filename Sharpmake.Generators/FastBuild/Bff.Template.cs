@@ -70,7 +70,7 @@ Settings
     .AllowCaching = [fastBuildAllowCaching]
 ";
 
-                public const string WinEnvironment =
+                public static readonly string WinEnvironment =
 @"    #import TMP
     #import TEMP
     #import USERPROFILE
@@ -87,7 +87,7 @@ Settings
     }
 ";
 
-                public const string OsxEnvironment =
+                public static readonly string OsxEnvironment =
 @"    #import TMPDIR
     .Environment =
     {
@@ -97,7 +97,7 @@ Settings
     }
 ";
 
-                public const string LinuxEnvironment =
+                public static readonly string LinuxEnvironment =
 @"    .Environment =
     {
         ""PATH=[fastBuildPATH]""
@@ -460,7 +460,7 @@ Compiler( '[fastBuildNasmCompilerName]' )
                             + ' /Od'
 ";
 
-                public const string ClangCompilerOptionsDeoptimize = @"
+                public static readonly string ClangCompilerOptionsDeoptimize = @"
     .CompilerOptionsDeoptimized = '[fastBuildClangFileLanguage]""%1"" -o ""%2"" -c'
                             + ' [fastBuildCompilerPCHOptionsClang]'
                             + ' $CompilerExtraOptions$'

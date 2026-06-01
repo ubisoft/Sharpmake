@@ -14,54 +14,9 @@ namespace Sharpmake
                 typeof(Sharpmake.Project.Configuration.IConfigurationTasks)})]
         public sealed class AndroidAgdePlatform : Sharpmake.BasePlatform, Sharpmake.Generators.FastBuild.IClangPlatformBff, Sharpmake.Generators.FastBuild.IPlatformBff, Sharpmake.IFastBuildCompilerSettings, Sharpmake.Project.Configuration.IConfigurationTasks
         {
-            public const string _compilerExtraOptionsTemplate = ("\\r\\n    .CompilerExtraOptions   = \'\'\\r\\n            // System options\\r\\n        " +
-                "    // -------------------------\\r\\n            + \' [cmdLineOptions.ClangDiagnos" +
-                "ticsFormat]\'\\r\\n            + \' [cmdLineOptions.ClangCompilerTarget]\'\\r\\n       " +
-                "     + \' [cmdLineOptions.LimitDebugInfo]\'\\r\\n            + \' [cmdLineOptions.Cla" +
-                "ngDebugInformationFormat]\'\\r\\n            + \' [cmdLineOptions.FloatABI]\'\\r\\n    " +
-                "        + \' [cmdLineOptions.AddressSignificanceTable]\'\\r\\n            // General" +
-                " options\\r\\n            // -------------------------\\r\\n            + \' [cmdLine" +
-                "Options.AdditionalIncludeDirectories]\'\\r\\n            + \' [cmdLineOptions.Additi" +
-                "onalUsingDirectories]\'\\r\\n            + \' [cmdLineOptions.PreprocessorDefinition" +
-                "s]\'\\r\\n            + \' [cmdLineOptions.UndefinePreprocessorDefinitions]\'\\r\\n    " +
-                "        + \' [cmdLineOptions.UndefineAllPreprocessorDefinitions]\'\\r\\n            " +
-                "+ \' [cmdLineOptions.WarningLevel]\'\\r\\n            + \' [cmdLineOptions.TreatWarni" +
-                "ngAsError]\'\\r\\n            + \' [cmdLineOptions.StackProtectionLevel]\'\\r\\n       " +
-                "     + \' [cmdLineOptions.EnableDataLevelLinking]\'\\r\\n            + \' [cmdLineOpt" +
-                "ions.EnableFunctionLevelLinking]\'\\r\\n            + \' [cmdLineOptions.OmitFramePo" +
-                "inters]\'\\r\\n            + \' [cmdLineOptions.LinkTimeOptimization]\'\\r\\n          " +
-                "  + \' [cmdLineOptions.RuntimeTypeInfo]\'\\r\\n            + \' [cmdLineOptions.Excep" +
-                "tionHandling]\'\\r\\n            + \' [cmdLineOptions.UnwindTables]\'\\r\\n            " +
-                "+ \' [cmdLineOptions.CppLanguageStd]\'\\r\\n            + \' [cmdLineOptions.CLanguag" +
-                "eStd]\'\\r\\n            + \' [cmdLineOptions.ThumbMode]\'\\r\\n            + \' [cmdLin" +
-                "eOptions.PositionIndependentCode]\'\\r\\n            // Additional compiler options" +
-                "\\r\\n            //--------------------------\\r\\n            + \' [options.Additio" +
-                "nalCompilerOptions]\'\\r\\n");
-            public const string _compilerOptimizationOptionsTemplate = ("\\r\\n    // Optimizations options\\r\\n    // ---------------------\\r\\n    .Compiler" +
-                "Optimizations = \'\'\\r\\n            + \' [cmdLineOptions.Optimization]\'\\r\\n        " +
-                "    + \' [options.AdditionalCompilerOptimizeOptions]\'\\r\\n");
-            public const string _linkerOptionsTemplate = ("\\r\\n    .LinkerOptions          = \'-o \"%2\" \"%1\"\'\\r\\n                            /" +
-                "/ System options\\r\\n                            // -------------------------\\r\\n" +
-                "                            + \' [cmdLineOptions.ClangCompilerTarget]\'\\r\\n       " +
-                "                     + \' [cmdLineOptions.GenerateSharedObject]\'\\r\\n             " +
-                "               + \' [cmdLineOptions.UseOfStl]\'\\r\\n                            // " +
-                "\\r\\n                            // Library Search Path\\r\\n                      " +
-                "      // ---------------------------\\r\\n                            + \' [cmdLine" +
-                "Options.AdditionalLibraryDirectories]\'\\r\\n                            // Librari" +
-                "es\\r\\n                            // ---------------------------\\r\\n            " +
-                "                + \' [cmdLineOptions.AdditionalDependencies]\'\\r\\n                " +
-                "            // Options\\r\\n                            //--------\\r\\n            " +
-                "                + \' [cmdLineOptions.ClangLinkType]\'\\r\\n                         " +
-                "   + \' [cmdLineOptions.DebuggerSymbolInformation]\'\\r\\n                          " +
-                "  + \' [cmdLineOptions.GenerateMapFile]\'\\r\\n                            + \' [cmdL" +
-                "ineOptions.LinkIncremental]\'\\r\\n                            + \' [cmdLineOptions." +
-                "FunctionBinding]\'\\r\\n                            + \' [cmdLineOptions.NoExecStack" +
-                "Required]\'\\r\\n                            + \' [cmdLineOptions.Relocation]\'\\r\\n  " +
-                "                          + \' [cmdLineOptions.UnresolvedSymbolReferences]\'\\r\\n  " +
-                "                          + \' [cmdLineOptions.BuildId]\'\\r\\n                     " +
-                "       // Additional linker options\\r\\n                            //-----------" +
-                "---------------\\r\\n                            + \' [options.AdditionalLinkerOpti" +
-                "ons]\'\\r\\n");
+            public static readonly string _compilerExtraOptionsTemplate;
+            public static readonly string _compilerOptimizationOptionsTemplate;
+            public static readonly string _linkerOptionsTemplate;
             public AndroidAgdePlatform() { }
             public override string BffPlatformDefine { get; }
             public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, string> BinPath { get; set; }
@@ -608,11 +563,9 @@ namespace Sharpmake
                 typeof(Sharpmake.Project.Configuration.IConfigurationTasks)})]
         public sealed class LinuxPlatform : Sharpmake.BasePlatform, Sharpmake.Generators.FastBuild.IClangPlatformBff, Sharpmake.Generators.FastBuild.IPlatformBff, Sharpmake.IFastBuildCompilerSettings, Sharpmake.Project.Configuration.IConfigurationTasks
         {
-            public const string _compilerExtraOptions = @"\r\n    .CompilerExtraOptions   = ''\r\n            // General options\r\n            // -------------------------\r\n            + ' [cmdLineOptions.StdLib]'\r\n            + ' [cmdLineOptions.DebugInformationFormat]'\r\n            + ' [cmdLineOptions.AdditionalIncludeDirectories]'\r\n            + ' [cmdLineOptions.AdditionalUsingDirectories]'\r\n            + ' [cmdLineOptions.PreprocessorDefinitions]'\r\n            + ' [cmdLineOptions.UndefinePreprocessorDefinitions]'\r\n            + ' [cmdLineOptions.UndefineAllPreprocessorDefinitions]'\r\n            + ' [cmdLineOptions.Warnings]'\r\n            + ' [cmdLineOptions.ExtraWarnings]'\r\n            + ' [cmdLineOptions.WarningsAsErrors]'\r\n            + ' [cmdLineOptions.PositionIndependentCode]'\r\n            + ' [cmdLineOptions.FastMath]'\r\n            + ' [cmdLineOptions.NoStrictAliasing]'\r\n            + ' [cmdLineOptions.UnrollLoops]'\r\n            + ' [cmdLineOptions.LinkTimeOptimization]'\r\n            + ' [cmdLineOptions.AnsiCompliance]'\r\n            + ' [cmdLineOptions.RuntimeTypeInfo]'\r\n            + ' [cmdLineOptions.CharUnsigned]'\r\n            + ' [cmdLineOptions.MsExtensions]'\r\n            + ' [cmdLineOptions.CppLanguageStd]'\r\n            + ' [cmdLineOptions.CLanguageStd]'\r\n            + ' [cmdLineOptions.BffSysRoot]'\r\n            // Additional compiler options\r\n            //--------------------------\r\n            + ' [options.AdditionalCompilerOptions]'\r\n";
-            public const string _compilerOptimizationOptions = ("\\r\\n    // Optimizations options\\r\\n    // ---------------------\\r\\n    .Compiler" +
-                "Optimizations = \'\'\\r\\n            + \' [cmdLineOptions.OptimizationLevel]\'\\r\\n   " +
-                "         + \' [options.AdditionalCompilerOptimizeOptions]\'\\r\\n");
-            public const string _linkerOptionsTemplate = @"\r\n    .LinkerOptions          = '-o ""%2""'\r\n                            + ' [cmdLineOptions.WholeArchiveBegin]'\r\n                            + ' ""%1""'\r\n                            + ' [cmdLineOptions.WholeArchiveEnd]'\r\n                            + ' [sharedOption]'\r\n                            + ' [cmdLineOptions.BffSysRoot]'\r\n                            // Library Search Path\r\n                            // ---------------------------\r\n                            + ' [cmdLineOptions.AdditionalLibraryDirectories]'\r\n                            // Libraries\r\n                            // ---------------------------\r\n                            + ' [cmdLineOptions.AdditionalDependencies]'\r\n                            // Options\r\n                            //--------\r\n                            + ' [cmdLineOptions.StdLib]'\r\n                            + ' [cmdLineOptions.EditAndContinue]'\r\n                            + ' [cmdLineOptions.InfoStripping]'\r\n                            + ' [cmdLineOptions.DataStripping]'\r\n                            + ' [cmdLineOptions.DuplicateStripping]'\r\n                            + ' [cmdLineOptions.Addressing]'\r\n                            + ' [cmdLineOptions.GenerateMapFile]'\r\n                            // Additional linker options\r\n                            //--------------------------\r\n                            + ' [options.AdditionalLinkerOptions]'\r\n";
+            public static readonly string _compilerExtraOptions;
+            public static readonly string _compilerOptimizationOptions;
+            public static readonly string _linkerOptionsTemplate;
             public LinuxPlatform() { }
             public override string BffPlatformDefine { get; }
             public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, string> BinPath { get; set; }

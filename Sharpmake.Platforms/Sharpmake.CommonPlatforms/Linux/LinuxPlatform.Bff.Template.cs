@@ -7,7 +7,7 @@ namespace Sharpmake
     {
         public sealed partial class LinuxPlatform
         {
-            public const string _linkerOptionsTemplate = @"
+            public static readonly string _linkerOptionsTemplate = @"
     .LinkerOptions          = '-o ""%2""'
                             + ' [cmdLineOptions.WholeArchiveBegin]'
                             + ' ""%1""'
@@ -34,7 +34,7 @@ namespace Sharpmake
                             + ' [options.AdditionalLinkerOptions]'
 ";
 
-            public const string _compilerExtraOptions = @"
+            public static readonly string _compilerExtraOptions = @"
     .CompilerExtraOptions   = ''
             // General options
             // -------------------------
@@ -65,7 +65,7 @@ namespace Sharpmake
             + ' [options.AdditionalCompilerOptions]'
 ";
 
-            public const string _compilerOptimizationOptions =
+            public static readonly string _compilerOptimizationOptions =
                 @"
     // Optimizations options
     // ---------------------
