@@ -97,6 +97,7 @@ namespace Sharpmake.UnitTests
                 var guid1 = Sln.ReadOrGenerateGuidFromProjectFile(path);
                 var guid2 = Sln.ReadOrGenerateGuidFromProjectFile(path);
 
+                Assert.That(guid1, Is.Not.Null, "SDK-style csproj without <ProjectGuid> must still get a generated GUID");
                 Assert.That(guid2, Is.EqualTo(guid1), "deterministic GUID must be stable across calls");
             }
 
@@ -109,6 +110,8 @@ namespace Sharpmake.UnitTests
                 var guid1 = Sln.ReadOrGenerateGuidFromProjectFile(path1);
                 var guid2 = Sln.ReadOrGenerateGuidFromProjectFile(path2);
 
+                Assert.That(guid1, Is.Not.Null, "different files must each get a generated GUID");
+                Assert.That(guid2, Is.Not.Null, "different files must each get a generated GUID");
                 Assert.That(guid2, Is.Not.EqualTo(guid1), "different files must get different GUIDs");
             }
 

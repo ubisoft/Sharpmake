@@ -7,8 +7,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Sharpmake.Generators.VisualStudio
@@ -157,11 +155,10 @@ namespace Sharpmake.Generators.VisualStudio
         internal static string GenerateDeterministicGuid(string projectFile)
         {
             string normalised = Path.GetFullPath(projectFile).ToLowerInvariant();
-            byte[] hash = MD5.HashData(Encoding.UTF8.GetBytes(normalised));
-            return new Guid(hash).ToString("D").ToUpperInvariant();
+            return Util.BuildGuid(normalised).ToString("D").ToUpperInvariant();
         }
 
-        public static string ReadOrGenerateGuidFromProjectFile(string projectFile)
+        internal static string ReadOrGenerateGuidFromProjectFile(string projectFile)
         {
             return ReadGuidFromProjectFile(projectFile) ?? GenerateDeterministicGuid(projectFile);
         }

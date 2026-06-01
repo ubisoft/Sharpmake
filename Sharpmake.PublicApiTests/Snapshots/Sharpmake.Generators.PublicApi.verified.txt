@@ -245,12 +245,12 @@ namespace Sharpmake.Generators.FastBuild
         {
             public static class ConfigurationFile
             {
-                public const string ClangCompilerOptionsDeoptimize = @"\n    .CompilerOptionsDeoptimized = '[fastBuildClangFileLanguage]""%1"" -o ""%2"" -c'\n                            + ' [fastBuildCompilerPCHOptionsClang]'\n                            + ' $CompilerExtraOptions$'\n                            + ' [fastBuildCompilerDeoptimizeOptionClang]'\n";
-                public const string LinuxEnvironment = ("    .Environment =\\n    {\\n        \"PATH=[fastBuildPATH]\"\\n[envAdditionalVariable" +
-                    "s]\\n    }\\n");
-                public const string OsxEnvironment = ("    #import TMPDIR\\n    .Environment =\\n    {\\n        \"TMPDIR=$TMPDIR$\",\\n      " +
-                    "  \"PATH=[fastBuildPATH]\"\\n[envAdditionalVariables]\\n    }\\n");
-                public const string WinEnvironment = @"    #import TMP\n    #import TEMP\n    #import USERPROFILE\n    #import COMSPEC\n    .Environment =\n    {\n        ""TMP=$TMP$"",\n        ""TEMP=$TEMP$"",\n        ""USERPROFILE=$USERPROFILE$"",\n        ""COMSPEC=$COMSPEC$"",\n        ""SystemRoot=[fastBuildSystemRoot]""\n        ""PATH=[fastBuildPATH]""\n[envAdditionalVariables]\n    }\n";
+                public const string ClangCompilerOptionsDeoptimize = @"\r\n    .CompilerOptionsDeoptimized = '[fastBuildClangFileLanguage]""%1"" -o ""%2"" -c'\r\n                            + ' [fastBuildCompilerPCHOptionsClang]'\r\n                            + ' $CompilerExtraOptions$'\r\n                            + ' [fastBuildCompilerDeoptimizeOptionClang]'\r\n";
+                public const string LinuxEnvironment = ("    .Environment =\\r\\n    {\\r\\n        \"PATH=[fastBuildPATH]\"\\r\\n[envAdditionalVa" +
+                    "riables]\\r\\n    }\\r\\n");
+                public const string OsxEnvironment = ("    #import TMPDIR\\r\\n    .Environment =\\r\\n    {\\r\\n        \"TMPDIR=$TMPDIR$\",\\r" +
+                    "\\n        \"PATH=[fastBuildPATH]\"\\r\\n[envAdditionalVariables]\\r\\n    }\\r\\n");
+                public const string WinEnvironment = @"    #import TMP\r\n    #import TEMP\r\n    #import USERPROFILE\r\n    #import COMSPEC\r\n    .Environment =\r\n    {\r\n        ""TMP=$TMP$"",\r\n        ""TEMP=$TEMP$"",\r\n        ""USERPROFILE=$USERPROFILE$"",\r\n        ""COMSPEC=$COMSPEC$"",\r\n        ""SystemRoot=[fastBuildSystemRoot]""\r\n        ""PATH=[fastBuildPATH]""\r\n[envAdditionalVariables]\r\n    }\r\n";
                 public static string AllConfigsSection;
                 public static string AllowCaching;
                 public static string CPPCompilerExtraOptions;
@@ -765,7 +765,6 @@ namespace Sharpmake.Generators.VisualStudio
         public Sln() { }
         public void Generate(Sharpmake.Builder builder, Sharpmake.Solution solution, System.Collections.Generic.List<Sharpmake.Solution.Configuration> configurations, string solutionFile, System.Collections.Generic.List<string> generatedFiles, System.Collections.Generic.List<string> skipFiles) { }
         public static string ReadGuidFromProjectFile(string projectFile) { }
-        public static string ReadOrGenerateGuidFromProjectFile(string projectFile) { }
         public static string ReadTypeGuidFromProjectFile(string projectFile) { }
         public static class Template
         {

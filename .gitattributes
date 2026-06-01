@@ -16,10 +16,8 @@
 *.reg text eof=crlf
 *.csproj text eof=crlf
 
-# Declare files that must keep lf
-*.sh text eol=lf
-# Template files with embedded newlines must stay LF so public API snapshots are consistent across platforms
-Sharpmake.Generators/FastBuild/Bff.Template.cs text eol=lf
+# Declare files that must keep lf 
+*.sh text eof=lf
 
 # Verify snapshot files
 *.verified.txt text eol=lf working-tree-encoding=UTF-8
