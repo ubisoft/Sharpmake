@@ -1,6 +1,5 @@
 # Samples and FunctionalTests generated files
 samples/**/*.csproj
-!samples/**/analyzer/*.csproj
 samples/**/*.sln
 samples/**/projects/*
 samples/**/codebase/temp/*
