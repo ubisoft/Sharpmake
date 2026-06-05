@@ -10,8 +10,12 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Immutable;
+using System.Reflection.Metadata;
+using System.Reflection.PortableExecutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
 #if NET6_0
@@ -26,7 +30,7 @@ namespace Sharpmake
 {
     public class Assembler
     {
-        
+
 #if NET6_0
         public const Options.CSharp.LanguageVersion SharpmakeScriptsCSharpVersion = Options.CSharp.LanguageVersion.CSharp10;
         public const DotNetFramework SharpmakeDotNetFramework = DotNetFramework.net6_0;
@@ -78,8 +82,8 @@ namespace Sharpmake
             public Assembly Assembly { get; set; }
             public IReadOnlyCollection<string> SourceFiles => _sourceFiles;
             public IReadOnlyCollection<string> NoneFiles => _noneFiles;
-            
-            
+
+
             [Obsolete("Use RuntimeReference instead")]
             public IReadOnlyCollection<string> References => RuntimeReferences;
             public IReadOnlyCollection<string> RuntimeReferences => _runtimeReferences;
@@ -562,10 +566,13 @@ namespace Sharpmake
                 );
 
                 bool throwErrorException = builderContext == null || builderContext.CompileErrorBehavior == BuilderCompileErrorBehavior.ThrowException;
-                LogCompilationResult(result, throwErrorException);
+                LogDiagnostics(result.Diagnostics, throwErrorException);
 
                 if (result.Success)
                 {
+                    var analyzerDiagnostics = RunAnalyzers(compilation, fileReferences);
+                    LogDiagnostics(analyzerDiagnostics, throwErrorException);
+
                     if (libraryFile != null)
                     {
                         dllStream.Seek(0, SeekOrigin.Begin);
@@ -586,22 +593,83 @@ namespace Sharpmake
             return null;
         }
 
-        private void LogCompilationResult(EmitResult result, bool throwErrorException)
+        private void LogDiagnostics(IEnumerable<Diagnostic> diagnostics, bool throwErrorException)
         {
             string errorMessage = "";
+            bool hasErrors = false;
 
-            foreach (var diagnostic in result.Diagnostics)
+            foreach (var diagnostic in diagnostics)
             {
                 if (diagnostic.Severity == DiagnosticSeverity.Error)
+                {
                     EventOutputError?.Invoke("{0}" + Environment.NewLine, diagnostic.ToString());
+                    hasErrors = true;
+                }
                 else // catch everything else as warning
+                {
                     EventOutputWarning?.Invoke("{0}" + Environment.NewLine, diagnostic.ToString());
+                }
 
                 errorMessage += diagnostic + Environment.NewLine;
             }
 
-            if (!result.Success && throwErrorException)
+            if (hasErrors && throwErrorException)
                 throw new Error(errorMessage);
+        }
+
+        private static ImmutableArray<Diagnostic> RunAnalyzers(Compilation compilation, HashSet<string> fileReferences)
+        {
+            var analyzers = new List<DiagnosticAnalyzer>();
+            foreach (var reference in fileReferences.Where(r => !string.IsNullOrEmpty(r) && File.Exists(r)))
+            {
+                // Skip assemblies that cannot contain a DiagnosticAnalyzer before loading them.
+                // fileReferences contains all compilation references, most of which are regular script dependencies whose transitive dependencies may not be present at runtime.
+                // Loading them would cause GetExportedTypes to throw exceptions.
+                if (!MayContainDiagnosticAnalyzers(reference))
+                    continue;
+
+                var assembly = Assembly.LoadFrom(reference);
+
+                Type[] types;
+                try
+                {
+                    types = assembly.GetExportedTypes();
+                }
+                catch (FileNotFoundException)
+                {
+                    // A transitive dependency of this assembly is missing at runtime, so we skip it
+                    continue;
+                }
+
+                foreach (var type in types)
+                {
+                    if (!type.IsAbstract && typeof(DiagnosticAnalyzer).IsAssignableFrom(type))
+                        analyzers.Add((DiagnosticAnalyzer)Activator.CreateInstance(type));
+                }
+            }
+
+            if (analyzers.Count == 0)
+                return ImmutableArray<Diagnostic>.Empty;
+
+            var compilationWithAnalyzers = compilation.WithAnalyzers(ImmutableArray.CreateRange(analyzers));
+            return compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync().GetAwaiter().GetResult();
+        }
+
+        // Reads the assembly manifest using PEReader (metadata only, no type loading) to check whether the assembly references Microsoft.CodeAnalysis.
+        // A DiagnosticAnalyzer must inherit from a type defined in that assembly, so any assembly that does not reference it cannot contain one.
+        // This avoids loading all compilation references at runtime, which would fail for assemblies whose transitive dependencies are not present.
+        private static bool MayContainDiagnosticAnalyzers(string assemblyPath)
+        {
+            using var stream = File.OpenRead(assemblyPath);
+            using var peReader = new PEReader(stream);
+            var metadataReader = peReader.GetMetadataReader();
+            foreach (var referenceHandle in metadataReader.AssemblyReferences)
+            {
+                var reference = metadataReader.GetAssemblyReference(referenceHandle);
+                if (metadataReader.GetString(reference.Name) == "Microsoft.CodeAnalysis")
+                    return true;
+            }
+            return false;
         }
 
         private List<ISourceAttributeParser> ComputeParsers()

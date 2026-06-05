@@ -129,6 +129,19 @@
             ]
         },
         {
+            "Name": "CustomAnalyzer",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "windows-2022" ],
+            "Frameworks": [ "net8.0" ],
+            "Configurations": [ "release" ],
+            "TestFolder": "samples/CustomAnalyzer",
+            "Commands":
+            [
+                "dotnet build {testFolder}/analyzer/CustomAnalyzer.csproj --configuration {configuration}",
+                "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"CustomAnalyzer.sharpmake.cs\" -framework {framework}"
+            ]
+        },
+        {
             "Name": "CustomBuildStep",
             "CIs": [ "github", "gitlab" ],
             "OSs": [ "windows-2022" ],
