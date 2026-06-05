@@ -245,17 +245,12 @@ namespace Sharpmake.Generators.FastBuild
         {
             public static class ConfigurationFile
             {
-                public const string ClangCompilerOptionsDeoptimize = @"\r\n    .CompilerOptionsDeoptimized = '[fastBuildClangFileLanguage]""%1"" -o ""%2"" -c'\r\n                            + ' [fastBuildCompilerPCHOptionsClang]'\r\n                            + ' $CompilerExtraOptions$'\r\n                            + ' [fastBuildCompilerDeoptimizeOptionClang]'\r\n";
-                public const string LinuxEnvironment = ("    .Environment =\\r\\n    {\\r\\n        \"PATH=[fastBuildPATH]\"\\r\\n[envAdditionalVa" +
-                    "riables]\\r\\n    }\\r\\n");
-                public const string OsxEnvironment = ("    #import TMPDIR\\r\\n    .Environment =\\r\\n    {\\r\\n        \"TMPDIR=$TMPDIR$\",\\r" +
-                    "\\n        \"PATH=[fastBuildPATH]\"\\r\\n[envAdditionalVariables]\\r\\n    }\\r\\n");
-                public const string WinEnvironment = @"    #import TMP\r\n    #import TEMP\r\n    #import USERPROFILE\r\n    #import COMSPEC\r\n    .Environment =\r\n    {\r\n        ""TMP=$TMP$"",\r\n        ""TEMP=$TEMP$"",\r\n        ""USERPROFILE=$USERPROFILE$"",\r\n        ""COMSPEC=$COMSPEC$"",\r\n        ""SystemRoot=[fastBuildSystemRoot]""\r\n        ""PATH=[fastBuildPATH]""\r\n[envAdditionalVariables]\r\n    }\r\n";
                 public static string AllConfigsSection;
                 public static string AllowCaching;
                 public static string CPPCompilerExtraOptions;
                 public static string CPPCompilerOptimizationOptions;
                 public static string CPPCompilerOptionsDeoptimize;
+                public static readonly string ClangCompilerOptionsDeoptimize;
                 public static string CompilerConfiguration;
                 public static string CompilerOptionsCPP;
                 public static string CompilerOptionsClang;
@@ -284,11 +279,13 @@ namespace Sharpmake.Generators.FastBuild
                 public static string LibrarianOptions;
                 public static string LibrarianOptionsClang;
                 public static string LinkerOptions;
+                public static readonly string LinuxEnvironment;
                 public static string MasmCompilerExtraOptions;
                 public static string MasmConfigNameSuffix;
                 public static string NasmCompilerExtraOptions;
                 public static string NasmConfigNameSuffix;
                 public static string ObjectListBeginSection;
+                public static readonly string OsxEnvironment;
                 public static string PCHOptions;
                 public static string PCHOptionsClang;
                 public static string PCHOptionsDeoptimize;
@@ -306,6 +303,7 @@ namespace Sharpmake.Generators.FastBuild
                 public static string UsePrecomp;
                 public static string UsePrecompClang;
                 public static string Win64ConfigName;
+                public static readonly string WinEnvironment;
             }
         }
     }
@@ -693,13 +691,9 @@ namespace Sharpmake.Generators.VisualStudio
         {
             public static class Manifest
             {
-                public const string DPIAwarenessSettings = ("\\r\\n      <dpiAware xmlns=\"http://schemas.microsoft.com/SMI/2005/WindowsSettings\"" +
-                    ">true/PM</dpiAware>\\r\\n      <dpiAwareness xmlns=\"http://schemas.microsoft.com/S" +
-                    "MI/2016/WindowsSettings\">PerMonitorV2,PerMonitor</dpiAwareness>\\r\\n");
-                public const string FileBegin = ("<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\\r\\n<assembly xmlns=\"urn:s" +
-                    "chemas-microsoft-com:asm.v1\" manifestVersion=\"1.0\">\\r\\n  <application xmlns=\"urn" +
-                    ":schemas-microsoft-com:asm.v3\">\\r\\n    <windowsSettings>");
-                public const string FileEnd = "    </windowsSettings>\\r\\n  </application>\\r\\n</assembly>";
+                public static readonly string DPIAwarenessSettings;
+                public static readonly string FileBegin;
+                public static readonly string FileEnd;
             }
         }
     }
@@ -874,15 +868,13 @@ namespace Sharpmake.Generators.VisualStudio
         {
             public static class Project
             {
-                public const string AdditionalVCTargetsPath = ("    <AdditionalVCTargetsPath>[additionalVCTargetsPath]</AdditionalVCTargetsPath>\\" +
-                    "r\\n    <_VCTargetsPathForToolset>$(AdditionalVCTargetsPath)</_VCTargetsPathForTo" +
-                    "olset>\\r\\n");
-                public const string DisableRegistryUse = "    <DisableRegistryUse>true</DisableRegistryUse>\\r\\n";
-                public const string PlatformFolderOverride = "    <_PlatformFolder>[platformFolder]</_PlatformFolder>\\r\\n";
+                public static readonly string AdditionalVCTargetsPath;
                 public static string CustomProperty;
+                public static readonly string DisableRegistryUse;
                 public static string ImportCppDefaultProps;
                 public static string ItemGroupBegin;
                 public static string ItemGroupEnd;
+                public static readonly string PlatformFolderOverride;
                 public static string ProjectAfterConfigurationsGeneral;
                 public static string ProjectAfterConfigurationsGeneralImportPropertySheets;
                 public static string ProjectAfterImportedProps;

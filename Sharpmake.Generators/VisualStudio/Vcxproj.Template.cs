@@ -40,7 +40,7 @@ namespace Sharpmake.Generators.VisualStudio
     <ProjectName>[projectName]</ProjectName>
 ";
 
-                public const string DisableRegistryUse =
+                public static readonly string DisableRegistryUse =
 @"    <DisableRegistryUse>true</DisableRegistryUse>
 ";
 
@@ -445,11 +445,11 @@ namespace Sharpmake.Generators.VisualStudio
 @"  </ItemGroup>
 ";
 
-                public const string PlatformFolderOverride =
+                public static readonly string PlatformFolderOverride =
 @"    <_PlatformFolder>[platformFolder]</_PlatformFolder>
 ";
 
-                public const string AdditionalVCTargetsPath =
+                public static readonly string AdditionalVCTargetsPath =
                     @"    <AdditionalVCTargetsPath>[additionalVCTargetsPath]</AdditionalVCTargetsPath>
     <_VCTargetsPathForToolset>$(AdditionalVCTargetsPath)</_VCTargetsPathForToolset>
 ";
