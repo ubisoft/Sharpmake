@@ -39,7 +39,7 @@ jobs:
 
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
 
       - name: Setup .NET 8
         uses: actions/setup-dotnet@v5
@@ -63,7 +63,7 @@ jobs:
           matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
 
       - name: Generate samples matrix
         id: set-matrix
@@ -84,7 +84,7 @@ jobs:
       matrix: ${{fromJSON(needs.generate_samples_matrix.outputs.matrix)}}
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
     
       - name: Setup .NET 8
         uses: actions/setup-dotnet@v5
