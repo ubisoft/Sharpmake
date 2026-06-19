@@ -623,10 +623,11 @@ namespace Sharpmake
                         string platformVersion = windowsTargetPlatformVersion.ToVersionString();
                         var paths = new List<string> {
                             $@"{visualStudioInclude}",
-                            $@"{kitsRoot10}Include\{platformVersion}\um",     // $(UM_IncludePath)
-                            $@"{kitsRoot10}Include\{platformVersion}\shared", // $(KIT_SHARED_IncludePath)
-                            $@"{kitsRoot10}Include\{platformVersion}\winrt",  // $(WinRT_IncludePath)
-                            $@"{kitsRoot10}Include\{platformVersion}\ucrt",   // $(UniversalCRT_IncludePath)
+                            $@"{kitsRoot10}Include\{platformVersion}\um",        // $(UM_IncludePath)
+                            $@"{kitsRoot10}Include\{platformVersion}\shared",    // $(KIT_SHARED_IncludePath)
+                            $@"{kitsRoot10}Include\{platformVersion}\winrt",     // $(WinRT_IncludePath)
+                            $@"{kitsRoot10}Include\{platformVersion}\cppwinrt",  // $(CppWinRT_IncludePath)
+                            $@"{kitsRoot10}Include\{platformVersion}\ucrt",      // $(UniversalCRT_IncludePath)
                         };
 
                         if (windowsTargetPlatformVersion <= Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10240_0)
