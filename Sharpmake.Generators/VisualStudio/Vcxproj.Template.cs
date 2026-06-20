@@ -88,9 +88,12 @@ namespace Sharpmake.Generators.VisualStudio
                 public static string ProjectEnd =
                 @"</Project>";
 
-                public static string ProjectAfterConfigurationsGeneral =
+                public static string MicrosoftCppProps =
 @"  <Import Project=""[vcTargetsPath]\Microsoft.Cpp.props"" />
-  <ImportGroup Label=""ExtensionSettings"">
+";
+
+                public static string ProjectAfterConfigurationsGeneral =
+@"  <ImportGroup Label=""ExtensionSettings"">
 ";
                 public static string ProjectAfterConfigurationsGeneralImportPropertySheets =
 @"  <ImportGroup Label=""PropertySheets"">
@@ -138,9 +141,12 @@ namespace Sharpmake.Generators.VisualStudio
                 @"  </ItemDefinitionGroup>
 ";
 
-                public static string ProjectTargetsBegin =
+                public static string ImportMicrosoftCppTargets =
 @"  <Import Project=""[vcTargetsPath]\Microsoft.Cpp.targets"" />
-  <ImportGroup Label=""ExtensionTargets"">
+";
+
+                public static string ProjectTargetsBegin =
+@"  <ImportGroup Label=""ExtensionTargets"">
 ";
 
                 public static string ProjectTargetsItem =
@@ -180,6 +186,18 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public static string ProjectCustomTargetsEnd =
 @"  </Target>
+";
+
+                public static string NMakeBuildTargets =
+@"  <Target Name=""Build"" Condition=""'$(NMakeBuildCommandLine)' != ''"" >
+    <Exec Command=""$(NMakeBuildCommandLine)"" WorkingDirectory=""$(NMakeWorkingDirectory)""/>
+  </Target>
+  <Target Name=""Rebuild"" Condition=""'$(NMakeReBuildCommandLine)' != ''"" >
+    <Exec Command=""$(NMakeReBuildCommandLine)"" WorkingDirectory=""$(NMakeWorkingDirectory)""/>
+  </Target>
+  <Target Name=""Clean"" Condition=""'$(NMakeCleanCommandLine)' != ''"" >
+    <Exec Command=""$(NMakeCleanCommandLine)"" WorkingDirectory=""$(NMakeWorkingDirectory)""/>
+  </Target>
 ";
 
                 public static string ProjectConfigurationsResourceCompile =
@@ -367,6 +385,9 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public static string ProjectFilesSourceExcludeFromBuild =
                 @"      <ExcludedFromBuild Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">true</ExcludedFromBuild>
+";
+                public static string ProjectFilesSourceRemoveFromBuild =
+                @"    <ClCompile Remove=""[file.FilePath]"" Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"" />
 ";
                 public static string ProjectFilesSourceConsumeWinRTExtensions =
                 @"      <CompileAsWinRT Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">true</CompileAsWinRT>
