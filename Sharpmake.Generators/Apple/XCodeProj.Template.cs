@@ -362,7 +362,7 @@ namespace Sharpmake.Generators.Apple
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = [item.Options.UIApplicationSupportsIndirectInputEvents];
 				INFOPLIST_KEY_UIRequiresPersistentWiFi = [item.Options.UIRequiresPersistentWiFi];
 				INFOPLIST_KEY_UIAppSupportsHDR = [item.Options.UIAppSupportsHDR];
-				[item.Options.UserDefinedSettings];
+				[item.Options.CustomBuildSettings];
 			};
 			name = [item.Options.TargetName];
 		};

@@ -146,12 +146,12 @@ namespace Sharpmake
                 }
 
                 /// <summary>
-                /// User defined settings in Xcode build settings
-                /// Array of string user defined settings in Xcode build settings { "CUSTOM_SETTING = XYZ", "CUSTOM_SETTING_1 = ABC" }
+                /// User defined build settings in Xcode build settings
+                /// Array of string user defined build settings in Xcode build settings { "CUSTOM_SETTING = XYZ", "CUSTOM_SETTING_1 = ABC" }
                 /// </summary>
-                public class UserDefinedSettings : Strings
+                public class CustomBuildSettings : Strings
                 {
-                    public UserDefinedSettings(params string[] paths)
+                    public CustomBuildSettings(params string[] paths)
                         : base(paths)
                     { }
                 }
