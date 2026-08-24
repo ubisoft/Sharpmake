@@ -38,6 +38,16 @@ namespace XCodeProjects
 
             //adding `LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks @rpath/HelloKit.framework/Versions/A/HelloKit";`
             conf.Options.Add(new Options.XCode.Compiler.LdRunPaths(@"@executable_path/Frameworks @rpath/HelloKit.framework/Versions/A/HelloKit"));
+
+            //adding APS_ENVIRONMENT custom build setting that can be used as aps environment in an entitlements file... $(APS_ENVIRONMENT)
+            if (target.Optimization == Optimization.Release)
+            {
+                conf.Options.Add(new Options.XCode.Compiler.CustomBuildSettings("APS_ENVIRONMENT = production"));
+            }
+            else
+            {
+                conf.Options.Add(new Options.XCode.Compiler.CustomBuildSettings("APS_ENVIRONMENT = development"));
+            }
         }
     }
 }
