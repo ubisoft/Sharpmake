@@ -1,4 +1,4 @@
-﻿[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Sharpmake.Application")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Sharpmake.Application")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Sharpmake.Generators")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Sharpmake.UnitTests")]
 [assembly: System.Runtime.Versioning.TargetFramework(".NETCoreApp,Version=v8.0", FrameworkDisplayName=".NET 8.0")]
@@ -3498,6 +3498,10 @@ namespace Sharpmake
                 public class LdRunPaths : Sharpmake.Strings
                 {
                     public LdRunPaths(params string[] paths) { }
+                }
+                public class CustomBuildSettings : Sharpmake.Strings
+                {
+                    public CustomBuildSettings(params string[] settings) { }
                 }
                 public enum LibraryStandard
                 {

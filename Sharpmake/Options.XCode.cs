@@ -151,8 +151,8 @@ namespace Sharpmake
                 /// </summary>
                 public class CustomBuildSettings : Strings
                 {
-                    public CustomBuildSettings(params string[] paths)
-                        : base(paths)
+                    public CustomBuildSettings(params string[] settings)
+                        : base(settings)
                     { }
                 }
 
