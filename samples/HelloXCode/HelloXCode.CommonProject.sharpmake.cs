@@ -41,6 +41,8 @@ namespace HelloXCode
             conf.ProjectFileName = "[project.Name]_[target.Platform]";
             if (target.DevEnv != DevEnv.xcode)
                 conf.ProjectFileName += "_[target.DevEnv]";
+            if (target.BuildSystem == BuildSystem.FastBuild)
+                conf.ProjectFileName += "_FastBuild";
             conf.ProjectPath = Path.Combine(Globals.TmpDirectory, @"projects\[project.Name]");
             conf.IsFastBuild = target.BuildSystem == BuildSystem.FastBuild;
 
@@ -69,6 +71,27 @@ namespace HelloXCode
             }
             else
                 conf.Options.Add(Sharpmake.Options.XCode.Compiler.DebugInformationFormat.Dwarf);
+
+            if (target.DevEnv != DevEnv.xcode && target.BuildSystem != BuildSystem.FastBuild)
+            {
+                // Provide NMake build/rebuild/clean commands so MSBuild can invoke xcodebuild
+                // for this project when opened via the generated vcxproj.
+                // The xcodeproj is generated in the same directory as the vcxproj, so we use
+                // $(MSBuildProjectDirectory) to resolve the correct path at build time.
+                string xcodeProjectName = $"{Name}_{Util.GetSimplePlatformString(target.Platform)}";
+                string xcodeProjectPath = $"$(MSBuildProjectDirectory)/{xcodeProjectName}.xcodeproj";
+                // XCode configurations are named after target.Name which uses ToLowerInvariant()
+                // (e.g. "debug", "release"), so we must match that casing here.
+                // ONLY_ACTIVE_ARCH=NO ensures all architectures are built so that
+                // dependent projects (e.g. pre-linked libs) are consistent across archs.
+                string xcodeConfiguration = target.Optimization.ToString().ToLowerInvariant();
+                conf.CustomBuildSettings = new Configuration.NMakeBuildSettings
+                {
+                    BuildCommand   = $"xcodebuild build   -project \"{xcodeProjectPath}\" -configuration {xcodeConfiguration} ONLY_ACTIVE_ARCH=NO",
+                    RebuildCommand = $"xcodebuild clean build -project \"{xcodeProjectPath}\" -configuration {xcodeConfiguration} ONLY_ACTIVE_ARCH=NO",
+                    CleanCommand   = $"xcodebuild clean   -project \"{xcodeProjectPath}\" -configuration {xcodeConfiguration} ONLY_ACTIVE_ARCH=NO",
+                };
+            }
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -118,9 +141,6 @@ namespace HelloXCode
         {
             conf.FastBuildBlobbed = false;
             conf.IsBlobbed = false;
-
-            if (conf.IsFastBuild)
-                conf.ProjectName += "_NoBlob";
         }
         #endregion
         ////////////////////////////////////////////////////////////////////////

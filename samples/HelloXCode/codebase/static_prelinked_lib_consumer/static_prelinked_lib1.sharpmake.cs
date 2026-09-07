@@ -30,20 +30,29 @@ namespace HelloXCode
 
             conf.IncludePaths.Add(SourceRootPath);
 
-            //  Important! do not link the Consumed library - let it be pre-linked by XCode
-            conf.AddPrivateDependency<StaticPrelinkedLibConsumed>(target, DependencySetting.DefaultWithoutLinking);
+            if (target.BuildSystem == BuildSystem.FastBuild)
+            {
+                // FastBuild does not support XCode pre-linking options, so link the consumed
+                // library normally so all symbols are available at link time.
+                conf.AddPrivateDependency<StaticPrelinkedLibConsumed>(target);
+            }
+            else
+            {
+                //  Important! do not link the Consumed library - let it be pre-linked by XCode
+                conf.AddPrivateDependency<StaticPrelinkedLibConsumed>(target, DependencySetting.DefaultWithoutLinking);
 
-            //  Custom build step - to generate the sub library
-            var platform = Util.GetSimplePlatformString(target.GetPlatform());
-            var projPath = Path.Combine(Globals.TmpDirectory, "projects/static_prelinked_lib_consumed");
-            var configuration = target.Optimization.ToString().ToLowerInvariant();
-            conf.EventPreBuild.Add($"xcodebuild build -scheme static_prelinked_lib_consumed_{platform} -project {projPath}/static_prelinked_lib_consumed_{platform}.xcodeproj -configuration {configuration}");
+                //  Custom build step - to generate the sub library
+                var platform = Util.GetSimplePlatformString(target.GetPlatform());
+                var projPath = Path.Combine(Globals.TmpDirectory, "projects/static_prelinked_lib_consumed");
+                var configuration = target.Optimization.ToString().ToLowerInvariant();
+                conf.EventPreBuild.Add($"xcodebuild build ONLY_ACTIVE_ARCH=NO -scheme static_prelinked_lib_consumed_{platform} -project {projPath}/static_prelinked_lib_consumed_{platform}.xcodeproj -configuration {configuration}");
 
-            //  Test pre-linked libraries
-            var libraryToPrelink = Path.Combine(conf.TargetLibraryPath, "..", "static_prelinked_lib_consumed", "libstatic_prelinked_lib_consumed.a");
+                //  Test pre-linked libraries
+                var libraryToPrelink = Path.Combine(conf.TargetLibraryPath, "..", "static_prelinked_lib_consumed", "libstatic_prelinked_lib_consumed.a");
 
-            conf.Options.Add(Options.XCode.Linker.PerformSingleObjectPrelink.Enable);
-            conf.Options.Add(new Options.XCode.Linker.PrelinkLibraries(libraryToPrelink));
+                conf.Options.Add(Options.XCode.Linker.PerformSingleObjectPrelink.Enable);
+                conf.Options.Add(new Options.XCode.Linker.PrelinkLibraries(libraryToPrelink));
+            }
         }
     }
 }

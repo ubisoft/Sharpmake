@@ -25,6 +25,8 @@ namespace Sharpmake
             public override string SimplePlatformString => "macOS";
             #endregion
 
+            protected override string XcrunSdkName => "macosx";
+
             #region IPlatformBff implementation
             public override string BffPlatformDefine => "APPLE_OSX";
 

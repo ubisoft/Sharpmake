@@ -25,6 +25,8 @@ namespace Sharpmake
             public override string SimplePlatformString => "watchOS";
             #endregion
 
+            protected override string XcrunSdkName => "watchos";
+
             #region IPlatformBff implementation
             public override string BffPlatformDefine => "_WATCHOS";
 
