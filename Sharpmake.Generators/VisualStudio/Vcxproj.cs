@@ -738,6 +738,15 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
 
+            foreach (var element in context.Project.CustomTargets)
+            {
+                using (fileGenerator.Declare("project", context.Project))
+                using (fileGenerator.Declare("targetElement", element))
+                {
+                    fileGenerator.Write(Template.TargetElement.CustomTarget);
+                }
+            }
+
             // in case we are using fast build we do not want to write most dependencies
             // in the vcxproj because they are handled internally in the bff.
             // Nevertheless, non-fastbuild dependencies (such as C# projects) must be written.
