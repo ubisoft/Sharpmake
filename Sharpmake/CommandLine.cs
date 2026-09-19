@@ -203,14 +203,14 @@ namespace Sharpmake
                             if (isStatic)
                             {
                                 string executeCode = string.Format("{0}.{1}({2});", type.FullName.Replace("+", "."), methodInfo.Name, parameter.Args);
-                                Action execute = Assembler.BuildDelegate<Action>(executeCode, type.Namespace, DefaultNamespaces.ToArray(), assemblies.ToArray());
+                                Action execute = Assembler.BuildDelegate<Action>(executeCode, type.Namespace, namespacesSet.ToArray(), assemblies.ToArray());
 
                                 execute();
                             }
                             else
                             {
                                 string executeCode = string.Format("((global::{0})obj).{1}({2});", type.FullName.Replace("+", "."), methodInfo.Name, parameter.Args);
-                                Action<object> execute = Assembler.BuildDelegate<Action<object>>(executeCode, type.Namespace, DefaultNamespaces.ToArray(), assemblies.ToArray());
+                                Action<object> execute = Assembler.BuildDelegate<Action<object>>(executeCode, type.Namespace, namespacesSet.ToArray(), assemblies.ToArray());
 
                                 execute(instance);
                             }
