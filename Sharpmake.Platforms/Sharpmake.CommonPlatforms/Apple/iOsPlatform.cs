@@ -26,6 +26,8 @@ namespace Sharpmake
             public override string SimplePlatformString => "iOS";
             #endregion
 
+            protected override string XcrunSdkName => "iphoneos";
+
             #region IPlatformBff implementation
             public override string BffPlatformDefine => "_IOS";
 
