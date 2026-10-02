@@ -154,16 +154,20 @@ public sealed class TestAnalyzer : DiagnosticAnalyzer
     }}
 }}";
 
-        var objectAssembly = typeof(object).Assembly.Location;
-        var runtimeAssembly = Path.Combine(Path.GetDirectoryName(objectAssembly), "System.Runtime.dll");
-        var references = new MetadataReference[]
+        var trustedPlatformAssemblies = AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES") as string;
+
+        var references = new List<MetadataReference>();
+        if (!string.IsNullOrEmpty(trustedPlatformAssemblies))
         {
-            MetadataReference.CreateFromFile(objectAssembly),
-            MetadataReference.CreateFromFile(runtimeAssembly),
-            MetadataReference.CreateFromFile(typeof(ImmutableArray).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(Diagnostic).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(CSharpSyntaxTree).Assembly.Location),
-        };
+            foreach (var path in trustedPlatformAssemblies.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries))
+            {
+                references.Add(MetadataReference.CreateFromFile(path));
+            }
+        }
+
+        references.Add(MetadataReference.CreateFromFile(typeof(ImmutableArray).Assembly.Location));
+        references.Add(MetadataReference.CreateFromFile(typeof(Diagnostic).Assembly.Location));
+        references.Add(MetadataReference.CreateFromFile(typeof(CSharpSyntaxTree).Assembly.Location));
 
         var assemblyName = Path.GetFileNameWithoutExtension(outputPath);
         var syntaxTrees = new[] { CSharpSyntaxTree.ParseText(source) };
