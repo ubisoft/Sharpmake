@@ -537,7 +537,10 @@ namespace Sharpmake
             }
 
             // https://learn.microsoft.com/en-us/dotnet/api/microsoft.build.tasks.al.prefer32bit
-            // Unset omits the element and lets MSBuild decide; Enabled/Disabled write true/false explicitly.
+            // MSBuild defaults to true when absent on .NET Framework executables, false everywhere else.
+            // Unset (default) writes false explicitly for .NET Framework executables to override MSBuild's
+            // implicit true, and omits the element everywhere else, matching MSBuild's non-Framework default.
+            // Disabled always writes false. Enabled always writes true.
             public enum Prefer32Bit
             {
                 Enabled,
