@@ -1427,7 +1427,9 @@ namespace Sharpmake.Generators.VisualStudio
 
             if (!string.IsNullOrEmpty(project.BaseIntermediateOutputPath))
             {
-                string baseIntermediateOutputPath = Util.PathGetRelative(projectPath, project.BaseIntermediateOutputPath);
+                string baseIntermediateOutputPath = _projectConfigurationList[0].PreferRelativePaths
+                    ? Util.PathGetRelative(projectPath, project.BaseIntermediateOutputPath)
+                    : Util.PathGetAbsolute(projectPath, project.BaseIntermediateOutputPath);
                 using (resolver.NewScopedParameter("baseIntermediateOutputPath", baseIntermediateOutputPath))
                     Write(Template.Project.BaseIntermediateOutputPathPropertyGroup, writer, resolver);
             }
@@ -3571,7 +3573,9 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             //BaseIntermediateOutputPath
-            options["BaseIntermediateOutputPath"] = string.IsNullOrEmpty(conf.BaseIntermediateOutputPath) ? RemoveLineTag : Util.PathGetRelative(_projectPath, conf.BaseIntermediateOutputPath);
+            options["BaseIntermediateOutputPath"] = string.IsNullOrEmpty(conf.BaseIntermediateOutputPath) ? RemoveLineTag
+                : conf.PreferRelativePaths ? Util.PathGetRelative(_projectPath, conf.BaseIntermediateOutputPath)
+                : Util.PathGetAbsolute(_projectPath, conf.BaseIntermediateOutputPath);
 
             options["StartWorkingDirectory"] = string.IsNullOrEmpty(conf.StartWorkingDirectory) ? RemoveLineTag : conf.StartWorkingDirectory;
             options["DocumentationFile"] = string.IsNullOrEmpty(conf.XmlDocumentationFile) ? RemoveLineTag : Util.PathGetRelative(_projectPath, conf.XmlDocumentationFile);
@@ -3809,7 +3813,16 @@ namespace Sharpmake.Generators.VisualStudio
             (
             Options.Option(Options.CSharp.Prefer32Bit.Enabled, () => { options["Prefer32Bit"] = "true"; }),
             Options.Option(Options.CSharp.Prefer32Bit.Disabled, () => { options["Prefer32Bit"] = "false"; }),
-            Options.Option(Options.CSharp.Prefer32Bit.Unset, () => { options["Prefer32Bit"] = RemoveLineTag; })
+            Options.Option(Options.CSharp.Prefer32Bit.Unset, () =>
+            {
+                // MSBuild defaults Prefer32Bit to true when absent for .NET Framework executables.
+                // Write false explicitly to match the expected 64-bit default and avoid silent 32-bit mode.
+                var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
+                bool isNetFrameworkExe = dotNetFramework.IsDotNetFramework() &&
+                    (conf.Output == Project.Configuration.OutputType.DotNetConsoleApp ||
+                     conf.Output == Project.Configuration.OutputType.DotNetWindowsApp);
+                options["Prefer32Bit"] = isNetFrameworkExe ? "false" : RemoveLineTag;
+            })
             );
 
             SelectOption
