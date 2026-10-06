@@ -16,6 +16,9 @@ namespace Sharpmake.Generators
         private Sln _slnGenerator = null;
         public Sln SlnGenerator => _slnGenerator ?? (_slnGenerator = new Sln());
 
+        private Slnx _slnxGenerator = null;
+        public Slnx SlnxGenerator => _slnxGenerator ?? (_slnxGenerator = new Slnx());
+
         private MasterBff _masterBffGenerator = null;
         public MasterBff MasterBffGenerator => _masterBffGenerator ?? (_masterBffGenerator = new MasterBff());
 
@@ -126,6 +129,11 @@ namespace Sharpmake.Generators
                              List<string> generatedFiles,
                              List<string> skipFiles)
         {
+            // .slnx (SolutionFormat.Xml) is only supported on vs2026. Validate up front, before any
+            // platform/DevEnv dispatch, so requesting Xml on ANY other DevEnv (vs20xx, make, xcode)
+            // fails fast with a clear message rather than silently emitting a legacy solution or nothing.
+            Slnx.ValidateDevEnv(solution.Name, solution.Format, configurations[0].Target.GetFragment<DevEnv>());
+
             if (configurations[0].Platform == Platform.ios ||
                 configurations[0].Platform == Platform.mac ||
                 configurations[0].Platform == Platform.tvos ||
@@ -163,7 +171,11 @@ namespace Sharpmake.Generators
                                 MasterBffGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
                             }
 
-                            SlnGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                            // Format/DevEnv compatibility was validated at the top of Generate.
+                            if (solution.Format == Solution.SolutionFormat.Xml)
+                                SlnxGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                            else
+                                SlnGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
                             break;
                         }
                     default:

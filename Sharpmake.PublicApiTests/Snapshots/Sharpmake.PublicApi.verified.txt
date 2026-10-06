@@ -5233,6 +5233,7 @@ namespace Sharpmake
         public string PerforceRootPath;
         public Solution(System.Type targetType = null, System.Type configurationType = null) { }
         public string ClassName { get; }
+        public Sharpmake.Solution.SolutionFormat Format { get; set; }
         public bool IsFileNameToLower { get; set; }
         public bool MergePlatformConfiguration { get; set; }
         public string Name { get; set; }
@@ -5305,6 +5306,11 @@ namespace Sharpmake
             public Sharpmake.ITarget TargetDefault;
             public System.Collections.Generic.Dictionary<string, object> UserData;
             public ResolvedProject() { }
+        }
+        public enum SolutionFormat
+        {
+            Legacy = 0,
+            Xml = 1,
         }
         public delegate void GenerationCallback(string solutionPath, string solutionFile, string solutionExtension);
     }

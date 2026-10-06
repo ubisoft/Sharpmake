@@ -73,8 +73,7 @@ namespace Sharpmake.Generators.VisualStudio
     {
         public const string SolutionExtension = ".sln";
 
-        private readonly List<SolutionFolder> _rootSolutionFolders = new List<SolutionFolder>();
-        private readonly List<SolutionFolder> _solutionFolders = new List<SolutionFolder>();
+        private readonly SolutionFolderTree _folderTree = new SolutionFolderTree();
         private Builder _builder;
 
         private static Regex s_projectGuidRegex = new Regex(
@@ -199,66 +198,6 @@ namespace Sharpmake.Generators.VisualStudio
             return guid;
         }
 
-        [DebuggerDisplay("{Path} - {Guid}")]
-        private class SolutionFolder
-        {
-            public string Name;
-            public string Path
-            {
-                get
-                {
-                    if (Parent == null)
-                        return Name;
-
-                    return Parent.Path + System.IO.Path.DirectorySeparatorChar + Name;
-                }
-            }
-
-            public SolutionFolder Parent;
-            public List<SolutionFolder> Childs = new List<SolutionFolder>();
-            public Guid Guid;
-        }
-
-        private SolutionFolder GetSolutionFolder(string names)
-        {
-            if (names == null)
-                return null;
-
-            string[] nameList = names.Split(Util._pathSeparators, StringSplitOptions.RemoveEmptyEntries);
-
-            SolutionFolder result = null;
-            SolutionFolder parent = null;
-
-            foreach (string name in nameList)
-            {
-                result = null;
-
-                List<SolutionFolder> childs = parent == null ? _rootSolutionFolders : parent.Childs;
-
-                foreach (SolutionFolder child in childs)
-                {
-                    if (child.Name == name)
-                    {
-                        result = child;
-                        break;
-                    }
-                }
-
-                if (result == null)
-                {
-                    result = new SolutionFolder();
-                    result.Name = name;
-                    result.Parent = parent;
-                    result.Guid = Util.BuildGuid(result.Path);
-                    childs.Add(result);
-                    _solutionFolders.Add(result);
-                }
-                parent = result;
-            }
-
-            return result;
-        }
-
         private string Generate(
             Solution solution,
             IReadOnlyList<Solution.Configuration> solutionConfigurations,
@@ -269,15 +208,14 @@ namespace Sharpmake.Generators.VisualStudio
         )
         {
             // reset current solution state
-            _rootSolutionFolders.Clear();
-            _solutionFolders.Clear();
+            _folderTree.Clear();
 
             FileInfo solutionFileInfo = new FileInfo(Util.GetCapitalizedPath(solutionPath + Path.DirectorySeparatorChar + solutionFile + SolutionExtension));
 
             string solutionGuid = Util.BuildGuid(solutionFileInfo.FullName, solution.SharpmakeCsPath);
 
             DevEnv devEnv = solutionConfigurations[0].Target.GetFragment<DevEnv>();
-            List<Solution.ResolvedProject> solutionProjects = ResolveSolutionProjects(solution, solutionConfigurations);
+            List<Solution.ResolvedProject> solutionProjects = SolutionProjectResolver.ResolveSolutionProjects(solution, solutionConfigurations, _folderTree, out _);
 
             if (solutionProjects.Count == 0)
             {
@@ -287,7 +225,7 @@ namespace Sharpmake.Generators.VisualStudio
                 return solutionFileInfo.FullName;
             }
 
-            List<Solution.ResolvedProject> resolvedPathReferences = ResolveReferencesByPath(solutionProjects, solutionConfigurations[0].ProjectReferencesByPath, solutionConfigurations[0].ProjectReferencesByPathFolders);
+            List<Solution.ResolvedProject> resolvedPathReferences = SolutionProjectResolver.ResolveReferencesByPath(solutionProjects, solutionConfigurations[0].ProjectReferencesByPath, _folderTree, solutionConfigurations[0].ProjectReferencesByPathFolders);
 
             var guidlist = solutionProjects.Select(p => p.UserData["Guid"]);
             resolvedPathReferences = resolvedPathReferences.Where(r => !guidlist.Contains(r.UserData["Guid"])).ToList();
@@ -320,7 +258,7 @@ namespace Sharpmake.Generators.VisualStudio
             SolutionFolder masterBffFolder = null;
             if (addMasterBff)
             {
-                masterBffFolder = GetSolutionFolder(solution.FastBuildMasterBffSolutionFolder);
+                masterBffFolder = _folderTree.GetSolutionFolder(solution.FastBuildMasterBffSolutionFolder);
                 if (masterBffFolder == null)
                     throw new Error("FastBuildMasterBffSolutionFolder needs to be set in solution " + solutionFile);
             }
@@ -328,16 +266,9 @@ namespace Sharpmake.Generators.VisualStudio
             // Write all needed folders before the projects to make sure the proper startup project is selected.
 
             // Ensure folders are always in the same order to avoid random shuffles
-            _solutionFolders.Sort((a, b) =>
-            {
-                int nameComparison = string.Compare(a.Name, b.Name, StringComparison.InvariantCultureIgnoreCase);
-                if (nameComparison != 0)
-                    return nameComparison;
+            _folderTree.SortStably();
 
-                return a.Guid.CompareTo(b.Guid);
-            });
-
-            foreach (SolutionFolder folder in _solutionFolders)
+            foreach (SolutionFolder folder in _folderTree.AllFolders)
             {
                 using (fileGenerator.Declare("folderName", folder.Name))
                 using (fileGenerator.Declare("folderGuid", folder.Guid.ToString().ToUpper()))
@@ -429,7 +360,7 @@ namespace Sharpmake.Generators.VisualStudio
             // TODO: What happens if we define an existing folder?
             foreach (var items in solution.ExtraItems)
             {
-                var folder = GetSolutionFolder(items.Key);
+                var folder = _folderTree.GetSolutionFolder(items.Key);
 
                 using (fileGenerator.Declare("folderName", folder.Name))
                 using (fileGenerator.Declare("folderGuid", folder.Guid))
@@ -464,18 +395,7 @@ namespace Sharpmake.Generators.VisualStudio
             fileGenerator.Write(Template.Solution.GlobalSectionSolutionConfigurationBegin);
             foreach (Solution.Configuration solutionConfiguration in solutionConfigurations)
             {
-                string configurationName;
-                string category;
-                if (solution.MergePlatformConfiguration)
-                {
-                    configurationName = solutionConfiguration.PlatformName + "-" + solutionConfiguration.Name;
-                    category = "All Platforms";
-                }
-                else
-                {
-                    configurationName = solutionConfiguration.Name;
-                    category = solutionConfiguration.PlatformName;
-                }
+                SolutionConfigMatcher.GetNameAndCategory(solution, solutionConfiguration, out string configurationName, out string category);
 
                 if (containsMultiDotNetFramework)
                 {
@@ -519,72 +439,16 @@ namespace Sharpmake.Generators.VisualStudio
 
                 foreach (Solution.Configuration solutionConfiguration in solutionConfigurations)
                 {
-                    ITarget solutionTarget = solutionConfiguration.Target;
-
-                    ITarget projectTarget = null;
-
-                    Solution.Configuration.IncludedProjectInfo includedProject = solutionConfiguration.GetProject(solutionProject.Project.GetType());
-
-                    bool perfectMatch = includedProject != null && solutionProject.Configurations.Contains(includedProject.Configuration);
-                    if (perfectMatch)
-                    {
-                        projectTarget = includedProject.Target;
-                    }
-                    else
-                    {
-                        // try to find the target in the project that is the closest match from the solution one
-                        int maxEqualFragments = 0;
-                        int[] solutionTargetValues = solutionTarget.GetFragmentsValue();
-
-                        Platform previousPlatform = Platform._reserved1;
-
-                        foreach (var conf in solutionProject.Configurations)
-                        {
-                            Platform currentTargetPlatform = conf.Target.GetPlatform();
-
-                            int[] candidateTargetValues = conf.Target.GetFragmentsValue();
-                            if (solutionTargetValues.Length != candidateTargetValues.Length)
-                                continue;
-
-                            int equalFragments = 0;
-                            for (int i = 0; i < solutionTargetValues.Length; ++i)
-                            {
-                                if ((solutionTargetValues[i] & candidateTargetValues[i]) != 0)
-                                    equalFragments++;
-                            }
-
-                            if ((equalFragments == maxEqualFragments && currentTargetPlatform < previousPlatform) || equalFragments > maxEqualFragments)
-                            {
-                                projectTarget = conf.Target;
-                                maxEqualFragments = equalFragments;
-                                previousPlatform = currentTargetPlatform;
-                            }
-                        }
-
-                        // last resort: if we didn't find a good enough match, fallback to TargetDefault
-                        if (projectTarget == null)
-                            projectTarget = solutionProject.TargetDefault;
-                    }
-
-                    Project.Configuration projectConf = solutionProject.Project.GetConfiguration(projectTarget);
+                    SolutionProjectConfigMatch match = SolutionConfigMatcher.Match(solution, solutionConfiguration, solutionProject);
+                    Solution.Configuration.IncludedProjectInfo includedProject = match.IncludedProject;
+                    Project.Configuration projectConf = match.ProjectConf;
 
                     if (includedProject != null && includedProject.Configuration.IsFastBuild)
                         solutionConfigurationFastBuildBuilt.GetValueOrAdd(solutionConfiguration, new List<string>());
 
-                    Platform projectPlatform = projectTarget.GetPlatform();
+                    Platform projectPlatform = match.ProjectTarget.GetPlatform();
 
-                    string configurationName;
-                    string category;
-                    if (solution.MergePlatformConfiguration)
-                    {
-                        configurationName = solutionConfiguration.PlatformName + "-" + solutionConfiguration.Name;
-                        category = "All Platforms";
-                    }
-                    else
-                    {
-                        configurationName = solutionConfiguration.Name;
-                        category = solutionConfiguration.PlatformName;
-                    }
+                    SolutionConfigMatcher.GetNameAndCategory(solution, solutionConfiguration, out string configurationName, out string category);
 
                     if (containsMultiDotNetFramework && includedProject?.Project is CSharpProject)
                     {
@@ -594,6 +458,10 @@ namespace Sharpmake.Generators.VisualStudio
                         multiDotNetFrameworkConfigurationNames.Add(configurationName);
                     }
 
+                    // for fastbuild, record which project actually builds each solution config for the diagnostic below.
+                    if (projectConf.IsFastBuild && match.Build)
+                        solutionConfigurationFastBuildBuilt[solutionConfiguration].Add(projectConf.Project.Name + " " + projectConf.Name);
+
                     using (fileGenerator.Declare("solutionConf", solutionConfiguration))
                     using (fileGenerator.Declare("projectGuid", solutionProject.UserData["Guid"]))
                     using (fileGenerator.Declare("projectConf", projectConf))
@@ -601,36 +469,11 @@ namespace Sharpmake.Generators.VisualStudio
                     using (fileGenerator.Declare("category", category))
                     using (fileGenerator.Declare("configurationName", configurationName))
                     {
-                        bool build = false;
-                        bool forceDeploy = false;
-                        if (solution is PythonSolution)
-                        {
-                            // nothing is built in python solutions
-                        }
-                        else if (perfectMatch)
-                        {
-                            build = includedProject.ToBuild == Solution.Configuration.IncludedProjectInfo.Build.Yes;
-                            forceDeploy = includedProject.Project.DeployProjectType == Project.DeployType.AlwaysDeploy || includedProject.Configuration.DeployProjectType == Project.DeployType.AlwaysDeploy;
-
-                            // for fastbuild, only build the projects that cannot be built through dependency chain
-                            if (!projectConf.IsFastBuild)
-                                build |= includedProject.ToBuild == Solution.Configuration.IncludedProjectInfo.Build.YesThroughDependency;
-                            else
-                            {
-                                if (build)
-                                    solutionConfigurationFastBuildBuilt[solutionConfiguration].Add(projectConf.Project.Name + " " + projectConf.Name);
-                            }
-                        }
-
                         fileGenerator.Write(Template.Solution.GlobalSectionProjectConfigurationActive);
-                        bool buildDeploy = false;
-                        if (build)
-                        {
-                            buildDeploy = includedProject.Project.DeployProjectType == Project.DeployType.OnlyIfBuild || includedProject.Configuration.DeployProjectType == Project.DeployType.OnlyIfBuild;
+                        if (match.Build)
                             fileGenerator.Write(Template.Solution.GlobalSectionProjectConfigurationBuild);
-                        }
 
-                        if (forceDeploy || buildDeploy)
+                        if (match.ForceDeploy || match.BuildDeploy)
                         {
                             fileGenerator.Write(Template.Solution.GlobalSectionProjectConfigurationDeploy);
                         }
@@ -653,11 +496,11 @@ namespace Sharpmake.Generators.VisualStudio
 
             // Write nested folders
 
-            if (_solutionFolders.Count != 0)
+            if (_folderTree.AllFolders.Count != 0)
             {
                 fileGenerator.Write(Template.Solution.NestedProjectBegin);
 
-                foreach (SolutionFolder folder in _solutionFolders)
+                foreach (SolutionFolder folder in _folderTree.AllFolders)
                 {
                     if (folder.Parent != null)
                     {
@@ -718,166 +561,6 @@ namespace Sharpmake.Generators.VisualStudio
                     )
                 );
             }
-        }
-
-        private Solution.Configuration.IncludedProjectInfo ResolveStartupProject(Solution solution, IReadOnlyList<Solution.Configuration> solutionConfigurations)
-        {
-            // Set the default startup project.
-            var configuration = solutionConfigurations.FirstOrDefault();
-            if (configuration == null)
-                return null;
-
-            // Find all executable projects
-            var executableProjects = solutionConfigurations
-                .SelectMany(e => e.IncludedProjectInfos)
-                .Where(e =>
-                    e.Configuration.Output == Project.Configuration.OutputType.DotNetConsoleApp ||
-                    e.Configuration.Output == Project.Configuration.OutputType.DotNetWindowsApp ||
-                    e.Configuration.Output == Project.Configuration.OutputType.Exe)
-                .GroupBy(e => e.Configuration.ProjectFileName)
-                .OrderBy(filename => filename.Key, StringComparer.InvariantCultureIgnoreCase)
-                .ToList();
-
-            // If there is more than one, set the one with the same name as the solution
-            if (executableProjects.Count > 1)
-            {
-                var sameName = executableProjects.FirstOrDefault(e => solution.Name.Equals(e.First().Configuration.ProjectName, StringComparison.OrdinalIgnoreCase));
-                if (sameName != null)
-                {
-                    return sameName.First();
-                }
-
-                // If none, try to find a project that the name is at the beginning of the solution name
-                // (It can happen that a project "Application" is in a solution named "ApplicationSolution")
-                sameName = executableProjects.FirstOrDefault(e => solution.Name.StartsWith(e.First().Configuration.ProjectName, StringComparison.OrdinalIgnoreCase));
-                if (sameName != null)
-                {
-                    return sameName.First();
-                }
-            }
-
-            return executableProjects.FirstOrDefault()?.First();
-        }
-
-        private List<Solution.ResolvedProject> ResolveSolutionProjects(Solution solution, IReadOnlyList<Solution.Configuration> solutionConfigurations)
-        {
-            bool projectsWereFiltered;
-            var resolvedProjects = solution.GetResolvedProjects(solutionConfigurations, out projectsWereFiltered);
-
-            var filtered = resolvedProjects.Where(sp =>
-            {
-                var onlyNeeded = sp.SolutionConfigurationsBuild.All(
-                    scb => scb.Key.IncludeOnlyNeededFastBuildProjects && (scb.Value == Solution.Configuration.IncludedProjectInfo.Build.No || scb.Value == Solution.Configuration.IncludedProjectInfo.Build.YesThroughDependency)
-                );
-                if (onlyNeeded)
-                {
-                    if (!sp.Project.IsFastBuildAll && (sp.Configurations.All(pc => pc.IsFastBuild && !pc.DoNotGenerateFastBuild && !(pc.AddFastBuildProjectToSolutionCallback?.Invoke() ?? false))))
-                        return false;
-                }
-                return true;
-            });
-
-            // Ensure all projects are always in the same order to avoid random shuffles
-            var solutionProjects = filtered
-                .OrderBy(p => p.ProjectName, StringComparer.InvariantCultureIgnoreCase)
-                .ThenBy(p => p.ProjectFile, StringComparer.InvariantCultureIgnoreCase)
-                .ToList();
-
-            // Validate and handle startup project.
-            IEnumerable<Solution.Configuration> confWithStartupProjects = solutionConfigurations.Where(conf => conf.StartupProject != null);
-            var startupProjectGroups = confWithStartupProjects.GroupBy(conf => conf.StartupProject.Configuration.ProjectFullFileName).ToArray();
-            if (startupProjectGroups.Length > 1)
-            {
-                throw new Error("Solution {0} contains multiple startup projects; this is not supported. Startup projects: {1}", Path.Combine(solutionConfigurations[0].SolutionPath, solutionConfigurations[0].SolutionFileName), string.Join(", ", startupProjectGroups.Select(group => group.Key)));
-            }
-
-            Solution.Configuration.IncludedProjectInfo startupProject = startupProjectGroups.Select(group => group.First().StartupProject).FirstOrDefault();
-            if (startupProject == null)
-                startupProject = ResolveStartupProject(solution, solutionConfigurations);
-
-            if (startupProject != null)
-            {
-                //put the startup project at the top of the project list. Visual Studio will put it as the default startup project.
-                Solution.ResolvedProject resolvedStartupProject = solutionProjects.FirstOrDefault(x => x.OriginalProjectFile == startupProject.Configuration.ProjectFullFileName);
-                if (resolvedStartupProject != null)
-                {
-                    solutionProjects.Remove(resolvedStartupProject);
-                    solutionProjects.Insert(0, resolvedStartupProject);
-                }
-            }
-
-            // Read project Guid and append project extension
-            foreach (Solution.ResolvedProject resolvedProject in solutionProjects)
-            {
-                Project.Configuration firstConf = resolvedProject.Configurations.First();
-                if (firstConf.ProjectGuid == null)
-                {
-                    if (firstConf.Project.SharpmakeProjectType != Project.ProjectTypeAttribute.Compile)
-                        throw new Error("cannot read guid from existing project, project must have Compile attribute: {0}", resolvedProject.ProjectFile);
-                    firstConf.ProjectGuid = ReadGuidFromProjectFile(resolvedProject.ProjectFile);
-                }
-
-                resolvedProject.UserData["Guid"] = firstConf.ProjectGuid;
-                resolvedProject.UserData["TypeGuid"] = ReadTypeGuidFromProjectFile(resolvedProject.ProjectFile);
-                resolvedProject.UserData["Folder"] = GetSolutionFolder(resolvedProject.SolutionFolder);
-            }
-
-            return solutionProjects;
-        }
-
-        private IEnumerable<Solution.ResolvedProject> GetResolvedProjectsFromPaths(IEnumerable<string> paths)
-        {
-            return paths.Select(p => GetResolvedProjectFromPath(p));
-        }
-
-        private Solution.ResolvedProject GetResolvedProjectFromPath(string path)
-        {
-            return new Solution.ResolvedProject
-            {
-                ProjectFile = path,
-                ProjectName = Path.GetFileNameWithoutExtension(path)
-            };
-        }
-
-        private List<Solution.ResolvedProject> ResolveReferencesByPath(List<Solution.ResolvedProject> solutionProjects, Strings referencedProjectPaths, Dictionary<string, string> pathFolders = null)
-        {
-            // solution's referenced projects
-            var resolvedPathReferences = GetResolvedProjectsFromPaths(referencedProjectPaths).ToList();
-
-            foreach (Solution.ResolvedProject resolvedProject in resolvedPathReferences)
-            {
-                resolvedProject.UserData["Guid"] = ReadOrGenerateGuidFromProjectFile(resolvedProject.ProjectFile);
-                resolvedProject.UserData["TypeGuid"] = ReadTypeGuidFromProjectFile(resolvedProject.ProjectFile);
-                if (pathFolders != null && pathFolders.TryGetValue(resolvedProject.ProjectFile, out string folder))
-                    resolvedProject.SolutionFolder = folder;
-                resolvedProject.UserData["Folder"] = GetSolutionFolder(resolvedProject.SolutionFolder);
-            }
-
-            // user's projects references
-            var projectRefByPathInfos = solutionProjects
-                                            .SelectMany(p => p.Configurations)
-                                            .SelectMany(c => c.ProjectReferencesByPath.ProjectsInfos)
-                                            .Distinct();
-
-            foreach (var projectRefByPathInfo in projectRefByPathInfos)
-            {
-                var resolvedProject = GetResolvedProjectFromPath(projectRefByPathInfo.projectFilePath);
-
-                var projectGuid = projectRefByPathInfo.projectGuid;
-                if (projectGuid == Guid.Empty)
-                    projectGuid = new Guid(ReadOrGenerateGuidFromProjectFile(projectRefByPathInfo.projectFilePath));
-                resolvedProject.UserData["Guid"] = projectGuid.ToString("D").ToUpperInvariant();
-
-                var projectTypeGuid = projectRefByPathInfo.projectTypeGuid;
-                if (projectTypeGuid == Guid.Empty)
-                    projectTypeGuid = new Guid(ReadTypeGuidFromProjectFile(projectRefByPathInfo.projectFilePath)); // currently, just use the extension
-                resolvedProject.UserData["TypeGuid"] = projectTypeGuid.ToString("D").ToUpperInvariant();
-
-                resolvedProject.UserData["Folder"] = GetSolutionFolder(resolvedProject.SolutionFolder);
-                resolvedPathReferences.Add(resolvedProject);
-            }
-
-            return resolvedPathReferences;
         }
 
         private static string GetVisualStudioIdePath(DevEnv devEnv)
