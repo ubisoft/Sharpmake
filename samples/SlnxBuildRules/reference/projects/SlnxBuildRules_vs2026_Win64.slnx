@@ -1,0 +1,15 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Release" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="HeaderOnlyLib_vs2026_Win64.vcxproj" />
+  <Project Path="RulesExe_vs2026_Win64.vcxproj" DefaultStartup="true">
+    <BuildType Solution="Release|x64" Project="Retail" />
+    <BuildDependency Project="HeaderOnlyLib_vs2026_Win64.vcxproj" />
+  </Project>
+  <Project Path="RulesLib_vs2026_Win64.vcxproj">
+    <Build Solution="Release|x64" Project="false" />
+  </Project>
+</Solution>
