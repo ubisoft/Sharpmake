@@ -761,6 +761,8 @@ namespace Sharpmake
                     return "10.0.22621.0";
                 case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_26100_0:
                     return "10.0.26100.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_28000_0:
+                    return "10.0.28000.0";
                 case Options.Vc.General.WindowsTargetPlatformVersion.Latest:
                     return "$(LatestTargetPlatformVersion)";
                 default:

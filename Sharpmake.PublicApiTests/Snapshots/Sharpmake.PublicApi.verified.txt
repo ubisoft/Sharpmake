@@ -3004,7 +3004,8 @@ namespace Sharpmake
                     v10_0_22000_0 = 11,
                     v10_0_22621_0 = 12,
                     v10_0_26100_0 = 13,
-                    Latest = 14,
+                    v10_0_28000_0 = 14,
+                    Latest = 15,
                 }
             }
             public static class LLVM
