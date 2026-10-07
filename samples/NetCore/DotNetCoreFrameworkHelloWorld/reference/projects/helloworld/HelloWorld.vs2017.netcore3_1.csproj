@@ -40,5 +40,13 @@
       <Link>Program.cs</Link>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\..\codebase\HelloWorld\**\*.licx;..\..\codebase\HelloWorld\**\*.lic;..\..\codebase\HelloWorld\**\*.cur;..\..\codebase\HelloWorld\**\*.template" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\codebase\HelloWorld\**\*.licx;..\..\codebase\HelloWorld\**\*.lic;..\..\codebase\HelloWorld\**\*.cur;..\..\codebase\HelloWorld\**\*.template">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 </Project>
