@@ -2,6 +2,7 @@
 // Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -39,29 +40,70 @@ namespace Sharpmake.Generators.VisualStudio
             if (launchSettingsProfiles == null || !launchSettingsProfiles.Any())
                 return null;
 
-            var memoryStream = new MemoryStream();
-            var writer = new StreamWriter(memoryStream);
-
             var root = new JsonRoot
             {
                 profiles = launchSettingsProfiles
             };
 
-            // Write the list of files.
-            writer.Write(JsonSerializer.Serialize(root, GetJsonSerializerOptions()));
-            writer.Flush();
+            // There can be only one launchSettings.json file in a project directory, as described here:
+            // https://learn.microsoft.com/en-us/answers/questions/5588454/my-minimal-api-project-has-2-launchsettings-json-f
+            string userFilePath = Path.Combine(projectPath, "Properties", FileName);
+            string userFileContent = JsonSerializer.Serialize(root, GetJsonSerializerOptions());
+            string firstConfigName = configurations.First().Name;
 
-            //Skip overwriting user file if it exists already so he can keep his setup
-            // unless the UserProjSettings specifies to overwrite
-            var userFileInfo = new FileInfo(Path.Combine(projectPath, "Properties", FileName));
-            bool shouldWrite = !userFileInfo.Exists || overwriteFile;
-            if (shouldWrite && builder.Context.WriteGeneratedFile(typeof(LaunchSettingsJson), userFileInfo, memoryStream))
-                generatedFiles.Add(userFileInfo.FullName);
+            var userFileInfo = new FileInfo(userFilePath);
+
+            // Avoid conflicts on launchSettings.json file when several generated project files
+            // (eg. one per devenv) share the same project path.
+            // Only let the first caller for a given path actually touch the file; later callers in
+            // the same session just validate that they would have produced the same content.
+            if (s_launchSettingsFileStates.TryAdd(userFilePath, new LaunchSettingsFileState(userFileContent, firstConfigName)))
+            {
+                using (var memoryStream = new MemoryStream())
+                using (var writer = new StreamWriter(memoryStream))
+                {
+                    writer.Write(userFileContent);
+                    writer.Flush();
+
+                    //Skip overwriting user file if it exists already so he can keep his setup
+                    // unless the UserProjSettings specifies to overwrite
+                    bool shouldWrite = !userFileInfo.Exists || overwriteFile;
+                    if (shouldWrite && builder.Context.WriteGeneratedFile(typeof(LaunchSettingsJson), userFileInfo, memoryStream))
+                        generatedFiles.Add(userFileInfo.FullName);
+                    else
+                        skipFiles.Add(userFileInfo.FullName);
+                }
+            }
             else
-                skipFiles.Add(userFileInfo.FullName);
+            {
+                LaunchSettingsFileState fileState = s_launchSettingsFileStates[userFilePath];
+                if (!fileState.Content.Equals(userFileContent, StringComparison.Ordinal))
+                {
+                    throw new Error(
+                        "Multiple generator cannot output to the same file:" + Environment.NewLine +
+                        "\tConfigurations '{0}' and '{1}' produced conflicting content for '{2}'",
+                        fileState.FirstConfigurationName,
+                        firstConfigName,
+                        userFilePath);
+                }
+            }
 
             return userFileInfo.FullName;
         }
+
+        private class LaunchSettingsFileState
+        {
+            public LaunchSettingsFileState(string content, string firstConfigurationName)
+            { 
+                Content = content;
+                FirstConfigurationName = firstConfigurationName;
+            }
+            public string Content;
+            public string FirstConfigurationName;
+        }
+
+        private static readonly ConcurrentDictionary<string, LaunchSettingsFileState> s_launchSettingsFileStates =
+            new ConcurrentDictionary<string, LaunchSettingsFileState>(StringComparer.InvariantCultureIgnoreCase);
 
         /// <summary>
         /// Get the formatting properties of the json

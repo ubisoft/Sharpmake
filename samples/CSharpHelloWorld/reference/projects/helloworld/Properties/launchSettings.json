@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "HelloWorld": {
+      "commandName": "Project",
+      "commandLineArgs": "-firstArg -secondArg"
+    }
+  }
+}
