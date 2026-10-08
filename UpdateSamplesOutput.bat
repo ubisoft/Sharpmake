@@ -7,8 +7,8 @@ COLOR
 dotnet build Sharpmake.sln /p:Configuration=Release /p:Platform="Any CPU"
 if %errorlevel% NEQ 0 goto error
 
-set SHARPMAKE_EXECUTABLE=%~dp0Sharpmake.Application\bin\Release\net6.0\Sharpmake.Application.exe
-if not exist %SHARPMAKE_EXECUTABLE% echo Cannot find sharpmake executable in %~dp0Sharpmake.Application\bin\Release\net6.0 & pause & goto error
+set SHARPMAKE_EXECUTABLE=%~dp0Sharpmake.Application\bin\Release\net8.0\Sharpmake.Application.exe
+if not exist %SHARPMAKE_EXECUTABLE% echo Cannot find sharpmake executable in %~dp0Sharpmake.Application\bin\Release\net8.0 & pause & goto error
 
 echo Using executable %SHARPMAKE_EXECUTABLE%
 
@@ -35,6 +35,8 @@ if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples CSharpWCF                   CSharpWCF.sharpmake.cs                     reference         CSharpWCF
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples CSharpImports               CSharpImports.sharpmake.cs                 reference         CSharpImports
+if not "%ERRORLEVEL_BACKUP%" == "0" goto error
+call :UpdateRef samples CPPForcePackageReference    CPPForcePackageReference.sharpmake.cs      reference         CPPForcePackageReference
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples PackageReferences           PackageReferences.sharpmake.cs             reference         PackageReferences
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
