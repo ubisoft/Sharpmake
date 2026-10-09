@@ -57,21 +57,27 @@ namespace HelloXCode
                 nameParts.Add(Optimization.ToString().ToLowerInvariant());
                 if (BuildSystem == BuildSystem.FastBuild)
                     nameParts.Add(BuildSystem.ToString().ToLowerInvariant());
+                
+                if (Blob == Blob.Blob)
+                    nameParts.Add(Blob.ToString().ToLowerInvariant());
 
                 return string.Join("_", nameParts);
             }
         }
-
+        
         public string SolutionPlatformName
         {
             get
             {
                 var nameParts = new List<string>();
 
-                nameParts.Add(BuildSystem.ToString());
-
-                if (BuildSystem == BuildSystem.FastBuild && Blob == Blob.NoBlob)
-                    nameParts.Add(Blob.ToString());
+                if (BuildSystem == BuildSystem.FastBuild)
+                    nameParts.Add(BuildSystem.ToString().ToLowerInvariant());
+                
+                if (Blob == Blob.Blob)
+                    nameParts.Add(Blob.ToString().ToLowerInvariant());
+                
+                nameParts.Add(DevEnv.ToString().ToLowerInvariant());
 
                 return string.Join("_", nameParts);
             }
@@ -92,8 +98,7 @@ namespace HelloXCode
                 if (BuildSystem == BuildSystem.FastBuild)
                     dirNameParts.Add(BuildSystem.ToString());
 
-                if (DevEnv != DevEnv.xcode)
-                    dirNameParts.Add(DevEnv.ToString());
+                dirNameParts.Add(DevEnv.ToString());
 
                 return string.Join("_", dirNameParts).ToLowerInvariant();
             }
@@ -115,7 +120,7 @@ namespace HelloXCode
         {
             var macosTarget = new CommonTarget(
                 Platform.mac,
-                DevEnv.xcode,
+                DevEnv.xcode | DevEnv.vs2026,
                 Optimization.Debug | Optimization.Release,
                 Blob.NoBlob,
                 BuildSystem.Default
@@ -129,12 +134,13 @@ namespace HelloXCode
             // make a fastbuild version of the target
             var macosFastBuildTarget = (CommonTarget)macosTarget.Clone(
                 Blob.FastBuildUnitys,
-                BuildSystem.FastBuild
+                BuildSystem.FastBuild,
+                DevEnv.vs2026
             );
 
             var iosTarget = new CommonTarget(
                 Platform.ios,
-                DevEnv.xcode,
+                DevEnv.xcode | DevEnv.vs2026,
                 Optimization.Debug | Optimization.Release,
                 Blob.NoBlob,
                 BuildSystem.Default
@@ -148,12 +154,13 @@ namespace HelloXCode
             // make a fastbuild version of the target
             var iosFastBuildTarget = (CommonTarget)iosTarget.Clone(
                 Blob.FastBuildUnitys,
-                BuildSystem.FastBuild
+                BuildSystem.FastBuild,
+                DevEnv.vs2026
             );
 
             var tvosTarget = new CommonTarget(
                 Platform.tvos,
-                DevEnv.xcode,
+                DevEnv.xcode | DevEnv.vs2026,
                 Optimization.Debug | Optimization.Release,
                 Blob.NoBlob,
                 BuildSystem.Default
@@ -167,12 +174,13 @@ namespace HelloXCode
             // make a fastbuild version of the target
             var tvosFastBuildTarget = (CommonTarget)tvosTarget.Clone(
                 Blob.FastBuildUnitys,
-                BuildSystem.FastBuild
+                BuildSystem.FastBuild,
+                DevEnv.vs2026
             );
 
             var watchosTarget = new CommonTarget(
                 Platform.watchos,
-                DevEnv.xcode,
+                DevEnv.xcode | DevEnv.vs2026,
                 Optimization.Debug | Optimization.Release,
                 Blob.NoBlob,
                 BuildSystem.Default
@@ -186,12 +194,13 @@ namespace HelloXCode
             // make a fastbuild version of the target
             var watchosFastBuildTarget = (CommonTarget)watchosTarget.Clone(
                 Blob.FastBuildUnitys,
-                BuildSystem.FastBuild
+                BuildSystem.FastBuild,
+                DevEnv.vs2026
             );
 
             var catalystTarget = new CommonTarget(
                 Platform.maccatalyst,
-                DevEnv.xcode,
+                DevEnv.xcode | DevEnv.vs2026,
                 Optimization.Debug | Optimization.Release,
                 Blob.NoBlob,
                 BuildSystem.Default
@@ -205,7 +214,8 @@ namespace HelloXCode
             // make a FastBuild version of the target
             var catalystFastBuildTarget = (CommonTarget)catalystTarget.Clone(
                 Blob.FastBuildUnitys,
-                BuildSystem.FastBuild
+                BuildSystem.FastBuild,
+                DevEnv.vs2026
             );
 
             return new[] {

@@ -120,56 +120,43 @@ namespace Sharpmake.Generators
         }
 
         public void Generate(Builder builder,
-                             Solution solution,
-                             List<Solution.Configuration> configurations,
-                             string solutionFile,
-                             List<string> generatedFiles,
-                             List<string> skipFiles)
+            Solution solution,
+            List<Solution.Configuration> configurations,
+            string solutionFile,
+            List<string> generatedFiles,
+            List<string> skipFiles)
         {
-            if (configurations[0].Platform == Platform.ios ||
-                configurations[0].Platform == Platform.mac ||
-                configurations[0].Platform == Platform.tvos ||
-                configurations[0].Platform == Platform.watchos ||
-                configurations[0].Platform == Platform.maccatalyst
-            )
+            if (UtilityMethods.HasFastBuildConfig(configurations))
             {
-                XCWorkspaceGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
-                if (UtilityMethods.HasFastBuildConfig(configurations))
-                {
-                    MasterBffGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
-                }
+                MasterBffGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
             }
-            else
-            {
-                DevEnv devEnv = configurations[0].Target.GetFragment<DevEnv>();
-                switch (devEnv)
-                {
-                    case DevEnv.make:
-                        {
-                            if (configurations[0].Platform == Platform.android)
-                                MakeApplicationGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
-                            else
-                                MakefileGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
-                            break;
-                        }
-                    case DevEnv.vs2015:
-                    case DevEnv.vs2017:
-                    case DevEnv.vs2019:
-                    case DevEnv.vs2022:
-                    case DevEnv.vs2026:
-                        {
-                            if (UtilityMethods.HasFastBuildConfig(configurations))
-                            {
-                                MasterBffGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
-                            }
 
-                            SlnGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
-                            break;
-                        }
-                    default:
-                        {
-                            throw new Error("Generate called with unknown DevEnv: " + devEnv);
-                        }
+            var devEnv = configurations[0].Target.GetFragment<DevEnv>();
+            switch (devEnv)
+            {
+                case DevEnv.xcode:
+                    XCWorkspaceGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                    break;
+                case DevEnv.make:
+                {
+                    if (configurations[0].Platform == Platform.android)
+                        MakeApplicationGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                    else
+                        MakefileGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                    break;
+                }
+                case DevEnv.vs2015:
+                case DevEnv.vs2017:
+                case DevEnv.vs2019:
+                case DevEnv.vs2022:
+                case DevEnv.vs2026:
+                {
+                    SlnGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                    break;
+                }
+                default:
+                {
+                    throw new Error("Generate called with unknown DevEnv: " + devEnv);
                 }
             }
         }
