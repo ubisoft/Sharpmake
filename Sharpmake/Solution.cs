@@ -64,6 +64,28 @@ namespace Sharpmake
         /// </summary>
         public Dictionary<string, Strings> ExtraItems = new Dictionary<string, Strings>();
 
+        /// <summary>
+        /// Selects the on-disk solution file format.
+        /// <see cref="SolutionFormat.Sln"/> emits the classic <c>.sln</c> text format (default).
+        /// </summary>
+        public enum SolutionFormat
+        {
+            /// <summary>Classic <c>.sln</c> text format.</summary>
+            Sln
+        }
+
+        private SolutionFormat _solutionFormat = SolutionFormat.Sln;
+
+        /// <summary>
+        /// The solution file format to generate. Defaults to <see cref="SolutionFormat.Sln"/>,
+        /// preserving the existing <c>.sln</c> behavior.
+        /// </summary>
+        public SolutionFormat Format
+        {
+            get { return _solutionFormat; }
+            set { SetProperty(ref _solutionFormat, value); }
+        }
+
         [Obsolete("This property is deprecated, scc info shouldn't be stored in the solution files anymore", error: true)]
         public string PerforceRootPath;
 

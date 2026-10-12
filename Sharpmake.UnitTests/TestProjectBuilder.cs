@@ -149,6 +149,26 @@ namespace Sharpmake.UnitTests
                 DependencyTracker.Instance.DumpGraphs(outputs);
         }
 
+        // Builds and links the projects and solutions of the namespace without running any
+        // generator, for tests that need resolved configurations but call generator code directly.
+        protected void BuildAndLinkProjects()
+        {
+            IEnumerable<Type> sharpmakeProjects = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.Namespace == _namespace);
+
+            AddFakeFiles(sharpmakeProjects);
+
+            foreach (var sharpmakeProject in sharpmakeProjects)
+                Builder.Arguments.Generate(sharpmakeProject);
+
+            Builder.BuildProjectAndSolution();
+            Builder.Link();
+        }
+
+        public Solution GetSolution<T>()
+        {
+            return Builder.GetSolution(typeof(T));
+        }
+
         [OneTimeTearDown]
         public void Shutdown()
         {
