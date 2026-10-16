@@ -157,7 +157,7 @@ namespace Sharpmake
 
         // This is a reverse-growing section for undisclosed platforms
         _reserved10 = 1 << 21, // ACTIVE
-        _reserved9  = 1 << 22, // ACTIVE
+        _reserved9  = 1 << 22, // Inactive
         _reserved8  = 1 << 23, // ACTIVE
         _reserved7  = 1 << 24, // ACTIVE
         _reserved6  = 1 << 25, // Inactive
