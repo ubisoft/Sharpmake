@@ -9,7 +9,6 @@ Sharpmake.FunctionalTests/**/projects/*
 Sharpmake.FunctionalTests/**/blob/*
 Sharpmake.FunctionalTests/**/sharpmake_debug*.vs*.*
 Sharpmake.FunctionalTests/**/sharpmake_package*.vs*.csproj
-!**/reference/**
 
 ## Ignore Visual Studio temporary files, build results, and
 sharpmakeautocleanupdb*.bin
@@ -67,3 +66,6 @@ Sharpmake.Application.args.json
 
 # Verify snapshot files
 *.received.*
+
+# Keep everything under reference folders, no exceptions
+!**/reference/**

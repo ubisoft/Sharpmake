@@ -46,6 +46,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Properties\launchSettings.json" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\helloworldreference\HelloWorldReference.vs2022.net6_0.csproj">
       <Private>false</Private>
     </ProjectReference>

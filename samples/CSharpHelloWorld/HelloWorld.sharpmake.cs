@@ -25,7 +25,13 @@ namespace CSharpHelloWorld
                     DevEnv.vs2022,
                     Optimization.Debug | Optimization.Release,
                     OutputType.Dll,
-                    framework: DotNetFramework.net6_0)
+                    framework: DotNetFramework.net6_0),
+                new Target(
+                    Platform.anycpu,
+                    DevEnv.vs2026,
+                    Optimization.Debug | Optimization.Release,
+                    OutputType.Dll,
+                    framework: DotNetFramework.net8_0)
             };
         }
     }
@@ -74,6 +80,11 @@ namespace CSharpHelloWorld
 
             conf.Options.Add(Sharpmake.Options.CSharp.TreatWarningsAsErrors.Enabled);
             conf.AddPublicDependency<HelloWorldReference>(target, DependencySetting.DefaultWithoutCopy);
+
+            conf.CsprojUserFile = new Configuration.CsprojUserFileSettings
+            {
+                StartArguments = $@"-firstArg -secondArg"
+            };
         }
     }
 
