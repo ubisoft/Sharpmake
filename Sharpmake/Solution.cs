@@ -68,7 +68,8 @@ namespace Sharpmake
         /// Selects the on-disk solution file format.
         /// <see cref="SolutionFormat.Sln"/> emits the classic <c>.sln</c> text format (default).
         /// <see cref="SolutionFormat.Slnx"/> emits the XML <c>.slnx</c> format and is only supported
-        /// with <see cref="DevEnv.vs2026"/>; combining it with any other DevEnv throws during generation.
+        /// with <see cref="DevEnv.vs2026"/>; combining it with any other Visual Studio DevEnv throws during
+        /// generation. Non Visual Studio generators (make, Xcode) ignore it.
         /// </summary>
         public enum SolutionFormat
         {

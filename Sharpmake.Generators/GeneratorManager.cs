@@ -129,11 +129,6 @@ namespace Sharpmake.Generators
                              List<string> generatedFiles,
                              List<string> skipFiles)
         {
-            // .slnx (SolutionFormat.Slnx) is only supported on vs2026. Validate up front, before any
-            // platform/DevEnv dispatch, so requesting Slnx on ANY other DevEnv (vs20xx, make, xcode)
-            // fails fast with a clear message rather than silently emitting a legacy solution or nothing.
-            Slnx.ValidateDevEnv(solution.Name, solution.Format, configurations[0].Target.GetFragment<DevEnv>());
-
             if (configurations[0].Platform == Platform.ios ||
                 configurations[0].Platform == Platform.mac ||
                 configurations[0].Platform == Platform.tvos ||
@@ -171,7 +166,7 @@ namespace Sharpmake.Generators
                                 MasterBffGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
                             }
 
-                            // Format/DevEnv compatibility was validated at the top of Generate.
+                            // Slnx.Generate validates that the DevEnv is vs2026.
                             if (solution.Format == Solution.SolutionFormat.Slnx)
                                 SlnxGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
                             else
