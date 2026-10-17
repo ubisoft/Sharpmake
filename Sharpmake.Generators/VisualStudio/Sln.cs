@@ -421,7 +421,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             configurationSectionNames.Sort();
 
-            VerifySectionNamesDuplicates(solutionFileInfo.FullName, solutionConfigurations, configurationSectionNames);
+            SolutionConfigMatcher.VerifySectionNamesDuplicates(solutionFileInfo.FullName, solutionConfigurations, configurationSectionNames);
 
             foreach (string configurationSectionName in configurationSectionNames)
                 fileGenerator.Write(configurationSectionName);
@@ -539,31 +539,7 @@ namespace Sharpmake.Generators.VisualStudio
             return solutionFileInfo.FullName;
         }
 
-        // Will check that two configurations in the solution do not share the same name
-        private void VerifySectionNamesDuplicates(
-            string solutionFile,
-            IReadOnlyList<Solution.Configuration> solutionConfigurations,
-            List<string> configurationSectionNames
-        )
-        {
-            int count = configurationSectionNames.Count;
-            var distinctSectionNames = configurationSectionNames.Distinct().ToList();
-            if (count != distinctSectionNames.Count)
-            {
-                throw new Error(
-                    "Solution '{0}' contains distinct configurations with the same name, please add something to distinguish them:\n- {1}",
-                    solutionFile,
-                    string.Join(
-                        Environment.NewLine + "- ",
-                        solutionConfigurations.Select(
-                            sc => $"{sc.Name}|{sc.PlatformName} => '{sc}'"
-                        ).OrderBy(name => name)
-                    )
-                );
-            }
-        }
-
-        private static string GetVisualStudioIdePath(DevEnv devEnv)
+        internal static string GetVisualStudioIdePath(DevEnv devEnv)
         {
             string commonToolsPath = devEnv.GetCommonToolsPath();
             if (commonToolsPath != null)
