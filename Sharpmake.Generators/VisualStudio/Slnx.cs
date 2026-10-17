@@ -143,7 +143,7 @@ namespace Sharpmake.Generators.VisualStudio
                     set.Add(Util.PathGetRelative(solutionPath, file));
             }
 
-            // Distinct project list (projects + path references), folder grouping.
+            // Discriminate projects depending on where they are in the folder hierarchy(solution root vs under a folder)
             var allProjects = solutionProjects.Concat(resolvedPathReferences).Distinct(new Solution.ResolvedProjectGuidComparer()).ToList();
             var projectsByFolder = new Dictionary<SolutionFolder, List<Solution.ResolvedProject>>();
             var rootProjects = new List<Solution.ResolvedProject>();
@@ -164,6 +164,8 @@ namespace Sharpmake.Generators.VisualStudio
                     list.Add(rp);
                 }
             }
+
+            SetCompileCommandLinesAndVerifyConfigurationNames(solution, solutionConfigurations, devEnv, solutionFileInfo);
 
             // Precompute, per resolved project, the slnx config rules and build dependencies.
             var projectRules = ComputeProjectRules(solution, solutionConfigurations, solutionProjects, fastBuildAllProjectForSolutionDependency, solutionFileInfo);
@@ -211,6 +213,46 @@ namespace Sharpmake.Generators.VisualStudio
             solution.PostGenerationCallback?.Invoke(solutionPath, solutionFile, SolutionExtension);
 
             return solutionFileInfo.FullName;
+        }
+
+        // Same solution-config pass as Sln.Generate: sets each configuration's CompileCommandLine and
+        // throws when two distinct configurations resolve to the same "name|category" identity.
+        private static void SetCompileCommandLinesAndVerifyConfigurationNames(
+            Solution solution,
+            IReadOnlyList<Solution.Configuration> solutionConfigurations,
+            DevEnv devEnv,
+            FileInfo solutionFileInfo)
+        {
+            string visualStudioExe = Sln.GetVisualStudioIdePath(devEnv) + Util.WindowsSeparator + "devenv.com";
+
+            var configurationNames = new List<string>();
+
+            bool containsMultiDotNetFramework = solutionConfigurations.All(sc => sc.Target.HaveFragment<DotNetFramework>()) &&
+                                                solutionConfigurations.Select(sc => sc.Target.GetFragment<DotNetFramework>()).Distinct().Count() > 1;
+            var multiDotNetFrameworkConfigurationNames = new HashSet<string>();
+
+            foreach (Solution.Configuration solutionConfiguration in solutionConfigurations)
+            {
+                SolutionConfigMatcher.GetNameAndCategory(solution, solutionConfiguration, out string configurationName, out string category);
+
+                if (containsMultiDotNetFramework)
+                {
+                    if (multiDotNetFrameworkConfigurationNames.Contains(configurationName))
+                        continue;
+
+                    multiDotNetFrameworkConfigurationNames.Add(configurationName);
+                }
+
+                configurationNames.Add(configurationName + "|" + category);
+
+                if (File.Exists(visualStudioExe))
+                {
+                    solutionConfiguration.CompileCommandLine = string.Format(@"""{0}"" ""{1}"" /build ""{2}|{3}""",
+                        visualStudioExe, solutionFileInfo.FullName, configurationName, category);
+                }
+            }
+
+            SolutionConfigMatcher.VerifySectionNamesDuplicates(solutionFileInfo.FullName, solutionConfigurations, configurationNames);
         }
 
         private void WriteConfigurations(FileGenerator fileGenerator, Solution solution, IReadOnlyList<Solution.Configuration> solutionConfigurations)
@@ -294,8 +336,7 @@ namespace Sharpmake.Generators.VisualStudio
                     // projects and erroring when a config has zero, or more than one with
                     // GenerateFastBuildAllProject) is intentionally NOT reproduced here. It is
                     // diagnostic-only and does not affect which project config maps to a solution
-                    // config. This is a known, documented divergence from the legacy .sln path; see
-                    // the "Known limitations" section of docs/superpowers/plans/2026-06-01-slnx-vs2026.md.
+                    // config.
                     SolutionProjectConfigMatch match = SolutionConfigMatcher.Match(solution, solutionConfiguration, solutionProject);
                     Solution.Configuration.IncludedProjectInfo includedProject = match.IncludedProject;
                     Project.Configuration projectConf = match.ProjectConf;

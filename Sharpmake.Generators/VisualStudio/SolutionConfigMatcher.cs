@@ -1,6 +1,10 @@
 // Copyright (c) Ubisoft. All Rights Reserved.
 // Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace Sharpmake.Generators.VisualStudio
 {
     // Per-(project x solution-config) match: which project target/configuration a solution
@@ -33,6 +37,30 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 name = solutionConfiguration.Name;
                 category = solutionConfiguration.PlatformName;
+            }
+        }
+
+        // Will check that two configurations in the solution do not share the same name
+        public static void VerifySectionNamesDuplicates(
+            string solutionFile,
+            IReadOnlyList<Solution.Configuration> solutionConfigurations,
+            List<string> configurationSectionNames
+        )
+        {
+            int count = configurationSectionNames.Count;
+            var distinctSectionNames = configurationSectionNames.Distinct().ToList();
+            if (count != distinctSectionNames.Count)
+            {
+                throw new Error(
+                    "Solution '{0}' contains distinct configurations with the same name, please add something to distinguish them:\n- {1}",
+                    solutionFile,
+                    string.Join(
+                        Environment.NewLine + "- ",
+                        solutionConfigurations.Select(
+                            sc => $"{sc.Name}|{sc.PlatformName} => '{sc}'"
+                        ).OrderBy(name => name)
+                    )
+                );
             }
         }
 
