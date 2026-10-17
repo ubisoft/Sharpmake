@@ -1,0 +1,20 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Release" />
+    <Platform Name="Any CPU" />
+  </Configurations>
+  <Folder Name="/Apps/">
+  </Folder>
+  <Folder Name="/Libraries/">
+    <Project Path="helloworldlib\HelloWorldLib.vs2026.csproj" />
+  </Folder>
+  <Folder Name="/Apps/MultiFrameworks/">
+    <Project Path="helloworldmultiframeworks\HelloWorldMultiFrameworks.vs2026.csproj" DefaultStartup="true" />
+  </Folder>
+  <Folder Name="/Solution Items/Sharpmake/">
+    <File Path="..\HelloWorld.sharpmake.cs" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+  </Folder>
+</Solution>
