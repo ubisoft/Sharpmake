@@ -616,7 +616,7 @@ namespace Sharpmake
         vs2022 = 64,
         vs2026 = 1024,
         xcode = 128,
-        eclipse = 256,
+        _inactive1 = 256,
         make = 512,
         [Sharpmake.CompositeFragment]
         VisualStudio = 1144,
@@ -626,6 +626,8 @@ namespace Sharpmake
         vs2012 = -1,
         [System.Obsolete("Sharpmake doesn\'t support vs2013 anymore.")]
         vs2013 = -1,
+        [System.Obsolete("Sharpmake doesn\'t support eclipse anymore.")]
+        eclipse = -1,
     }
     public struct DevEnvRange
     {
