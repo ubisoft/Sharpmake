@@ -49,10 +49,7 @@ namespace Sharpmake
         /// </summary>
         xcode = 1 << 7,
 
-        /// <summary>
-        /// Eclipse.
-        /// </summary>
-        eclipse = 1 << 8,
+        _inactive1 = 1 << 8, // This used to be "eclipse"
 
         /// <summary>
         /// GNU Makefiles.
@@ -71,6 +68,8 @@ namespace Sharpmake
         vs2012 = -1,
         [Obsolete("Sharpmake doesn't support vs2013 anymore.")]
         vs2013 = -1,
+        [Obsolete("Sharpmake doesn't support eclipse anymore.")]
+        eclipse = -1,
     }
 
     /// <summary>

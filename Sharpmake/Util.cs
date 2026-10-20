@@ -1664,9 +1664,6 @@ namespace Sharpmake
                     case DevEnv.xcode:
                         return ".xcodeproj";
 
-                    case DevEnv.eclipse:
-                        return ".mk";
-
                     case DevEnv.make:
                         return ".make";
 

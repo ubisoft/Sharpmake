@@ -27,11 +27,11 @@ namespace Sharpmake.UnitTests
 
         [TestCase(Platform.win64)]
         [TestCase(Platform._reserved7)]
-        public void HasVS2019orVS2022Compiler(Platform platform)
+        public void HasCompatibleVSCompiler(Platform platform)
         {
             // Some setup on CI machines might test only one version of Visual Studio
             // Ensure at least one of the supported version is installed.
-            Assert.That(HasVSCompiler(DevEnv.vs2019, platform) || HasVSCompiler(DevEnv.vs2022, platform), Is.EqualTo(true));
+            Assert.That(HasVSCompiler(DevEnv.vs2019, platform) || HasVSCompiler(DevEnv.vs2022, platform) || HasVSCompiler(DevEnv.vs2026, platform), Is.EqualTo(true));
         }
 
         [TestCase(DevEnv.vs2019, Platform.win64, Options.Vc.General.PlatformToolset.Default)]
