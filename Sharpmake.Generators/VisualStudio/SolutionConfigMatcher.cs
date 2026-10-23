@@ -1,6 +1,8 @@
 // Copyright (c) Ubisoft. All Rights Reserved.
 // Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
+using System.Collections.Generic;
+
 namespace Sharpmake.Generators.VisualStudio
 {
     // Per-(project x solution-config) match: which project target/configuration a solution
@@ -33,6 +35,33 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 name = solutionConfiguration.Name;
                 category = solutionConfiguration.PlatformName;
+            }
+        }
+
+        // Records, per solution configuration, which FastBuild projects actually build it. Call
+        // TrackFastBuildConfig for every match (before any filtering), RecordFastBuildBuilt for the
+        // matches that are written out, then ReportFastBuildDiagnostics once all projects are done.
+        public static void TrackFastBuildConfig(Dictionary<Solution.Configuration, List<string>> fastBuildBuilt, Solution.Configuration solutionConfiguration, SolutionProjectConfigMatch match)
+        {
+            if (match.IncludedProject != null && match.IncludedProject.Configuration.IsFastBuild)
+                fastBuildBuilt.GetValueOrAdd(solutionConfiguration, new List<string>());
+        }
+
+        public static void RecordFastBuildBuilt(Dictionary<Solution.Configuration, List<string>> fastBuildBuilt, Solution.Configuration solutionConfiguration, SolutionProjectConfigMatch match)
+        {
+            if (match.ProjectConf.IsFastBuild && match.Build)
+                fastBuildBuilt[solutionConfiguration].Add(match.ProjectConf.Project.Name + " " + match.ProjectConf.Name);
+        }
+
+        public static void ReportFastBuildDiagnostics(string solutionFile, Solution solution, Dictionary<Solution.Configuration, List<string>> fastBuildBuilt)
+        {
+            foreach (var fb in fastBuildBuilt)
+            {
+                var solutionConfiguration = fb.Key;
+                if (fb.Value.Count == 0)
+                    Builder.Instance.LogErrorLine($"{solutionFile} - {solutionConfiguration.Name}|{solutionConfiguration.PlatformName} - has no FastBuild projects to build.");
+                else if (solution.GenerateFastBuildAllProject && fb.Value.Count > 1)
+                    Builder.Instance.LogErrorLine($"{solutionFile} - {solutionConfiguration.Name}|{solutionConfiguration.PlatformName} - has more than one FastBuild project to build ({string.Join(";", fb.Value)}).");
             }
         }
 

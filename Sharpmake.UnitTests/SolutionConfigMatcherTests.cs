@@ -1,6 +1,7 @@
 // Copyright (c) Ubisoft. All Rights Reserved.
 // Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
@@ -167,6 +168,102 @@ namespace Sharpmake.UnitTests
             Assert.That(match.ForceDeploy, Is.False);
             Assert.That(match.BuildDeploy, Is.False);
         }
+
+        // Runs the FastBuild tracking over every (project x solution-config) match the same way the
+        // solution generators do.
+        private static Dictionary<Solution.Configuration, List<string>> CollectFastBuildBuilt(Solution solution)
+        {
+            var fastBuildBuilt = new Dictionary<Solution.Configuration, List<string>>();
+            foreach (Solution.ResolvedProject resolvedProject in solution.GetResolvedProjects(solution.Configurations, out _))
+            {
+                foreach (Solution.Configuration solutionConfiguration in solution.Configurations)
+                {
+                    var match = SolutionConfigMatcher.Match(solution, solutionConfiguration, resolvedProject);
+                    SolutionConfigMatcher.TrackFastBuildConfig(fastBuildBuilt, solutionConfiguration, match);
+                    SolutionConfigMatcher.RecordFastBuildBuilt(fastBuildBuilt, solutionConfiguration, match);
+                }
+            }
+            return fastBuildBuilt;
+        }
+
+        [Test]
+        public void SolutionWithoutFastBuildProjectsIsNotTracked()
+        {
+            Solution solution = GetSolution<MatcherSolution>();
+
+            var fastBuildBuilt = CollectFastBuildBuilt(solution);
+            SolutionConfigMatcher.ReportFastBuildDiagnostics("MatcherSolution", solution, fastBuildBuilt);
+
+            Assert.That(fastBuildBuilt, Is.Empty);
+            Assert.That(ErrorCount, Is.Zero);
+        }
+
+        [TestCase(Platform.win32)]
+        [TestCase(Platform.win64)]
+        public void SolutionConfigurationWithBuiltFastBuildProjectIsNotReported(Platform platform)
+        {
+            Solution solution = GetSolution<FastBuildSolution>();
+            Solution.Configuration solutionConfiguration = GetSolutionConfiguration(solution, platform, Optimization.Debug);
+
+            var fastBuildBuilt = CollectFastBuildBuilt(solution);
+
+            Assert.That(fastBuildBuilt[solutionConfiguration], Is.EqualTo(new[] { "FastBuildLib " + solutionConfiguration.Name }));
+        }
+
+        [TestCase(Platform.win32)]
+        [TestCase(Platform.win64)]
+        public void SolutionConfigurationWithoutBuiltFastBuildProjectIsTracked(Platform platform)
+        {
+            // Only the inactive FastBuild project is included in Release, so nothing builds it.
+            Solution solution = GetSolution<FastBuildSolution>();
+            Solution.Configuration solutionConfiguration = GetSolutionConfiguration(solution, platform, Optimization.Release);
+
+            var fastBuildBuilt = CollectFastBuildBuilt(solution);
+
+            Assert.That(fastBuildBuilt[solutionConfiguration], Is.Empty);
+        }
+
+        [Test]
+        public void SolutionConfigurationsWithoutBuiltFastBuildProjectAreReported()
+        {
+            Solution solution = GetSolution<FastBuildSolution>();
+
+            SolutionConfigMatcher.ReportFastBuildDiagnostics("FastBuildSolution", solution, CollectFastBuildBuilt(solution));
+
+            // win32|Release and win64|Release
+            Assert.That(ErrorCount, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void MoreThanOneBuiltFastBuildProjectIsReportedWithFastBuildAll()
+        {
+            Solution solution = GetSolution<MatcherSolution>();
+            Assert.That(solution.GenerateFastBuildAllProject, Is.True);
+
+            var fastBuildBuilt = new Dictionary<Solution.Configuration, List<string>>
+            {
+                { GetSolutionConfiguration(solution, Platform.win64, Optimization.Debug), new List<string> { "A Debug", "B Debug" } },
+                { GetSolutionConfiguration(solution, Platform.win64, Optimization.Release), new List<string> { "A Release" } },
+            };
+            SolutionConfigMatcher.ReportFastBuildDiagnostics("MatcherSolution", solution, fastBuildBuilt);
+
+            Assert.That(ErrorCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void MoreThanOneBuiltFastBuildProjectIsNotReportedWithoutFastBuildAll()
+        {
+            Solution solution = GetSolution<FastBuildSolution>();
+            Assert.That(solution.GenerateFastBuildAllProject, Is.False);
+
+            var fastBuildBuilt = new Dictionary<Solution.Configuration, List<string>>
+            {
+                { GetSolutionConfiguration(solution, Platform.win64, Optimization.Debug), new List<string> { "A Debug", "B Debug" } },
+            };
+            SolutionConfigMatcher.ReportFastBuildDiagnostics("FastBuildSolution", solution, fastBuildBuilt);
+
+            Assert.That(ErrorCount, Is.Zero);
+        }
     }
 
     namespace SolutionConfigMatcherTestProjects
@@ -239,6 +336,21 @@ namespace Sharpmake.UnitTests
             }
         }
 
+        public abstract class FastBuildProjectBase : MatcherProjectBase
+        {
+            public override void ConfigureAll(Configuration conf, Target target)
+            {
+                base.ConfigureAll(conf, target);
+                conf.IsFastBuild = true;
+            }
+        }
+
+        [Generate]
+        public class FastBuildLib : FastBuildProjectBase { }
+
+        [Generate]
+        public class InactiveFastBuildLib : FastBuildProjectBase { }
+
         public abstract class MatcherSolutionBase : Solution
         {
             protected MatcherSolutionBase()
@@ -280,6 +392,24 @@ namespace Sharpmake.UnitTests
             public void ConfigureAll(Configuration conf, Target target)
             {
                 conf.AddProject<FullLib>(target);
+            }
+        }
+
+        [Generate]
+        public class FastBuildSolution : MatcherSolutionBase
+        {
+            public FastBuildSolution()
+            {
+                GenerateFastBuildAllProject = false;
+            }
+
+            [Configure]
+            public void ConfigureAll(Configuration conf, Target target)
+            {
+                conf.AddProject<InactiveFastBuildLib>(target, inactiveProject: true);
+
+                if (target.Optimization == Optimization.Debug)
+                    conf.AddProject<FastBuildLib>(target);
             }
         }
     }
