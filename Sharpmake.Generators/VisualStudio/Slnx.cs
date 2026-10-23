@@ -319,6 +319,7 @@ namespace Sharpmake.Generators.VisualStudio
                                                 solutionConfigurations.Select(sc => sc.Target.GetFragment<DotNetFramework>()).Distinct().Count() > 1;
             var multiDotNetFrameworkConfigurationNames = new HashSet<string>();
 
+            var solutionConfigurationFastBuildBuilt = new Dictionary<Solution.Configuration, List<string>>();
             foreach (Solution.ResolvedProject solutionProject in solutionProjects)
             {
                 string guid = solutionProject.UserData["Guid"] as string;
@@ -330,17 +331,14 @@ namespace Sharpmake.Generators.VisualStudio
 
                 foreach (Solution.Configuration solutionConfiguration in solutionConfigurations)
                 {
-                    // NOTE: this reuses the exact same project<->solution-config matching and
-                    // build/deploy computation as Sln.cs (via SolutionConfigMatcher), but Sln.cs's
-                    // per-solution-config FastBuild diagnostic (counting buildable FastBuild
-                    // projects and erroring when a config has zero, or more than one with
-                    // GenerateFastBuildAllProject) is intentionally NOT reproduced here. It is
-                    // diagnostic-only and does not affect which project config maps to a solution
-                    // config.
+                    // Same project<->solution-config matching, build/deploy computation and FastBuild
+                    // diagnostics as Sln.cs (via SolutionConfigMatcher).
                     SolutionProjectConfigMatch match = SolutionConfigMatcher.Match(solution, solutionConfiguration, solutionProject);
                     Solution.Configuration.IncludedProjectInfo includedProject = match.IncludedProject;
                     Project.Configuration projectConf = match.ProjectConf;
                     Platform projectPlatform = match.ProjectTarget.GetPlatform();
+
+                    SolutionConfigMatcher.TrackFastBuildConfig(solutionConfigurationFastBuildBuilt, solutionConfiguration, match);
 
                     SolutionConfigMatcher.GetNameAndCategory(solution, solutionConfiguration, out string configurationName, out string category);
 
@@ -350,6 +348,8 @@ namespace Sharpmake.Generators.VisualStudio
                             continue;
                         multiDotNetFrameworkConfigurationNames.Add(configurationName);
                     }
+
+                    SolutionConfigMatcher.RecordFastBuildBuilt(solutionConfigurationFastBuildBuilt, solutionConfiguration, match);
 
                     string solutionConfigScope = configurationName + "|" + category;
                     string projectPlatformString = Util.GetToolchainPlatformString(projectPlatform, solutionProject.Project, solutionConfiguration.Target, true);
@@ -401,6 +401,8 @@ namespace Sharpmake.Generators.VisualStudio
                 }
                 rules.DependencyPaths.AddRange(depPaths);
             }
+
+            SolutionConfigMatcher.ReportFastBuildDiagnostics(solutionFileInfo.Name, solution, solutionConfigurationFastBuildBuilt);
 
             return result;
         }
