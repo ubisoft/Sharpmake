@@ -443,8 +443,7 @@ namespace Sharpmake.Generators.VisualStudio
                     Solution.Configuration.IncludedProjectInfo includedProject = match.IncludedProject;
                     Project.Configuration projectConf = match.ProjectConf;
 
-                    if (includedProject != null && includedProject.Configuration.IsFastBuild)
-                        solutionConfigurationFastBuildBuilt.GetValueOrAdd(solutionConfiguration, new List<string>());
+                    SolutionConfigMatcher.TrackFastBuildConfig(solutionConfigurationFastBuildBuilt, solutionConfiguration, match);
 
                     Platform projectPlatform = match.ProjectTarget.GetPlatform();
 
@@ -459,8 +458,7 @@ namespace Sharpmake.Generators.VisualStudio
                     }
 
                     // for fastbuild, record which project actually builds each solution config for the diagnostic below.
-                    if (projectConf.IsFastBuild && match.Build)
-                        solutionConfigurationFastBuildBuilt[solutionConfiguration].Add(projectConf.Project.Name + " " + projectConf.Name);
+                    SolutionConfigMatcher.RecordFastBuildBuilt(solutionConfigurationFastBuildBuilt, solutionConfiguration, match);
 
                     using (fileGenerator.Declare("solutionConf", solutionConfiguration))
                     using (fileGenerator.Declare("projectGuid", solutionProject.UserData["Guid"]))
@@ -481,14 +479,7 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
 
-            foreach (var fb in solutionConfigurationFastBuildBuilt)
-            {
-                var solutionConfiguration = fb.Key;
-                if (fb.Value.Count == 0)
-                    Builder.Instance.LogErrorLine($"{solutionFile} - {solutionConfiguration.Name}|{solutionConfiguration.PlatformName} - has no FastBuild projects to build.");
-                else if (solution.GenerateFastBuildAllProject && fb.Value.Count > 1)
-                    Builder.Instance.LogErrorLine($"{solutionFile} - {solutionConfiguration.Name}|{solutionConfiguration.PlatformName} - has more than one FastBuild project to build ({string.Join(";", fb.Value)}).");
-            }
+            SolutionConfigMatcher.ReportFastBuildDiagnostics(solutionFile, solution, solutionConfigurationFastBuildBuilt);
 
             fileGenerator.Write(Template.Solution.GlobalSectionProjectConfigurationEnd);
 
