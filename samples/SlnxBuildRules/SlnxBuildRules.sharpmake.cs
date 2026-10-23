@@ -141,9 +141,6 @@ namespace SlnxBuildRules
         [Sharpmake.Main]
         public static void SharpmakeMain(Arguments arguments)
         {
-            arguments.Generate<HeaderOnlyLib>();
-            arguments.Generate<RulesLib>();
-            arguments.Generate<RulesExe>();
             arguments.Generate<SlnxBuildRulesSolution>();
         }
     }

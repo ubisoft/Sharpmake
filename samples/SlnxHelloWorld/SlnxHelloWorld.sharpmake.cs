@@ -54,7 +54,6 @@ namespace SlnxHelloWorld
         [Sharpmake.Main]
         public static void SharpmakeMain(Arguments arguments)
         {
-            arguments.Generate<SlnxExeProject>();
             arguments.Generate<SlnxSolution>();
         }
     }
