@@ -357,9 +357,6 @@ namespace Sharpmake.Generators.VisualStudio
 
                     // Emit BuildType / Platform remap rules when the project's resolved config name
                     // or platform differs from the solution config (ActiveCfg semantics).
-                    // Comparisons use the raw (unescaped) values; only the values written into the XML
-                    // attributes are escaped via SecurityElement.Escape (the '|' scope separator is
-                    // structural and is left intact by Escape).
                     string escapedSolutionConfigScope = SecurityElement.Escape(solutionConfigScope);
                     if (!string.Equals(projectBuildType, configurationName, StringComparison.Ordinal))
                     {
@@ -407,19 +404,14 @@ namespace Sharpmake.Generators.VisualStudio
             return result;
         }
 
-        // Declares [token]=value for each pair (plus [indent]) and writes the resolved template,
-        // disposing the declarations via nested `using` regardless of exceptions.
-        private static void WriteRule(FileGenerator fileGenerator, string template, string indent, (string token, string value)[] values, int index = 0)
+        // Declares [token]=value for each pair (plus [indent]) and writes the resolved template.
+        private static void WriteRule(FileGenerator fileGenerator, string template, string indent, (string token, string value)[] values)
         {
-            if (index == values.Length)
+            using (fileGenerator.Declare("indent", indent))
+            using (fileGenerator.Declare(values.Select((val) => new VariableAssignment(val.token, val.value)).ToArray()))
             {
-                using (fileGenerator.Declare("indent", indent))
-                    fileGenerator.Write(template);
-                return;
+                fileGenerator.Write(template);
             }
-
-            using (fileGenerator.Declare(values[index].token, values[index].value))
-                WriteRule(fileGenerator, template, indent, values, index + 1);
         }
 
         private void WriteProject(
