@@ -16,6 +16,9 @@ namespace Sharpmake.Generators
         private Sln _slnGenerator = null;
         public Sln SlnGenerator => _slnGenerator ?? (_slnGenerator = new Sln());
 
+        private Slnx _slnxGenerator = null;
+        public Slnx SlnxGenerator => _slnxGenerator ?? (_slnxGenerator = new Slnx());
+
         private MasterBff _masterBffGenerator = null;
         public MasterBff MasterBffGenerator => _masterBffGenerator ?? (_masterBffGenerator = new MasterBff());
 
@@ -163,7 +166,11 @@ namespace Sharpmake.Generators
                                 MasterBffGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
                             }
 
-                            SlnGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                            // Slnx.Generate validates that the DevEnv is vs2026.
+                            if (solution.Format == Solution.SolutionFormat.Slnx)
+                                SlnxGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                            else
+                                SlnGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
                             break;
                         }
                     default:
