@@ -13,64 +13,64 @@ namespace Sharpmake.Generators.VisualStudio
     {
         public static class Template
         {
-            public static string PropertyGroupStart =
+            internal const string PropertyGroupStart =
                 @"  <PropertyGroup>
 ";
 
-            public static string PropertyGroupWithConditionStart=
+            internal const string PropertyGroupWithConditionStart=
                 @"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
 ";
 
-            public static string PropertyGroupEnd =
+            internal const string PropertyGroupEnd =
                 @"  </PropertyGroup>
 ";
 
-            public static string ItemGroupBegin =
+            internal const string ItemGroupBegin =
                 @"  <ItemGroup>
 ";
 
-            public static string ItemGroupEnd =
+            internal const string ItemGroupEnd =
                 @"  </ItemGroup>
 ";
 
-            public const string ItemDefinitionGroupBegin =
+            internal const string ItemDefinitionGroupBegin =
                 @"  <ItemDefinitionGroup>
 ";
 
-            public const string ItemDefinitionGroupEnd =
+            internal const string ItemDefinitionGroupEnd =
                 @"  </ItemDefinitionGroup>
 ";
 
-            public static string CustomProperty =
+            internal const string CustomProperty =
                 @"    <[custompropertyname]>[custompropertyvalue]</[custompropertyname]>
 ";
 
             public static class Project
             {
-                public static string ProjectBeginConfigurationDescription =
+                internal const string ProjectBeginConfigurationDescription =
                     @"  <ItemGroup Label=""ProjectConfigurations"">
 ";
 
-                public static string ProjectEndConfigurationDescription =
+                internal const string ProjectEndConfigurationDescription =
                     @"  </ItemGroup>
 ";
 
-                public static string ProjectConfigurationDescription =
+                internal const string ProjectConfigurationDescription =
                     @"    <ProjectConfiguration Include=""[configName]|[platformName]"">
       <Configuration>[configName]</Configuration>
       <Platform>[platformName]</Platform>
     </ProjectConfiguration>
 ";
 
-                public static string ProjectImportProps =
+                internal const string ProjectImportProps =
                     @"    <Import Project=""[importedPropsFile]"" />
 ";
 
-                public static string ProjectConfigurationImportProps =
+                internal const string ProjectConfigurationImportProps =
                     @"    <Import Project=""[importedPropsFile]"" Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"" />
 ";
 
-                public static string ProjectBuildMacroEnvironmentVariable =
+                internal const string ProjectBuildMacroEnvironmentVariable =
                     @"    <BuildMacro Include=""[environmentVariableName]"">
       <Value>[environmentVariableValue]</Value>
       <EnvironmentVariable>true</EnvironmentVariable>

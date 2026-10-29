@@ -12,142 +12,142 @@ namespace Sharpmake.Generators.VisualStudio
             public static class Solution
             {
                 [Obsolete("Sharpmake doesn't support vs2010 anymore.")]
-                public static string HeaderBeginVs2010 =
+                internal const string HeaderBeginVs2010 =
 @"Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 ";
 
                 [Obsolete("Sharpmake doesn't support vs2012 anymore.")]
-                public static string HeaderBeginVs2012 =
+                internal const string HeaderBeginVs2012 =
 @"Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 ";
                 [Obsolete("Sharpmake doesn't support vs2013 anymore.")]
-                public static string HeaderBeginVs2013 =
+                internal const string HeaderBeginVs2013 =
 @"Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 ";
 
-                public static string HeaderBeginVs2015 =
+                internal const string HeaderBeginVs2015 =
 @"Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 ";
 
-                public static string HeaderBeginVs2017 =
+                internal const string HeaderBeginVs2017 =
 @"Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 ";
 
-                public static string HeaderBeginVs2019 =
+                internal const string HeaderBeginVs2019 =
 @"Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29424.173
 MinimumVisualStudioVersion = 10.0.40219.1
 ";
 
-                public static string HeaderBeginVs2022 =
+                internal const string HeaderBeginVs2022 =
 @"Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 ";
 
-                public static string HeaderBeginVs2026 =
+                internal const string HeaderBeginVs2026 =
 @"Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 ";
 
-                public static string ProjectBegin =
+                internal const string ProjectBegin =
 @"Project(""{[projectTypeGuid]}"") = ""[projectName]"", ""[projectFile]"", ""{[projectGuid]}""
 ";
 
-                public static string ProjectDependencyBegin =
+                internal const string ProjectDependencyBegin =
 @"	ProjectSection(ProjectDependencies) = postProject
 ";
 
-                public static string ProjectDependency =
+                internal const string ProjectDependency =
 @"		{[projectDependencyGuid]} = {[projectDependencyGuid]}
 ";
 
-                public static string SolutionItemBegin =
+                internal const string SolutionItemBegin =
 @"	ProjectSection(SolutionItems) = preProject
 ";
 
-                public static string SolutionItem =
+                internal const string SolutionItem =
 @"		[solutionItemPath] = [solutionItemPath]
 ";
 
-                public static string ProjectSectionEnd =
+                internal const string ProjectSectionEnd =
 @"	EndProjectSection
 ";
 
-                public static string ProjectEnd =
+                internal const string ProjectEnd =
 @"EndProject
 ";
 
-                public static string ProjectFolder =
+                internal const string ProjectFolder =
 @"Project(""{2150E333-8FDC-42A3-9474-1A3956D46DE8}"") = ""[folderName]"", ""[folderName]"", ""{[folderGuid]}""
 ";
 
-                public static string HeaderEnd =
+                internal const string HeaderEnd =
 @"EndProject
 ";
 
-                public static string GlobalBegin =
+                internal const string GlobalBegin =
 @"Global
 ";
 
-                public static string GlobalEnd =
+                internal const string GlobalEnd =
 @"EndGlobal
 ";
 
-                public static string SolutionProperties =
+                internal const string SolutionProperties =
 @"	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 ";
 
                 [Obsolete("This property is deprecated, scc info shouldn't be stored in the solution files anymore", error: true)]
-                public static string GlobalSectionSolutionSourceCodeControlBegin;
+                internal static readonly string GlobalSectionSolutionSourceCodeControlBegin;
 
                 [Obsolete("This property is deprecated, scc info shouldn't be stored in the solution files anymore", error: true)]
-                public static string GlobalSectionSolutionSourceCodeControlProject;
+                internal static readonly string GlobalSectionSolutionSourceCodeControlProject;
 
                 [Obsolete("This property is deprecated, scc info shouldn't be stored in the solution files anymore", error: true)]
-                public static string GlobalSectionSolutionSourceCodeControlEnd;
+                internal static readonly string GlobalSectionSolutionSourceCodeControlEnd;
 
-                public static string GlobalSectionSolutionConfigurationBegin =
+                internal const string GlobalSectionSolutionConfigurationBegin =
 @"	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 ";
-                public static string GlobalSectionSolutionConfiguration =
+                internal const string GlobalSectionSolutionConfiguration =
 @"		[configurationName]|[category] = [configurationName]|[category]
 ";
-                public static string GlobalSectionSolutionConfigurationEnd =
+                internal const string GlobalSectionSolutionConfigurationEnd =
 @"	EndGlobalSection
 ";
 
-                public static string GlobalSectionProjectConfigurationBegin =
+                internal const string GlobalSectionProjectConfigurationBegin =
 @"	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 ";
 
-                public static string GlobalSectionProjectConfigurationActive =
+                internal const string GlobalSectionProjectConfigurationActive =
 @"		{[projectGuid]}.[configurationName]|[category].ActiveCfg = [projectConf.Name]|[projectPlatform]
 ";
-                public static string GlobalSectionProjectConfigurationBuild =
+                internal const string GlobalSectionProjectConfigurationBuild =
 @"		{[projectGuid]}.[configurationName]|[category].Build.0 = [projectConf.Name]|[projectPlatform]
 ";
-                public static string GlobalSectionProjectConfigurationDeploy =
+                internal const string GlobalSectionProjectConfigurationDeploy =
 @"		{[projectGuid]}.[configurationName]|[category].Deploy.0 = [projectConf.Name]|[projectPlatform]
 ";
-                public static string GlobalSectionProjectConfigurationEnd =
+                internal const string GlobalSectionProjectConfigurationEnd =
 @"	EndGlobalSection
 ";
 
-                public static string NestedProjectBegin =
+                internal const string NestedProjectBegin =
 @"	GlobalSection(NestedProjects) = preSolution
 ";
-                public static string NestedProjectItem =
+                internal const string NestedProjectItem =
 @"		{[nestedChildGuid]} = {[nestedParentGuid]}
 ";
-                public static string NestedProjectEnd =
+                internal const string NestedProjectEnd =
 @"	EndGlobalSection
 ";
             }

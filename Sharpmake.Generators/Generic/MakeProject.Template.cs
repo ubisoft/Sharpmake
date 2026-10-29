@@ -7,7 +7,7 @@ namespace Sharpmake.Generators.Generic
     {
         private static class Template
         {
-            public static string GlobalTemplate =
+            internal const string GlobalTemplate =
 @"include $(CLEAR_VARS)
 
 ifeq ($(COMPIL_FINAL),1)
@@ -60,14 +60,14 @@ LOCAL_LDLIBS := [item.SharedLibraries]
 [item.BuildType]
 ";
 
-            public static string IncludePathTemplate = @"LOCAL_C_INCLUDES += [Path]";
+            internal const string IncludePathTemplate = @"LOCAL_C_INCLUDES += [Path]";
 
-            public static string SourceFileTemplate = @"LOCAL_SRC_FILES += [Path]";
+            internal const string SourceFileTemplate = @"LOCAL_SRC_FILES += [Path]";
 
-            public static string BuildSharedLibraryTemplate = @"include $(BUILD_SHARED_LIBRARY)";
-            public static string BuildStaticLibraryTemplate = @"include $(BUILD_STATIC_LIBRARY)";
+            internal const string BuildSharedLibraryTemplate = @"include $(BUILD_SHARED_LIBRARY)";
+            internal const string BuildStaticLibraryTemplate = @"include $(BUILD_STATIC_LIBRARY)";
 
-            public static string PrebuiltStaticLibraryTemplate =
+            internal const string PrebuiltStaticLibraryTemplate =
 @"include $(CLEAR_VARS)
 LOCAL_MODULE := [item.ModuleName]
 LOCAL_ARM_MODE := [item.ArmMode]

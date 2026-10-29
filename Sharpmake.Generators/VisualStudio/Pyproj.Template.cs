@@ -9,24 +9,24 @@ namespace Sharpmake.Generators.VisualStudio
         {
             public static class Project
             {
-                public static string ProjectBegin =
+                internal const string ProjectBegin =
                 @"<Project DefaultTargets=""Build"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"" ToolsVersion=""4.0"">
 ";
 
-                public static string ProjectEnd =
+                internal const string ProjectEnd =
                 @"</Project>
 ";
 
-                public static string ProjectItemGroupBegin =
+                internal const string ProjectItemGroupBegin =
                 @"  <ItemGroup>
 ";
 
-                public static string ProjectItemGroupEnd =
+                internal const string ProjectItemGroupEnd =
                 @"  </ItemGroup>
 ";
 
 
-                public static string ProjectDescription =
+                internal const string ProjectDescription =
 @"  <PropertyGroup>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>[guid]</ProjectGuid>
@@ -46,7 +46,7 @@ namespace Sharpmake.Generators.VisualStudio
   </PropertyGroup>
 ";
 
-                public static string Interpreter =
+                internal const string Interpreter =
 @"  <Interpreter Include=""[basePath]"">
     <Id>{[guid]}</Id>
     <Version>[version]</Version>
@@ -59,7 +59,7 @@ namespace Sharpmake.Generators.VisualStudio
   </Interpreter>
 ";
 
-                public static string VirtualEnvironmentInterpreter =
+                internal const string VirtualEnvironmentInterpreter =
 @"    <Interpreter Include=""[basePath]"">
       <Id>{[guid]}</Id>
       <BaseInterpreter>[baseGuid]</BaseInterpreter>
@@ -73,31 +73,31 @@ namespace Sharpmake.Generators.VisualStudio
     </Interpreter>
 ";
 
-                public static string ImportPythonTools =
+                internal const string ImportPythonTools =
 @"  <Import Project=""$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets"" />
 ";
 
-                public static string InterpreterReference =
+                internal const string InterpreterReference =
 @"  <InterpreterReference Include=""[guid]\[version]"" />
 ";
 
-                public static string ProjectReferenceBegin =
+                internal const string ProjectReferenceBegin =
 @"    <ProjectReference Include=""[include]"">
 ";
 
-                public static string ProjectReferenceEnd =
+                internal const string ProjectReferenceEnd =
 @"    </ProjectReference>
 ";
-                public static string Private =
+                internal const string Private =
 @"      <Private>[private]</Private>
 ";
-                public static string ReferenceOutputAssembly =
+                internal const string ReferenceOutputAssembly =
 @"      <ReferenceOutputAssembly>[ReferenceOutputAssembly]</ReferenceOutputAssembly>
 ";
-                public static string ProjectGUID =
+                internal const string ProjectGUID =
 @"      <Project>[projectGUID]</Project>
 ";
-                public static string ProjectRefName =
+                internal const string ProjectRefName =
 @"      <Name>[projectRefName]</Name>
 ";
             }

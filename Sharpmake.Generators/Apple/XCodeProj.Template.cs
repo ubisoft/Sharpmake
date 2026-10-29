@@ -1,6 +1,7 @@
 // Copyright (c) Ubisoft. All Rights Reserved.
 // Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
+using System.Collections.Frozen;
 using System.Collections.Generic;
 
 namespace Sharpmake.Generators.Apple
@@ -9,7 +10,7 @@ namespace Sharpmake.Generators.Apple
     {
         private static class Template
         {
-            public static string GlobalHeader =
+            internal const string GlobalHeader =
 @"// !$*UTF8*$!
 {
 	archiveVersion = [archiveVersion];
@@ -19,28 +20,28 @@ namespace Sharpmake.Generators.Apple
 	objects = {
 
 ";
-            public static string GlobalFooter =
+            internal const string GlobalFooter =
 @"	};
 	rootObject = [RootObject.Uid] /* Project object */;
 }
 ";
 
-            public static string SectionBegin = @"/* Begin [item.SectionString] section */
+            internal const string SectionBegin = @"/* Begin [item.SectionString] section */
 ";
-            public static string SectionEnd = @"/* End [item.SectionString] section */
+            internal const string SectionEnd = @"/* End [item.SectionString] section */
 
 ";
 
-            public static string SectionSubItem =
+            internal const string SectionSubItem =
 @"				[item.Uid] /* [item.Identifier] */,
 ";
-            public static string ProjectReferenceSubItem =
+            internal const string ProjectReferenceSubItem =
 @"				{
 					ProductGroup = [group.Uid] /* Products */;
 					ProjectRef = [project.Uid] /* [project.Name] */;
 				},
 ";
-            public static string ProjectTargetAttribute =
+            internal const string ProjectTargetAttribute =
 @"					[item.Uid] /* [item.Identifier] */ = {
 						DevelopmentTeam = [project.DevelopmentTeam];
 						ProvisioningStyle = [project.ProvisioningStyle];
@@ -52,7 +53,7 @@ namespace Sharpmake.Generators.Apple
 					};
 ";
 
-            public static Dictionary<ItemSection, string> Section = new Dictionary<ItemSection, string>
+            internal static readonly FrozenDictionary<ItemSection, string> Section = new Dictionary<ItemSection, string>
             {
                 { ItemSection.PBXBuildFile,
 @"		[item.Uid] /* [item.File.Name] in [item.File.Type] */ = {
@@ -494,30 +495,30 @@ namespace Sharpmake.Generators.Apple
 			defaultConfigurationName = ""[item.DefaultConfiguration.Identifier]"";
 		};
 "               }
-            };
+            }.ToFrozenDictionary();
 
-            public static string CommandLineArgumentsBegin =
+            internal const string CommandLineArgumentsBegin =
 @"      <CommandLineArguments>
 ";
 
-            public static string CommandLineArgument =
+            internal const string CommandLineArgument =
 @"         <CommandLineArgument
             argument = ""[argument]""
             isEnabled = ""YES"">
          </CommandLineArgument>
 ";
 
-            public static string CommandLineArgumentsEnd =
+            internal const string CommandLineArgumentsEnd =
 @"      </CommandLineArguments>";
 
-            public static string EnvironmentVariablesBegin =
+            internal const string EnvironmentVariablesBegin =
 @"      <EnvironmentVariables>
 ";
 
-            public static string EnvironmentVariablesEnd =
+            internal const string EnvironmentVariablesEnd =
 @"      </EnvironmentVariables>";
 
-            public static string EnvironmentVariable =
+            internal const string EnvironmentVariable =
 @"         <EnvironmentVariable
             key = ""[name]""
             value = ""[value]""
@@ -525,7 +526,7 @@ namespace Sharpmake.Generators.Apple
          </EnvironmentVariable>
 ";
 
-            public static string SchemeTestableReference =
+            internal const string SchemeTestableReference =
 @"
          <TestableReference
             skipped = ""NO"">
@@ -541,7 +542,7 @@ namespace Sharpmake.Generators.Apple
             /// <summary>
             /// This section is used to configure the executable to run for native projects.
             /// </summary>
-            public static string SchemeRunnableNativeProject = 
+            internal const string SchemeRunnableNativeProject = 
 @"      <BuildableProductRunnable>
           <BuildableReference
               BuildableIdentifier = ""primary""
@@ -556,7 +557,7 @@ namespace Sharpmake.Generators.Apple
             /// <summary>
             /// This section is used to configure the executable to run for makefile projects.
             /// </summary>
-            public static string SchemeRunnableMakeFileProject =
+            internal const string SchemeRunnableMakeFileProject =
 @"      <PathRunnable
          runnableDebuggingMode = ""0""
          FilePath = ""[runnableFilePath]"">
@@ -572,7 +573,7 @@ namespace Sharpmake.Generators.Apple
             /// SchemeRunnableNativeProject OR SchemeRunnableMakeFileProject
             /// SchemeFileTemplatePart2
             /// </remarks>
-            public static string SchemeFileTemplatePart1 =
+            internal const string SchemeFileTemplatePart1 =
 @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <Scheme
    LastUpgradeVersion = ""0460""
@@ -623,7 +624,7 @@ namespace Sharpmake.Generators.Apple
             /// <summary>
             /// Secondpart of schema file
             /// </summary>
-            public static string SchemeFileTemplatePart2 = 
+            internal const string SchemeFileTemplatePart2 = 
 @"[commandLineArguments]
 [environmentVariables]
       <AdditionalOptions>

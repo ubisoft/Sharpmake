@@ -9,27 +9,27 @@ namespace Sharpmake.Generators.VisualStudio
         {
             public static class Project
             {
-                public static string ProjectBegin =
+                internal const string ProjectBegin =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
 <Project DefaultTargets=""Build"" ToolsVersion=""[toolsVersion]"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
 ";
 
-                public static string ProjectBeginConfigurationDescription =
+                internal const string ProjectBeginConfigurationDescription =
                 @"  <ItemGroup Label=""ProjectConfigurations"">
 ";
 
-                public static string ProjectEndConfigurationDescription =
+                internal const string ProjectEndConfigurationDescription =
                 @"  </ItemGroup>
 ";
 
-                public static string ProjectConfigurationDescription =
+                internal const string ProjectConfigurationDescription =
                 @"    <ProjectConfiguration Include=""[configName]|[platformName]"">
       <Configuration>[configName]</Configuration>
       <Platform>[platformName]</Platform>
     </ProjectConfiguration>
 ";
 
-                public static string ProjectDescription =
+                internal const string ProjectDescription =
 @"  <PropertyGroup Label=""Globals"">
     <ProjectGuid>{[guid]}</ProjectGuid>
     <TargetFrameworkVersion>[targetFrameworkVersion]</TargetFrameworkVersion>
@@ -40,7 +40,7 @@ namespace Sharpmake.Generators.VisualStudio
     <ProjectName>[projectName]</ProjectName>
 ";
 
-                public static readonly string DisableRegistryUse =
+                internal const string DisableRegistryUse =
 @"    <DisableRegistryUse>true</DisableRegistryUse>
 ";
 
@@ -48,77 +48,77 @@ namespace Sharpmake.Generators.VisualStudio
 @"    <DisableInstalledVCTargetsUse>true</DisableInstalledVCTargetsUse>
 ";
 
-                public static string ProjectDescriptionStartPlatformConditional =
+                internal const string ProjectDescriptionStartPlatformConditional =
     @"  <PropertyGroup Label=""Globals"" Condition=""'$(Platform)'=='[platformName]'"">
 ";
 
-                public static string ProjectDescriptionEnd =
+                internal const string ProjectDescriptionEnd =
 @"  </PropertyGroup>
 ";
 
-                public static string ImportCppDefaultProps =
+                internal const string ImportCppDefaultProps =
 @"  <Import Project=""[vcTargetsPath]\Microsoft.Cpp.Default.props"" />
 ";
 
-                public static string PropertyGroupStart =
+                internal const string PropertyGroupStart =
                 @"  <PropertyGroup>
 ";
 
-                public static string PropertyGroupEnd =
+                internal const string PropertyGroupEnd =
                 @"  </PropertyGroup>
 ";
 
-                public static string CustomProperty =
+                internal const string CustomProperty =
                 @"    <[custompropertyname]>[custompropertyvalue]</[custompropertyname]>
 ";
 
-                public static string VCOverridesProperties =
+                internal const string VCOverridesProperties =
 @"    <MSBuildExtensionsPath>[msBuildExtensionsPath]</MSBuildExtensionsPath>
     <[vcInstallDirKey]>[vcInstallDirValue]</[vcInstallDirKey]>
 ";
 
-                public static string VCTargetsPathOverride =
+                internal const string VCTargetsPathOverride =
 @"    <[vcTargetsPathKey]>[vcTargetsPath]</[vcTargetsPathKey]>
 ";
 
-                public static string VCTargetsPathOverrideConditional =
+                internal const string VCTargetsPathOverrideConditional =
 @"    <[vcTargetsPathKey] Condition=""'$(VisualStudioVersion)'=='[vsVersion]'"">[vcTargetsPath]</[vcTargetsPathKey]>
 ";
 
-                public static string ProjectEnd =
+                internal const string ProjectEnd =
                 @"</Project>";
 
-                public static string ProjectAfterConfigurationsGeneral =
+                internal const string ProjectAfterConfigurationsGeneral =
 @"  <Import Project=""[vcTargetsPath]\Microsoft.Cpp.props"" />
   <ImportGroup Label=""ExtensionSettings"">
 ";
-                public static string ProjectAfterConfigurationsGeneralImportPropertySheets =
+                internal const string ProjectAfterConfigurationsGeneralImportPropertySheets =
 @"  <ImportGroup Label=""PropertySheets"">
     <Import Project=""$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"" Condition=""exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')"" Label=""LocalAppDataPlatform"" />
   </ImportGroup>
 ";
 
-                public static string ProjectImportedProps =
+                internal const string ProjectImportedProps =
 @"    <Import Project=""[importedPropsFile]"" />
 ";
 
-                public static string ProjectImportedMasmProps =
+                internal const string ProjectImportedMasmProps =
 @"    <Import Project=""[vcTargetsPath]\BuildCustomizations\masm.props"" />
 ";
 
-                public static string ProjectImportedNasmProps =
+                internal const string ProjectImportedNasmProps =
 @"    <Import Project=""[importedNasmPropsFile]"" />
 ";
 
 
-                public static string ProjectConfigurationImportedProps =
+                internal const string ProjectConfigurationImportedProps =
 @"    <Import Project=""[importedPropsFile]"" Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"" />
 ";
 
-                public static string ProjectImportedPropsEnd =
+                internal const string ProjectImportedPropsEnd =
 @"  </ImportGroup>
 ";
-                public static string ProjectAfterImportedProps =
+                internal const string ProjectAfterImportedProps =
 @"  <PropertyGroup Label=""UserMacros"" />
 ";
 
@@ -126,63 +126,63 @@ namespace Sharpmake.Generators.VisualStudio
                 //  <Import Project=""$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"" Condition=""exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')"" Label=""LocalAppDataPlatform"" />
                 //</ImportGroup>
 
-                public static string ProjectFilesFastBuildFile =
+                internal const string ProjectFilesFastBuildFile =
                 @"    <None Include=""[fastBuildFile]"" />
 ";
 
-                public static string ProjectConfigurationBeginItemDefinition =
+                internal const string ProjectConfigurationBeginItemDefinition =
                 @"  <ItemDefinitionGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
 ";
 
-                public static string ProjectConfigurationEndItemDefinition =
+                internal const string ProjectConfigurationEndItemDefinition =
                 @"  </ItemDefinitionGroup>
 ";
 
-                public static string ProjectTargetsBegin =
+                internal const string ProjectTargetsBegin =
 @"  <Import Project=""[vcTargetsPath]\Microsoft.Cpp.targets"" />
   <ImportGroup Label=""ExtensionTargets"">
 ";
 
-                public static string ProjectTargetsItem =
+                internal const string ProjectTargetsItem =
 @"    <Import Project=""[importedTargetsFile]"" />
 ";
 
-                public static string ProjectMasmTargetsItem =
+                internal const string ProjectMasmTargetsItem =
 @"    <Import Project=""[vcTargetsPath]\BuildCustomizations\masm.targets"" />
 ";
 
-                public static string ProjectNasmTargetsItem =
+                internal const string ProjectNasmTargetsItem =
 @"    <Import Project=""[importedNasmTargetsFile]"" />
 ";
 
-                public static string ProjectConfigurationImportedTargets =
+                internal const string ProjectConfigurationImportedTargets =
 @"    <Import Project=""[importedTargetsFile]"" Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"" />
 ";
 
                 // Support both regular and native package types, whichever happens to exist
                 // possible file extension: .targets and .props
-                public static string ProjectNugetReferenceImport =
+                internal const string ProjectNugetReferenceImport =
 @"    <Import Project=""$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].[fileExtension]"" Condition=""Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].[fileExtension]')"" />
     <Import Project=""$(SolutionDir)\packages\[packageName].[packageVersion]\build\[packageName].[fileExtension]"" Condition=""!Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].[fileExtension]') and Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\[packageName].[fileExtension]')"" />
 ";
 
-                public static string ProjectNugetReferenceError =
+                internal const string ProjectNugetReferenceError =
 @"    <Error Condition=""!Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\[packageName].[fileExtension]') and !Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].[fileExtension]')"" Text=""$([[System.String]]::Format('$(ErrorText)', '$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].[fileExtension]'))"" />
 ";
 
-                public static string ProjectTargetsEnd =
+                internal const string ProjectTargetsEnd =
 @"  </ImportGroup>
 ";
 
-                public static string ProjectCustomTargetsBegin =
+                internal const string ProjectCustomTargetsBegin =
 @"  <Target Name=""[targetName]"" BeforeTargets=""[beforeTargets]"">
 ";
 
-                public static string ProjectCustomTargetsEnd =
+                internal const string ProjectCustomTargetsEnd =
 @"  </Target>
 ";
 
-                public static string ProjectConfigurationsResourceCompile =
+                internal const string ProjectConfigurationsResourceCompile =
                 @"    <ResourceCompile>[options.ResourceCompileTag]
       <PreprocessorDefinitions>[options.ResourcePreprocessorDefinitions];%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>[options.AdditionalResourceIncludeDirectories];%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -190,35 +190,35 @@ namespace Sharpmake.Generators.VisualStudio
     </ResourceCompile>[options.ResourceCompileTag]
 ";
 
-                public static string ProjectConfigurationsPreBuildEvent =
+                internal const string ProjectConfigurationsPreBuildEvent =
                 @"    <PreBuildEvent>
       <Command>[options.PreBuildEvent]</Command>
       <Message>[options.PreBuildEventDescription]</Message>
     </PreBuildEvent>
 ";
 
-                public static string ProjectConfigurationsPreLinkEvent =
+                internal const string ProjectConfigurationsPreLinkEvent =
                 @"    <PreLinkEvent>
       <Command>[options.PreLinkEvent]</Command>
       <Message>[options.PreLinkEventDescription]</Message>
     </PreLinkEvent>
 ";
 
-                public static string ProjectConfigurationsPrePostLinkEvent =
+                internal const string ProjectConfigurationsPrePostLinkEvent =
                 @"    <PrePostLinkEvent>
       <Command>[options.PrePostLinkEvent]</Command>
       <Message>[options.PrePostLinkEventDescription]</Message>
     </PrePostLinkEvent>
 ";
 
-                public static string ProjectConfigurationsPostBuildEvent =
+                internal const string ProjectConfigurationsPostBuildEvent =
                 @"    <PostBuildEvent>
       <Command>[options.PostBuildEvent]</Command>
       <Message>[options.PostBuildEventDescription]</Message>
     </PostBuildEvent>
 ";
 
-                public static string ProjectConfigurationsCustomBuildStep =
+                internal const string ProjectConfigurationsCustomBuildStep =
                 @"    <CustomBuildStep>
       <Command>[options.CustomBuildStep]</Command>
       <Message>[options.CustomBuildStepDescription]</Message>
@@ -228,7 +228,7 @@ namespace Sharpmake.Generators.VisualStudio
     </CustomBuildStep>
 ";
 
-                public static string ProjectConfigurationsManifestTool =
+                internal const string ProjectConfigurationsManifestTool =
                 @"    <Manifest>
       <EnableDpiAwareness>[options.EnableDpiAwareness]</EnableDpiAwareness>
       <AdditionalManifestFiles>[options.AdditionalManifestFiles]</AdditionalManifestFiles>
@@ -236,7 +236,7 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
 
-                public static string ProjectConfigurationsCustomBuildEvent =
+                internal const string ProjectConfigurationsCustomBuildEvent =
                 @"    <CustomBuildStep>
       <Command>[options.CustomBuildEvent]</Command>
       <Message>[options.CustomBuildEventDescription]</Message>
@@ -244,175 +244,175 @@ namespace Sharpmake.Generators.VisualStudio
     </CustomBuildStep>
 ";
 
-                public static string ProjectFilesBegin =
+                internal const string ProjectFilesBegin =
                 @"  <ItemGroup>
 ";
 
-                public static string ProjectFilesEnd =
+                internal const string ProjectFilesEnd =
                 @"  </ItemGroup>
 ";
 
-                public static string ProjectFilesHeader =
+                internal const string ProjectFilesHeader =
                 @"    <ClInclude Include=""[file.FilePath]"" />
 ";
 
-                public static string ProjectFilesNatvis =
+                internal const string ProjectFilesNatvis =
                 @"    <Natvis Include=""[file.FilePath]"" />
 ";
 
-                public static string ProjectFilesSourceBegin =
+                internal const string ProjectFilesSourceBegin =
                 @"    <ClCompile Include=""[file.FilePath]""";
 
-                public static string ProjectFilesResourceBegin =
+                internal const string ProjectFilesResourceBegin =
                 @"    <ResourceCompile Include=""[file.FilePath]""";
 
-                public static string ProjectFilesPRIResources =
+                internal const string ProjectFilesPRIResources =
                 @"    <PRIResource Include=""[file.FilePath]"">
       <FileType>Document</FileType>
     </PRIResource>
 ";
 
-                public static string ProjectFilesNone =
+                internal const string ProjectFilesNone =
                 @"    <None Include=""[file.FilePath]"" />
 ";
 
-                public static string ProjectFilesCustomSourceBegin =
+                internal const string ProjectFilesCustomSourceBegin =
                 @"    <[type] Include=""[file.FilePath]""";
 
 
-                public static string ProjectFilesResourceEnd =
+                internal const string ProjectFilesResourceEnd =
                 @"    </ResourceCompile>
 ";
 
-                public static string ProjectFilesCustomBuildBegin =
+                internal const string ProjectFilesCustomBuildBegin =
                 @"    <CustomBuild Include=""[file]"">
       <FileType>[filetype]</FileType>
 ";
 
-                public static string ProjectFilesCustomBuildDescription =
+                internal const string ProjectFilesCustomBuildDescription =
                 @"      <Message Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">[description]</Message>
 ";
 
-                public static string ProjectFilesCustomBuildCommand =
+                internal const string ProjectFilesCustomBuildCommand =
                 @"      <Command Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">[command]</Command>
 ";
 
-                public static string ProjectFilesCustomBuildInputs =
+                internal const string ProjectFilesCustomBuildInputs =
                 @"      <AdditionalInputs Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">[inputs]</AdditionalInputs>
 ";
 
-                public static string ProjectFilesCustomBuildOutputs =
+                internal const string ProjectFilesCustomBuildOutputs =
                 @"      <Outputs Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">[outputs]</Outputs>
 ";
 
-                public static string ProjectFilesCustomBuildLinkObject =
+                internal const string ProjectFilesCustomBuildLinkObject =
 @"      <LinkObjects Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">[linkobjects]</LinkObjects>
 ";
 
-                public static string ProjectFilesCustomBuildOutputItemType =
+                internal const string ProjectFilesCustomBuildOutputItemType =
 @"      <OutputItemType>[outputItemType]</OutputItemType>
 ";
 
-                public static string ProjectFilesCustomBuildEnd =
+                internal const string ProjectFilesCustomBuildEnd =
                 @"    </CustomBuild>
 ";
-                public static string ProjectFilesSourceEnd =
+                internal const string ProjectFilesSourceEnd =
                 @" />
 ";
 
-                public static string ProjectFilesCustomSourceEnd =
+                internal const string ProjectFilesCustomSourceEnd =
                 @" />
 ";
 
-                public static string ProjectFilesSourceBeginOptions =
+                internal const string ProjectFilesSourceBeginOptions =
                 @">
 ";
 
-                public static string ProjectFilesCustomSourceBeginOptions =
+                internal const string ProjectFilesCustomSourceBeginOptions =
                 @">
 ";
 
-                public static string ProjectFilesSourceEndOptions =
+                internal const string ProjectFilesSourceEndOptions =
                 @"    </ClCompile>
 ";
 
-                public static string ProjectFilesCustomSourceEndOptions =
+                internal const string ProjectFilesCustomSourceEndOptions =
                 @"    </[type]>
 ";
 
-                public static string ProjectFilesSourceObjectFileName =
+                internal const string ProjectFilesSourceObjectFileName =
                 @"      <ObjectFileName Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">[ObjectFileName]</ObjectFileName>
 ";
 
 
-                public static string ProjectFilesSourcePrecompCreate =
+                internal const string ProjectFilesSourcePrecompCreate =
                 @"      <PrecompiledHeader Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">Create</PrecompiledHeader>
 ";
 
-                public static string ProjectFilesSourcePrecompNotUsing =
+                internal const string ProjectFilesSourcePrecompNotUsing =
                 @"      <PrecompiledHeader Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">NotUsing</PrecompiledHeader>
 ";
 
-                public static string ProjectFilesForcedIncludeVanilla =
+                internal const string ProjectFilesForcedIncludeVanilla =
                 @"      <ForcedIncludeFiles Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">[options.ForcedIncludeFilesVanilla]</ForcedIncludeFiles>
 ";
 
-                public static string ProjectFilesAdditionalForcedInclude =
+                internal const string ProjectFilesAdditionalForcedInclude =
                 @"      <ForcedIncludeFiles Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">%(ForcedIncludeFiles);[ForcedIncludeFiles]</ForcedIncludeFiles>
 ";
 
-                public static string ProjectFilesAdditionalForcedIncludeVanilla =
+                internal const string ProjectFilesAdditionalForcedIncludeVanilla =
                 @"      <ForcedIncludeFiles Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">[options.ForcedIncludeFilesVanilla];[ForcedIncludeFiles]</ForcedIncludeFiles>
 ";
 
-                public static string ProjectFilesSourceExcludeFromBuild =
+                internal const string ProjectFilesSourceExcludeFromBuild =
                 @"      <ExcludedFromBuild Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">true</ExcludedFromBuild>
 ";
-                public static string ProjectFilesSourceConsumeWinRTExtensions =
+                internal const string ProjectFilesSourceConsumeWinRTExtensions =
                 @"      <CompileAsWinRT Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">true</CompileAsWinRT>
 ";
-                public static string ProjectFilesSourceExcludeWinRTExtensions =
+                internal const string ProjectFilesSourceExcludeWinRTExtensions =
                 @"      <CompileAsWinRT Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">false</CompileAsWinRT>
 ";
 
-                public static string ProjectFilesSourceEnableExceptions =
+                internal const string ProjectFilesSourceEnableExceptions =
                 @"      <ExceptionHandling Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">[exceptionSetting]</ExceptionHandling>
 ";
 
-                public static string ProjectFilesSourceCompileAsC =
+                internal const string ProjectFilesSourceCompileAsC =
                 @"      <CompileAs Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">CompileAsC</CompileAs>
 ";
 
-                public static string ProjectFilesSourceCompileAsCPP =
+                internal const string ProjectFilesSourceCompileAsCPP =
                 @"      <CompileAs Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">CompileAsCPP</CompileAs>
 ";
 
-                public static string ProjectFilesSourceCompileAsCLR =
+                internal const string ProjectFilesSourceCompileAsCLR =
                 @"      <CompileAsManaged Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">true</CompileAsManaged>
 ";
 
-                public static string ProjectFilesSourceDoNotCompileAsCLR =
+                internal const string ProjectFilesSourceDoNotCompileAsCLR =
                 @"      <CompileAsManaged Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">false</CompileAsManaged>
 ";
-                public static string ProjectFilesSourceDefine =
+                internal const string ProjectFilesSourceDefine =
                 @"      <PreprocessorDefinitions Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">[ProjectFilesSourceDefine];%(PreprocessorDefinitions)</PreprocessorDefinitions>
 ";
 
-                public static string ProjectFilesSourceExcludeGenerateXmlDocumentation =
+                internal const string ProjectFilesSourceExcludeGenerateXmlDocumentation =
                 @"      <GenerateXMLDocumentationFiles Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">false</GenerateXMLDocumentationFiles>
 ";
 
-                public static string SingleReferenceByName =
+                internal const string SingleReferenceByName =
                     @"    <Reference Include=""[include]"" />
 ";
 
-                public static string ReferenceByName =
+                internal const string ReferenceByName =
 @"    <Reference Include=""[include]"">
       <Private>[private]</Private>
     </Reference>";
 
 
-                public static string ProjectReference =
+                internal const string ProjectReference =
 @"    <ProjectReference Include=""[include]"">
       <Project>{[projectGUID]}</Project>
       <Name>[projectRefName]</Name>
@@ -424,61 +424,61 @@ namespace Sharpmake.Generators.VisualStudio
     </ProjectReference>
 ";
 
-                public static string ReferenceByPath =
+                internal const string ReferenceByPath =
 @"    <Reference Include=""[include]"" Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
       <HintPath>[hintPath]</HintPath>
       <Private>[private]</Private>
     </Reference>
 ";
-                public static string ProjectBuildMacroEnvironmentVariable =
+                internal const string ProjectBuildMacroEnvironmentVariable =
 @"    <BuildMacro Include=""[environmentVariableName]"">
       <Value>[environmentVariableValue]</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
 ";
 
-                public static string ItemGroupBegin =
+                internal const string ItemGroupBegin =
 @"  <ItemGroup>
 ";
 
-                public static string ItemGroupEnd =
+                internal const string ItemGroupEnd =
 @"  </ItemGroup>
 ";
 
-                public static readonly string PlatformFolderOverride =
+                internal const string PlatformFolderOverride =
 @"    <_PlatformFolder>[platformFolder]</_PlatformFolder>
 ";
 
-                public static readonly string AdditionalVCTargetsPath =
+                internal const string AdditionalVCTargetsPath =
                     @"    <AdditionalVCTargetsPath>[additionalVCTargetsPath]</AdditionalVCTargetsPath>
     <_VCTargetsPathForToolset>$(AdditionalVCTargetsPath)</_VCTargetsPathForToolset>
 ";
 
                 internal static class Filters
                 {
-                    public static string Begin =
+                    internal const string Begin =
 @"<?xml version=""1.0"" encoding=""utf-8""?>
 <Project ToolsVersion=""[toolsVersion]"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
 ";
 
-                    public static string ProjectFiltersEnd =
+                    internal const string ProjectFiltersEnd =
 @"</Project>";
 
-                    public static string FileNoFilter =
+                    internal const string FileNoFilter =
 @"    <[type] Include=""[file.FilePath]"" />
 ";
 
-                    public static string FileWithFilter =
+                    internal const string FileWithFilter =
 @"    <[type] Include=""[file.FilePath]"">
       <Filter>[file.FilterPath]</Filter>
     </[type]>
 ";
 
-                    public static string FileWithDependencyFilter =
+                    internal const string FileWithDependencyFilter =
 @"    <CustomBuild Include=""[fileName]"" />
 ";
 
-                    public static string Filter =
+                    internal const string Filter =
 @"    <Filter Include=""[name]"">
       <UniqueIdentifier>{[guid]}</UniqueIdentifier>
     </Filter>

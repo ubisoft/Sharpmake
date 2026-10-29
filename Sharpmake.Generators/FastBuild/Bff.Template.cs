@@ -9,7 +9,7 @@ namespace Sharpmake.Generators.FastBuild
         {
             public static class ConfigurationFile
             {
-                public static string HeaderFile = @"
+                internal const string HeaderFile = @"
 //=================================================================================================================
 // [fastBuildProjectName] FASTBuild config file
 //=================================================================================================================
@@ -17,32 +17,32 @@ namespace Sharpmake.Generators.FastBuild
 
 ";
 
-                public static string Define = @"#define [fastBuildDefine]
+                internal const string Define = @"#define [fastBuildDefine]
 ";
 
 
-                public static string CustomSectionHeader = @"
+                internal const string CustomSectionHeader = @"
 //=================================================================================================================
 // FASTBuild custom section
 //=================================================================================================================
 ";
 
 
-                public static string Includes = @"
+                internal const string Includes = @"
 //=================================================================================================================
 // [fastBuildProjectName] .bff includes
 //=================================================================================================================
 [fastBuildOrderedBffDependencies]
 ";
 
-                public static string GlobalConfigurationInclude = @"
+                internal const string GlobalConfigurationInclude = @"
 //=================================================================================================================
 // Global Configuration include
 //=================================================================================================================
 [fastBuildGlobalConfigurationInclude]
 ";
 
-                public static string GlobalSettings = @"
+                internal const string GlobalSettings = @"
 //=================================================================================================================
 // Global Settings
 //=================================================================================================================
@@ -58,7 +58,7 @@ Settings
 }
 ";
 
-                public static string ConcurrencyGroup =
+                internal const string ConcurrencyGroup =
 @"[fastBuildConcurrencyGroupSectionName] =
 [
     .ConcurrencyGroupName = '[fastBuildConcurrencyGroupName]'
@@ -66,11 +66,11 @@ Settings
     .ConcurrencyPerJobMiB = [fastBuildConcurrencyPerJobMiB]
 ]
 ";
-                public static string AllowCaching = @"
+                internal const string AllowCaching = @"
     .AllowCaching = [fastBuildAllowCaching]
 ";
 
-                public static readonly string WinEnvironment =
+                internal const string WinEnvironment =
 @"    #import TMP
     #import TEMP
     #import USERPROFILE
@@ -87,7 +87,7 @@ Settings
     }
 ";
 
-                public static readonly string OsxEnvironment =
+                internal const string OsxEnvironment =
 @"    #import TMPDIR
     .Environment =
     {
@@ -97,7 +97,7 @@ Settings
     }
 ";
 
-                public static readonly string LinuxEnvironment =
+                internal const string LinuxEnvironment =
 @"    .Environment =
     {
         ""PATH=[fastBuildPATH]""
@@ -105,11 +105,11 @@ Settings
     }
 ";
 
-                public static string MasmConfigNameSuffix = "Masm";
-                public static string NasmConfigNameSuffix = "Nasm";
-                public static string Win64ConfigName = ".win64Config";
+                internal const string MasmConfigNameSuffix = "Masm";
+                internal const string NasmConfigNameSuffix = "Nasm";
+                internal const string Win64ConfigName = ".win64Config";
 
-                public static string CompilerSetting = @"
+                internal const string CompilerSetting = @"
 //=================================================================================================================
 Compiler( '[fastbuildCompilerName]' )
 {
@@ -122,7 +122,7 @@ Compiler( '[fastbuildCompilerName]' )
 }
 ";
 
-                internal static string ResourceCompilerSettings = @"
+                internal const string ResourceCompilerSettings = @"
 Compiler( '[fastBuildResourceCompilerName]' )
 {
     .Executable             = '[fastBuildResourceCompiler]'
@@ -130,7 +130,7 @@ Compiler( '[fastBuildResourceCompilerName]' )
 }
 ";
 
-                internal static string MasmCompilerSettings = @"
+                internal const string MasmCompilerSettings = @"
 Compiler( '[fastBuildMasmCompilerName]' )
 {
     .Executable             = '[fastBuildMasmCompiler]'
@@ -139,7 +139,7 @@ Compiler( '[fastBuildMasmCompilerName]' )
 ";
 
                 // TODOANT
-                internal static string NasmCompilerSettings = @"
+                internal const string NasmCompilerSettings = @"
 Compiler( '[fastBuildNasmCompilerName]' )
 {
     .Executable             = '[fastBuildNasmCompiler]'
@@ -147,7 +147,7 @@ Compiler( '[fastBuildNasmCompilerName]' )
 }
 ";
 
-                public static string CompilerConfiguration = @"
+                internal const string CompilerConfiguration = @"
 [fastBuildConfigurationName] =
 [
     Using( [fastBuildUsing] )
@@ -163,7 +163,7 @@ Compiler( '[fastBuildNasmCompilerName]' )
 ]
 ";
 
-                public static string LinkerOptions = @"
+                internal const string LinkerOptions = @"
     .LinkerOptions          = '/OUT:""%2""[dllOption]'
                             // Input files
                             // ---------------------------
@@ -234,7 +234,7 @@ Compiler( '[fastBuildNasmCompilerName]' )
                             + ' [options.AdditionalLinkerOptions]'
 ";
 
-                public static string PCHOptions = @"
+                internal const string PCHOptions = @"
     // Precompiled Headers options
     // ---------------------------
     .PCHInputFile           = '[fastBuildPrecompiledSourceFile]'
@@ -247,7 +247,7 @@ Compiler( '[fastBuildNasmCompilerName]' )
                             + ' $CompilerOptimizations$'
 
 ";
-                public static string PCHOptionsClang = @"
+                internal const string PCHOptionsClang = @"
     // Precompiled Header options for Clang
     // ------------------------------------
     .PCHInputFile           = '[fastBuildPrecompiledSourceFile]'
@@ -258,18 +258,18 @@ Compiler( '[fastBuildNasmCompilerName]' )
                             + ' $CompilerOptimizations$'
 
 ";
-                public static string PCHOptionsDeoptimize = @"
+                internal const string PCHOptionsDeoptimize = @"
     .PCHOptionsDeoptimized = .PCHOptions
 ";
 
-                public static string UsePrecompClang = @"-include-pch $PCHOutputFile$'
+                internal const string UsePrecompClang = @"-include-pch $PCHOutputFile$'
                             + ' [options.AdditionalCompilerOptionsOnPCHUse]'
                             + '";
-                public static string UsePrecomp = @"/Yu""[cmdLineOptions.PrecompiledHeaderThrough]"" /Fp""$PCHOutputFile$""'
+                internal const string UsePrecomp = @"/Yu""[cmdLineOptions.PrecompiledHeaderThrough]"" /Fp""$PCHOutputFile$""'
                             + ' [options.AdditionalCompilerOptionsOnPCHUse]'
                             + ' [fastBuildPCHForceInclude]";
 
-                public static string ResourceCompilerOptions = @"
+                internal const string ResourceCompilerOptions = @"
     // Resource Compiler options
     // -------------------------
     .Compiler               = .ResourceCompiler
@@ -280,13 +280,13 @@ Compiler( '[fastBuildNasmCompilerName]' )
 
 ";
 
-                public static string ResourceCompilerExtraOptions = @"
+                internal const string ResourceCompilerExtraOptions = @"
     .ResourceCompilerExtraOptions   = ' /l 0x0409 /nologo'
                                     + ' [cmdLineOptions.AdditionalResourceIncludeDirectories]'
                                     + ' [cmdLineOptions.ResourcePreprocessorDefinitions]'
 ";
 
-                public static string EmbeddedResourceCompilerOptions = @"
+                internal const string EmbeddedResourceCompilerOptions = @"
     // Resource Compiler options
     // -------------------------
     .Compiler               = '[fastBuildEmbeddedResourceCompiler]'
@@ -298,7 +298,7 @@ Compiler( '[fastBuildNasmCompilerName]' )
 
 ";
 
-                public static string CompilerOptionsCommon = @"
+                internal const string CompilerOptionsCommon = @"
     .CompilerInputUnity       = '[fastBuildUnityName]'
     .CompilerOutputPath       = '$Intermediate$'
     .CompilerInputPath        = [fastBuildInputPath]
@@ -309,7 +309,7 @@ Compiler( '[fastBuildNasmCompilerName]' )
 
 ";
 
-                public static string CompilerOptionsCPP = @"
+                internal const string CompilerOptionsCPP = @"
     // Compiler options
     // ----------------
     .CompilerOptions        = '""%1"" /Fo""%2"" /c'
@@ -317,21 +317,21 @@ Compiler( '[fastBuildNasmCompilerName]' )
                             + ' $CompilerExtraOptions$'
                             + ' $CompilerOptimizations$'
 ";
-                public static string CompilerOptionsMasm = @"
+                internal const string CompilerOptionsMasm = @"
     // Compiler options
     // ----------------
     .CompilerOptions        = ' $CompilerExtraOptions$'
                             + ' /Fo""%2"" /c /Ta ""%1""'
 ";
                 // TODOANT
-                public static string CompilerOptionsNasm = @"
+                internal const string CompilerOptionsNasm = @"
     // Compiler options
     // ----------------
     .CompilerOptions        = ' $CompilerExtraOptions$'
                             + ' -Xvc -Ox -o""%2"" ""%1""'
                             + ' [cmdLineOptions.NasmCompilerFormat] '
 ";
-                public static string CompilerOptionsClang = @"
+                internal const string CompilerOptionsClang = @"
     // Compiler options
     // ----------------
     .CompilerOptions        = '[fastBuildClangFileLanguage]""%1"" -o ""%2"" -c'
@@ -340,11 +340,11 @@ Compiler( '[fastBuildNasmCompilerName]' )
                             + ' $CompilerOptimizations$'
 ";
 
-                public static string LibrarianAdditionalInputs = @"
+                internal const string LibrarianAdditionalInputs = @"
     .LibrarianAdditionalInputs = [fastBuildLibrarianAdditionalInputs]
 ";
 
-                public static string LibrarianOptions = @"
+                internal const string LibrarianOptions = @"
     .LibrarianOutput        = '[fastBuildOutputFile]'
     .LibrarianOptions       = '""%1"" /OUT:""%2""'
                             + ' [cmdLineOptions.LinkerSuppressStartupBanner]'
@@ -353,14 +353,14 @@ Compiler( '[fastBuildNasmCompilerName]' )
 
 ";
 
-                public static string LibrarianOptionsClang = @"
+                internal const string LibrarianOptionsClang = @"
     .LibrarianOutput        = '[fastBuildOutputFile]'
     .LibrarianOptions       = 'rcs[cmdLineOptions.UseThinArchives] ""%2"" ""%1""'
                             + ' [options.AdditionalLibrarianOptions]'
 
 ";
 
-                public static string MasmCompilerExtraOptions = @"
+                internal const string MasmCompilerExtraOptions = @"
     .CompilerExtraOptions   = ''
             + ' [cmdLineOptions.AdditionalAssemblyIncludeDirectories]'
             + ' /nologo'
@@ -370,14 +370,14 @@ Compiler( '[fastBuildNasmCompilerName]' )
 ";
 
                 // TODOANT: NasmCompilerExtraOptions
-                public static string NasmCompilerExtraOptions = @"
+                internal const string NasmCompilerExtraOptions = @"
     .CompilerExtraOptions   = ''
             + ' [cmdLineOptions.AdditionalAssemblyNasmIncludeDirectories]'
             + ' [cmdLineOptions.NasmPreprocessorDefinitions]'
             + ' [cmdLineOptions.PreIncludedFiles]'
 ";
 
-                public static string CPPCompilerExtraOptions = @"
+                internal const string CPPCompilerExtraOptions = @"
     .CompilerExtraOptions   = ''
             + ' [cmdLineOptions.AdditionalIncludeDirectories]'
             + ' [cmdLineOptions.AdditionalUsingDirectories]'
@@ -437,7 +437,7 @@ Compiler( '[fastBuildNasmCompilerName]' )
             + ' [options.AdditionalCompilerOptions]'
             + ' [fastBuildCompilerForceUsing]'
 ";
-                public static string CPPCompilerOptimizationOptions =
+                internal const string CPPCompilerOptimizationOptions =
 @"
     .CompilerOptimizations = ''
             + ' [cmdLineOptions.Optimization]'
@@ -452,7 +452,7 @@ Compiler( '[fastBuildNasmCompilerName]' )
             + ' [options.AdditionalCompilerOptimizeOptions]'
 ";
 
-                public static string CPPCompilerOptionsDeoptimize = @"
+                internal const string CPPCompilerOptionsDeoptimize = @"
     .CompilerOptionsDeoptimized = '""%1"" /Fo""%2"" /c'
                             + ' [fastBuildCompilerPCHOptions]'
                             + ' [fastBuildPCHForceInclude]'
@@ -460,33 +460,33 @@ Compiler( '[fastBuildNasmCompilerName]' )
                             + ' /Od'
 ";
 
-                public static readonly string ClangCompilerOptionsDeoptimize = @"
+                internal const string ClangCompilerOptionsDeoptimize = @"
     .CompilerOptionsDeoptimized = '[fastBuildClangFileLanguage]""%1"" -o ""%2"" -c'
                             + ' [fastBuildCompilerPCHOptionsClang]'
                             + ' $CompilerExtraOptions$'
                             + ' [fastBuildCompilerDeoptimizeOptionClang]'
 ";
-                public static string DeOptimizeOption = @"
+                internal const string DeOptimizeOption = @"
     .DeoptimizeWritableFiles = [fastBuildDeoptimizationWritableFiles]
     .DeoptimizeWritableFilesWithToken = [fastBuildDeoptimizationWritableFilesWithToken]
 ";
-                public static string PreBuildDependencies = @"
+                internal const string PreBuildDependencies = @"
     .PreBuildDependencies = [fastBuildPreBuildTargets]
 ";
 
-                public static string PlatformBeginSection = @"
+                internal const string PlatformBeginSection = @"
 ////////////////////////////////////////////////////////////////////////////////
 // PLATFORM SPECIFIC SECTION
 #if [fastBuildDefine]
 ";
 
-                public static string PlatformEndSection = @"
+                internal const string PlatformEndSection = @"
 #endif // [fastBuildDefine]
 ////////////////////////////////////////////////////////////////////////////////
 ";
 
 
-                public static string LibBeginSection = @"
+                internal const string LibBeginSection = @"
 //=================================================================================================================
 Library( '[fastBuildOutputFileShortName]_[fastBuildOutputType]' )
 {
@@ -494,9 +494,9 @@ Library( '[fastBuildOutputFileShortName]_[fastBuildOutputType]' )
     .Intermediate           = '[cmdLineOptions.IntermediateDirectory]\'
 ";
 
-                public static string EndSection = "}\n\n";
+                internal const string EndSection = "}\n\n";
 
-                public static string TargetSection = @"
+                internal const string TargetSection = @"
 //=================================================================================================================
 Alias( '[fastBuildOutputFileShortName]' )
 {
@@ -505,7 +505,7 @@ Alias( '[fastBuildOutputFileShortName]' )
 
 ";
 
-                public static string TargetForLibraryDependencySection = @"
+                internal const string TargetForLibraryDependencySection = @"
 //=================================================================================================================
 Alias( '[fastBuildOutputFileShortName]_LibraryDependency' )
 {
@@ -514,7 +514,7 @@ Alias( '[fastBuildOutputFileShortName]_LibraryDependency' )
 
 ";
 
-                public static string CopyFileSection = @"
+                internal const string CopyFileSection = @"
 //=================================================================================================================
 Copy( '[fastBuildCopyAlias]' )
 {
@@ -525,7 +525,7 @@ Copy( '[fastBuildCopyAlias]' )
 
 ";
 
-                public static string ExeDllBeginSection = @"
+                internal const string ExeDllBeginSection = @"
 //=================================================================================================================
 [fastBuildOutputType]( '[fastBuildOutputFileShortName]_[fastBuildOutputType]' )
 {
@@ -541,7 +541,7 @@ Copy( '[fastBuildCopyAlias]' )
     .ConcurrencyGroupName   = '[fastbuildConcurrencyGroupName]'
 ";
 
-                public static string ResourcesBeginSection = @"
+                internal const string ResourcesBeginSection = @"
 //=================================================================================================================
 ObjectList( '[fastBuildOutputFileShortName]_resources' )
 {
@@ -549,7 +549,7 @@ ObjectList( '[fastBuildOutputFileShortName]_resources' )
     .Intermediate           = '[cmdLineOptions.IntermediateDirectory]\'
 ";
 
-                public static string EmbeddedResourcesBeginSection = @"
+                internal const string EmbeddedResourcesBeginSection = @"
 //=================================================================================================================
 ObjectList( '[fastBuildOutputFileShortName]_embedded' )
 {
@@ -557,7 +557,7 @@ ObjectList( '[fastBuildOutputFileShortName]_embedded' )
     .Intermediate           = '[cmdLineOptions.IntermediateDirectory]\'
 ";
 
-                public static string ObjectListBeginSection = @"
+                internal const string ObjectListBeginSection = @"
 //=================================================================================================================
 ObjectList( '[fastBuildOutputFileShortName]_objects' )
 {
@@ -565,7 +565,7 @@ ObjectList( '[fastBuildOutputFileShortName]_objects' )
     .Intermediate           = '[cmdLineOptions.IntermediateDirectory]\'
 ";
 
-                public static string GenericExecutableSection = @"
+                internal const string GenericExecutableSection = @"
 //=================================================================================================================
 Exec( '[fastBuildPreBuildName]' )
 {
@@ -582,7 +582,7 @@ Exec( '[fastBuildPreBuildName]' )
 
 ";
 
-                public static string TestSection = @"
+                internal const string TestSection = @"
 //=================================================================================================================
 Test( '[fastBuildTest]' )
 {
@@ -597,12 +597,12 @@ Test( '[fastBuildTest]' )
 
 ";
 
-                public static string UnityBeginSection = @"
+                internal const string UnityBeginSection = @"
 //=================================================================================================================
 // Master .bff Unity/Blob files (shared across configs)
 //=================================================================================================================
 ";
-                public static string UnitySection = @"
+                internal const string UnitySection = @"
 Unity( '[unityFile.UnityName]' )
 {
     .UnityInputPath                     = [unityFile.UnityInputPath]
@@ -624,7 +624,7 @@ Unity( '[unityFile.UnityName]' )
 }
 ";
 
-                public static string CopyDirSection = @"
+                internal const string CopyDirSection = @"
 //=================================================================================================================
 CopyDir( '[fastBuildCopyDirName]' )
 {
@@ -636,7 +636,7 @@ CopyDir( '[fastBuildCopyDirName]' )
 }
 ";
                 // All config sections. For now this section is used for submit assistant(when there is a source file filter)
-                public static string AllConfigsSection = @"
+                internal const string AllConfigsSection = @"
 //=================================================================================================================
 // All Configs Alias
 //=================================================================================================================
@@ -647,7 +647,7 @@ Alias( 'All-Configs' )
 }
 ";
 
-                public static string IncludeMasterBff = @"
+                internal const string IncludeMasterBff = @"
 //=================================================================================================================
 // Entry BFF for [solutionFileName]
 //=================================================================================================================

@@ -7,32 +7,32 @@ namespace Sharpmake.Generators.Apple
     {
         private static class Template
         {
-            public static string Header =
+            internal const string Header =
 @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <Workspace
    version = ""1.0"">
 ";
-            public static string Footer = "</Workspace>";
+            internal const string Footer = "</Workspace>";
 
-            public static string ProjectReference = "\t<FileRef\n\t\tlocation = \"group:[projectName].xcodeproj\">\n\t</FileRef>\n";
+            internal const string ProjectReference = "\t<FileRef\n\t\tlocation = \"group:[projectName].xcodeproj\">\n\t</FileRef>\n";
 
-            public static string ProjectReferenceAbsolute =
+            internal const string ProjectReferenceAbsolute =
 @"[indent]    <FileRef
 [indent]        location = ""absolute:[projectPath]"">
 [indent]    </FileRef>
 ";
 
-            public static string ProjectReferenceRelative =
+            internal const string ProjectReferenceRelative =
 @"[indent]    <FileRef
 [indent]        location = ""group:[projectName].xcodeproj"">
 [indent]    </FileRef>
 ";
-            public static string GroupBegin =
+            internal const string GroupBegin =
 @"[indent]    <Group
 [indent]        location = ""container:""
 [indent]        name = ""[folderName]"">
 ";
-            public static string GroupEnd =
+            internal const string GroupEnd =
 @"[indent]    </Group>
 ";
         }

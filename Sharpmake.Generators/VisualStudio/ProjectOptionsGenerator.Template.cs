@@ -11,19 +11,19 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 // Manifest file contents copied from example on msdn page here:
                 // https://learn.microsoft.com/en-us/windows/win32/hidpi/setting-the-default-dpi-awareness-for-a-process#setting-default-awareness-with-the-application-manifest
-                public static readonly string FileBegin = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+                internal const string FileBegin = @"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
 <assembly xmlns=""urn:schemas-microsoft-com:asm.v1"" manifestVersion=""1.0"">
   <application xmlns=""urn:schemas-microsoft-com:asm.v3"">
     <windowsSettings>";
 
                 // Include both dpiAware and dpiAwareness values for "backwards compatibility", though it should be good enough to just specify dpiAwareness = PerMonitorV2
                 // See msdn link above for more info on the dpiAwareness configuration values.
-                public static readonly string DPIAwarenessSettings = @"
+                internal const string DPIAwarenessSettings = @"
       <dpiAware xmlns=""http://schemas.microsoft.com/SMI/2005/WindowsSettings"">true/PM</dpiAware>
       <dpiAwareness xmlns=""http://schemas.microsoft.com/SMI/2016/WindowsSettings"">PerMonitorV2,PerMonitor</dpiAwareness>
 ";
 
-                public static readonly string FileEnd =
+                internal const string FileEnd =
 @"    </windowsSettings>
   </application>
 </assembly>";
