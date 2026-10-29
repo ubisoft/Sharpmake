@@ -9,23 +9,23 @@ namespace Sharpmake.Generators.VisualStudio
         {
             public static class Project
             {
-                public static string ProjectBegin =
+                internal const string ProjectBegin =
 @"<?xml version=""1.0"" encoding=""utf-8""?>
 <Project DefaultTargets=""Build"" ToolsVersion=""[toolsVersion]"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
 ";
 
-                public static string ProjectBeginVs2017 =
+                internal const string ProjectBeginVs2017 =
 @"<?xml version=""1.0"" encoding=""utf-8""?>
 <Project ToolsVersion=""[toolsVersion]"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
 ";
-                public static string ProjectBeginNetCore =
+                internal const string ProjectBeginNetCore =
 @"<Project>
 ";
 
-                public static string ProjectEnd =
+                internal const string ProjectEnd =
 @"</Project>";
 
-                public static string ProjectDescription =
+                internal const string ProjectDescription =
 @"  <PropertyGroup>
     <Configuration Condition="" '$(Configuration)' == '' "">[options.DefaultConfiguration]</Configuration>
     <Platform Condition="" '$(Platform)' == '' "">[defaultPlatform]</Platform>
@@ -121,16 +121,16 @@ namespace Sharpmake.Generators.VisualStudio
   </PropertyGroup>
 ";
 
-                public static string BaseIntermediateOutputPathPropertyGroup =
+                internal const string BaseIntermediateOutputPathPropertyGroup =
 @"  <PropertyGroup>
     <BaseIntermediateOutputPath>[baseIntermediateOutputPath]</BaseIntermediateOutputPath>
   </PropertyGroup>
 ";
 
-                public const string DefaultProjectConfigurationCondition = "'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'";
-                public const string MultiFrameworkProjectConfigurationCondition = "'$(Configuration)|$(Platform)|$(TargetFramework)'=='[conf.Name]|[platformName]|[targetFramework]'";
+                internal const string DefaultProjectConfigurationCondition = "'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'";
+                internal const string MultiFrameworkProjectConfigurationCondition = "'$(Configuration)|$(Platform)|$(TargetFramework)'=='[conf.Name]|[platformName]|[targetFramework]'";
 
-                public static string ProjectConfigurationsGeneral =
+                internal const string ProjectConfigurationsGeneral =
 @"    <PlatformTarget>[platformName]</PlatformTarget>
     <DebugSymbols>[options.DebugSymbols]</DebugSymbols>
     <DebugType>[options.DebugType]</DebugType>
@@ -160,25 +160,25 @@ namespace Sharpmake.Generators.VisualStudio
     <ProduceReferenceAssembly>[options.ProduceReferenceAssembly]</ProduceReferenceAssembly>
 ";
 
-                public static string ImportProjectItemSimple =
+                internal const string ImportProjectItemSimple =
 @"  <Import Project=""[importProject]"" />
 ";
-                public static string ImportProjectItem =
+                internal const string ImportProjectItem =
 @"  <Import Project=""[importProject]"" Condition=""[importCondition]"" />
 ";
 
-                public static string ImportProjectSdkItem =
+                internal const string ImportProjectSdkItem =
 @"  <Import Project=""[importProject]"" Sdk=""[sdkVersion]"" />
 ";
 
-                public static string VsixConfiguration =
+                internal const string VsixConfiguration =
 @"  <PropertyGroup>
     <VSToolsPath Condition=""'$(VSToolsPath)' == ''"">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <UseCodebase>true</UseCodebase>
   </PropertyGroup>
 ";
 
-                public static string ProjectConfigurationsPreBuildEvent =
+                internal const string ProjectConfigurationsPreBuildEvent =
 
 @"  <PropertyGroup>
     <PreBuildEvent>[options.PreBuildEvent]
@@ -188,7 +188,7 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
 
-                public static string ProjectConfigurationsPostBuildEvent =
+                internal const string ProjectConfigurationsPostBuildEvent =
 @"  <PropertyGroup>
     <PostBuildEvent>[options.PostBuildEvent]
       <Message>[options.PostBuildEventDescription]</Message>
@@ -196,7 +196,7 @@ namespace Sharpmake.Generators.VisualStudio
   </PropertyGroup>
 ";
 
-                public static string ProjectConfigurationsPreBuildEventConditional =
+                internal const string ProjectConfigurationsPreBuildEventConditional =
 
 @" <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
     <PreBuildEvent>
@@ -207,7 +207,7 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
 
-                public static string ProjectConfigurationsPostBuildEventConditional =
+                internal const string ProjectConfigurationsPostBuildEventConditional =
 @"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
     <PostBuildEvent>
       [options.PostBuildEvent]
@@ -216,13 +216,13 @@ namespace Sharpmake.Generators.VisualStudio
   </PropertyGroup>
 ";
 
-                public static string ProjectConfigurationsRunPostBuildEvent =
+                internal const string ProjectConfigurationsRunPostBuildEvent =
 @"  <PropertyGroup>
     <RunPostBuildEvent>[RunPostBuildEvent]</RunPostBuildEvent>
   </PropertyGroup>
 ";
 
-                public static string ProjectAspNetMvcDescription =
+                internal const string ProjectAspNetMvcDescription =
 @"  <PropertyGroup>
     <MvcBuildViews>[MvcBuildViews]</MvcBuildViews>
     <UseIISExpress>[UseIISExpress]</UseIISExpress>
@@ -235,31 +235,31 @@ namespace Sharpmake.Generators.VisualStudio
 ";
             } // END of public static class Project
 
-            public static string ApplicationIcon =
+            internal const string ApplicationIcon =
 @"  <PropertyGroup>
     <ApplicationIcon>[iconpath]</ApplicationIcon>
   </PropertyGroup>
 ";
 
-            public static string ApplicationManifest =
+            internal const string ApplicationManifest =
 @"  <PropertyGroup>
     <ApplicationManifest>[applicationmanifest]</ApplicationManifest>
   </PropertyGroup>
 ";
 
-            public static string StartupObject =
+            internal const string StartupObject =
 @"  <PropertyGroup>
     <StartupObject>[startupobject]</StartupObject>
   </PropertyGroup>
 ";
 
-            public static string NoWin32Manifest =
+            internal const string NoWin32Manifest =
 @"  <PropertyGroup>
     <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
 ";
 
-            public static string MSBuild14PropertyGroup =
+            internal const string MSBuild14PropertyGroup =
 @"  <PropertyGroup>
     <!-- Find program files path in a 32-bit environment -->
     <ProgramFiles32>$(MSBuildProgramFiles32)</ProgramFiles32>
@@ -271,15 +271,15 @@ namespace Sharpmake.Generators.VisualStudio
   </PropertyGroup>
 ";
 
-            public static string WebReferenceUrlBegin =
+            internal const string WebReferenceUrlBegin =
 @"    <WebReferenceUrl Include=""[include]"">
 ";
 
-            public static string WebReferenceUrlEnd =
+            internal const string WebReferenceUrlEnd =
 @"    </WebReferenceUrl>
 ";
 
-            public static string COMReference =
+            internal const string COMReference =
 @"    <COMReference Include=""[include]"">
       <Guid>{[guid]}</Guid>
       <VersionMajor>[versionMajor]</VersionMajor>
@@ -292,224 +292,224 @@ namespace Sharpmake.Generators.VisualStudio
     </COMReference>
 ";
 
-            public static string UrlBehavior =
+            internal const string UrlBehavior =
                 @"      <UrlBehavior>[urlBehavior]</UrlBehavior>
 ";
 
-            public static string RelPath =
+            internal const string RelPath =
 @"      <RelPath>[relPath]</RelPath>
 ";
 
-            public static string UpdateFromURL =
+            internal const string UpdateFromURL =
 @"      <UpdateFromURL>[updateFromURL]</UpdateFromURL>
 ";
 
-            public static string CachedDynamicPropName =
+            internal const string CachedDynamicPropName =
 @"      <CachedDynamicPropName>[cachedDynamicPropName]</CachedDynamicPropName>";
 
-            public static string CachedAppSettingsObjectName =
+            internal const string CachedAppSettingsObjectName =
 @"      <CachedAppSettingsObjectName>[cachedAppSettingsObjectName]</CachedAppSettingsObjectName>
 ";
 
-            public static string CachedSettingsPropName =
+            internal const string CachedSettingsPropName =
 @"      <CachedSettingsPropName>[cachedSettingsPropName]</CachedSettingsPropName>
 ";
 
-            public static string PropertyGroupWithConditionStart =
+            internal const string PropertyGroupWithConditionStart =
 @"  <PropertyGroup Condition=""[projectConfigurationCondition]"">
 ";
 
             public static class ItemGroups
             {
-                public static string NoneItemGroupBegin =
+                internal const string NoneItemGroupBegin =
 @"    <None Include=""[include]"">
 ";
-                public static string NoneItemGroupEnd =
+                internal const string NoneItemGroupEnd =
 @"    </None>
 ";
-                public static string SimpleNone =
+                internal const string SimpleNone =
 @"    <None Include=""[include]"" />
 ";
-                public static string SimpleNoneWithExclude =
+                internal const string SimpleNoneWithExclude =
 @"    <None Include=""[include]"" Exclude=""[exclude]"" />
 ";
-                public static string Link =
+                internal const string Link =
 @"      <Link>[link]</Link>
 ";
 
-                public static string LastGenOutput =
+                internal const string LastGenOutput =
 @"      <LastGenOutput>[lastGenOutput]</LastGenOutput>
 ";
-                public static string Generator =
+                internal const string Generator =
 @"      <Generator>[generator]</Generator>
 ";
 
-                public static string MergeWithCto =
+                internal const string MergeWithCto =
 @"      <MergeWithCTO>[mergeWithCto]</MergeWithCTO>
 ";
 
-                public static string DependentUpon =
+                internal const string DependentUpon =
 @"      <DependentUpon>[dependentUpon]</DependentUpon>
 ";
 
-                public static string SpecificVersion =
+                internal const string SpecificVersion =
 @"      <SpecificVersion>[specificVersion]</SpecificVersion>
 ";
 
-                public static string HintPath =
+                internal const string HintPath =
 @"      <HintPath>[hintPath]</HintPath>
 ";
 
-                public static string SimpleReference =
+                internal const string SimpleReference =
 @"    <Reference Include=""[include]"" />
 ";
 
-                public static string ReferenceBegin =
+                internal const string ReferenceBegin =
 @"    <Reference Include=""[include]"">
 ";
 
-                public static string ReferenceEnd =
+                internal const string ReferenceEnd =
 @"    </Reference>
 ";
 
-                public static string ChooseBegin =
+                internal const string ChooseBegin =
 @"  <Choose>
 ";
 
-                public static string ChooseEnd =
+                internal const string ChooseEnd =
 @"  </Choose>
 ";
 
-                public static string ChooseConditionBegin =
+                internal const string ChooseConditionBegin =
 @"    <When Condition="" [condition] "">
 ";
 
-                public static string ChooseConditionEnd =
+                internal const string ChooseConditionEnd =
 @"    </When>
 ";
 
-                public static string ItemGroupBegin =
+                internal const string ItemGroupBegin =
 @"  <ItemGroup>
 ";
 
-                public static string ItemGroupConditionalBegin =
+                internal const string ItemGroupConditionalBegin =
 @"  <ItemGroup Condition=""[itemGroupCondition]"">
 ";
 
-                public static string ItemGroupTargetFrameworkCondition = "'$(TargetFramework)'=='[targetFramework]'";
+                internal const string ItemGroupTargetFrameworkCondition = "'$(TargetFramework)'=='[targetFramework]'";
 
-                public static string ItemGroupEnd =
+                internal const string ItemGroupEnd =
 @"  </ItemGroup>
 ";
 
-                public static string SplashScreen =
+                internal const string SplashScreen =
 @"      <SplashScreen Include=""[include]"" />
 ";
 
-                public static string SimpleWebReference =
+                internal const string SimpleWebReference =
 @"    <WebReferences Include=""[include]"" />
 ";
 
-                public static string Folder =
+                internal const string Folder =
 @"    <Folder Include=""[folder]"" />
 ";
 
-                public static string SimpleResource =
+                internal const string SimpleResource =
 @"    <Resource Include=""[resource]"" />
 ";
 
 
-                public static string ResourceBegin =
+                internal const string ResourceBegin =
 @"    <Resource Include=""[include]"">
 ";
 
-                public static string ResourceEnd =
+                internal const string ResourceEnd =
 @"    </Resource>
 ";
 
-                public static string WCFMetadata =
+                internal const string WCFMetadata =
 @"    <WCFMetadata Include=""[baseStorage]"" />
 ";
 
-                public static string WCFMetadataStorage =
+                internal const string WCFMetadataStorage =
 @"    <WCFMetadataStorage Include=""[storage]"" />
 ";
 
-                public static string VSIXSourceItem =
+                internal const string VSIXSourceItem =
 @"    <VSIXSourceItem Include=""[vsixSourceItem]"" />
 ";
 
-                public static string CompileRemove =
+                internal const string CompileRemove =
 @"    <Compile Remove=""[remove]"" />
 ";
 
-                public static string NoneUpdate =
+                internal const string NoneUpdate =
 @"    <None Update=""[update]"">
       <CopyToOutputDirectory>[copyToOutputDirectory]</CopyToOutputDirectory>
     </None>
 ";
 
-                public static string ContentUpdate =
+                internal const string ContentUpdate =
 @"    <Content Update=""[update]"">
       <CopyToOutputDirectory>[copyToOutputDirectory]</CopyToOutputDirectory>
     </Content>
 ";
 
-                public static string NoneRemove =
+                internal const string NoneRemove =
 @"    <None Remove=""[remove]"" />
 ";
 
-                public static string ContentRemove =
+                internal const string ContentRemove =
 @"    <Content Remove=""[remove]"" />
 ";
 
-                public static string EmbeddedResourceRemove =
+                internal const string EmbeddedResourceRemove =
 @"    <EmbeddedResource Remove=""[remove]"" />
 ";
 
-                public static string PageRemove =
+                internal const string PageRemove =
 @"    <Page Remove=""[remove]"" />
 ";
 
-                public static string ResourceRemove =
+                internal const string ResourceRemove =
 @"    <Resource Remove=""[remove]"" />
 ";
 
-                public static string PageBegin =
+                internal const string PageBegin =
 @"    <Page Include=""[include]"">
 ";
-                public static string PageEnd =
+                internal const string PageEnd =
 @"    </Page>
 ";
-                public static string ApplicationDefinitionBegin =
+                internal const string ApplicationDefinitionBegin =
 @"    <ApplicationDefinition Include=""[include]"">
 ";
-                public static string ApplicationDefinitionEnd =
+                internal const string ApplicationDefinitionEnd =
 @"    </ApplicationDefinition>
 ";
-                public static string SubType =
+                internal const string SubType =
 @"      <SubType>[subType]</SubType>
 ";
 
-                public static string SimpleEmbeddedResource =
+                internal const string SimpleEmbeddedResource =
 @"    <EmbeddedResource Include=""[include]"" />
 ";
 
-                public static string EmbeddedResourceBegin =
+                internal const string EmbeddedResourceBegin =
 @"    <EmbeddedResource Include=""[include]"">
 ";
 
-                public static string EmbeddedResourceEnd =
+                internal const string EmbeddedResourceEnd =
 @"    </EmbeddedResource>
 ";
-                public static string BootstrapperPackage =
+                internal const string BootstrapperPackage =
 @"    <BootstrapperPackage Include=""[include]"">
       <Visible>[visible]</Visible>
       <ProductName>[productName]</ProductName>
       <Install>[install]</Install>
     </BootstrapperPackage>
 ";
-                public static string FileAssociationItem =
+                internal const string FileAssociationItem =
                     @"    <FileAssociation Include=""[include]"">
       <Visible>[visible]</Visible>
       <Description>[description]</Description>
@@ -517,7 +517,7 @@ namespace Sharpmake.Generators.VisualStudio
       <DefaultIcon>[defaultIcon]</DefaultIcon>
     </FileAssociation>
 ";
-                public static string PublishFile =
+                internal const string PublishFile =
                     @"    <PublishFile Include=""[include]"">
       <Visible>[visible]</Visible>
       <Group>[group]</Group>
@@ -527,152 +527,152 @@ namespace Sharpmake.Generators.VisualStudio
     </PublishFile>
 ";
 
-                public static string ProjectReferenceBegin =
+                internal const string ProjectReferenceBegin =
 @"    <ProjectReference Include=""[include]"">
 ";
 
-                public static string ProjectReferenceSelfClosing =
+                internal const string ProjectReferenceSelfClosing =
 @"    <ProjectReference Include=""[include]"" />
 ";
 
-                public static string ProjectGUID =
+                internal const string ProjectGUID =
 @"      <Project>[projectGUID]</Project>
 ";
 
-                public static string ProjectRefName =
+                internal const string ProjectRefName =
 @"      <Name>[projectRefName]</Name>
 ";
-                public static string Private =
+                internal const string Private =
 @"      <Private>[private]</Private>
 ";
-                public static string EmbedInteropTypes =
+                internal const string EmbedInteropTypes =
 @"      <EmbedInteropTypes>[embedInteropTypes]</EmbedInteropTypes>
 ";
-                public static string ReferenceOutputAssembly =
+                internal const string ReferenceOutputAssembly =
 @"      <ReferenceOutputAssembly>[ReferenceOutputAssembly]</ReferenceOutputAssembly>
 ";
-                public static string IncludeOutputGroupsInVSIX =
+                internal const string IncludeOutputGroupsInVSIX =
 @"      <IncludeOutputGroupsInVSIX>[IncludeOutputGroupsInVSIX]</IncludeOutputGroupsInVSIX>
 ";
-                public static string ProjectReferenceEnd =
+                internal const string ProjectReferenceEnd =
 @"    </ProjectReference>
 ";
 
-                public static string SimpleCompile =
+                internal const string SimpleCompile =
 @"    <Compile Include=""[include]"" />
 ";
 
-                public static string CompileBegin =
+                internal const string CompileBegin =
 @"    <Compile Include=""[include]"">
 ";
 
-                public static string SimpleCompileWithExclude =
+                internal const string SimpleCompileWithExclude =
 @"    <Compile Include=""[include]"" Exclude=""[exclude]""/>
 ";
 
-                public static string CompileBeginWithExclude =
+                internal const string CompileBeginWithExclude =
 @"    <Compile Include=""[include]"" Exclude=""[exclude]"">
 ";
 
-                public static string CompileEnd =
+                internal const string CompileEnd =
 @"    </Compile>
 ";
 
-                public static string AutoGen =
+                internal const string AutoGen =
 @"      <AutoGen>[autoGen]</AutoGen>
 ";
 
-                public static string DesignTime =
+                internal const string DesignTime =
 @"      <DesignTime>[designTime]</DesignTime>
 ";
 
-                public static string DesignTimeSharedInput =
+                internal const string DesignTimeSharedInput =
 @"      <DesignTimeSharedInput>[designTimeSharedInput]</DesignTimeSharedInput>
 ";
 
-                public static string Service =
+                internal const string Service =
 @"    <Service Include=""[include]"" />
 ";
 
-                public static string VsctCompileBegin =
+                internal const string VsctCompileBegin =
 @"    <VSCTCompile Include=""[include]"">
 ";
 
-                public static string VsdConfigXmlSimple =
+                internal const string VsdConfigXmlSimple =
 @"    <VsdConfigXmlFiles Include=""[include]"" />
 ";
 
-                public static string ResourceName =
+                internal const string ResourceName =
 @"      <ResourceName>[resourceName]</ResourceName>
 ";
 
-                public static string VsctCompileEnd =
+                internal const string VsctCompileEnd =
 @"    </VSCTCompile>
 ";
 
-                public static string ContentSimple =
+                internal const string ContentSimple =
 @"    <Content Include=""[include]"" />
 ";
 
-                public static string ContentBegin =
+                internal const string ContentBegin =
 @"    <Content Include=""[include]"">
 ";
 
-                public static string CopyToOutputDirectory =
+                internal const string CopyToOutputDirectory =
 @"      <CopyToOutputDirectory>[copyToOutputDirectory]</CopyToOutputDirectory>
 ";
 
-                public static string Analyzer =
+                internal const string Analyzer =
 @"    <Analyzer Include=""[include]"" />
 ";
 
-                public static string IncludeInVsix =
+                internal const string IncludeInVsix =
 @"      <IncludeInVSIX>[includeInVsix]</IncludeInVSIX>
 ";
 
-                public static string ContentEnd =
+                internal const string ContentEnd =
 @"    </Content>
 ";
-                public static string EntityDeployBegin =
+                internal const string EntityDeployBegin =
 @"    <EntityDeploy Include=""[include]"">
 ";
 
-                public static string EntityDeployEnd =
+                internal const string EntityDeployEnd =
 @"    </EntityDeploy>
 ";
 
-                public static string FrameworkReference =
+                internal const string FrameworkReference =
 @"    <FrameworkReference Include=""[include]"" />
 ";
 
-                public static string Protobuf =
+                internal const string Protobuf =
 @"    <Protobuf Include=""[include]"" GrpcServices=""Both"" />
 ";
             }
 
             public static class UsingTaskElement
             {
-                public static string UsingTask =
+                internal const string UsingTask =
 @"  <UsingTask AssemblyFile=""[usingTaskElement.AssemblyFile]"" TaskName=""[usingTaskElement.TaskName]"" />
 ";
             }
 
             public static class TargetElement
             {
-                public static string CustomTargetNoParameters =
+                internal const string CustomTargetNoParameters =
 @"  <Target Name=""[targetElement.Name]"">
     [targetElement.CustomTasks]
   </Target>
 ";
 
-                public static string CustomTarget =
+                internal const string CustomTarget =
 @"  <Target Name=""[targetElement.Name]"" [targetElement.TargetParameters]>
     [targetElement.CustomTasks]
   </Target>
 ";
             }
 
-            public static string ProjectExtensionsWcf =
+            internal const string ProjectExtensionsWcf =
 @"  <ProjectExtensions>
       <VisualStudio>
         <FlavorProperties GUID = ""[WCFExtensionGUID]"">
@@ -684,7 +684,7 @@ namespace Sharpmake.Generators.VisualStudio
   </ProjectExtensions>
 ";
 
-            public static string ProjectExtensionsVsto =
+            internal const string ProjectExtensionsVsto =
 @"  <ProjectExtensions>
     <VisualStudio>
       <FlavorProperties GUID=""{BAA0C2D2-18E2-41B9-852F-F413020CAA33}"">
@@ -724,7 +724,7 @@ namespace Sharpmake.Generators.VisualStudio
   </ItemGroup>
 ";
 
-            public static string ProjectExtensionsAspNetMvc5 =
+            internal const string ProjectExtensionsAspNetMvc5 =
 @"  <ProjectExtensions>
     <VisualStudio>
       <FlavorProperties GUID=""[AspNetMvc5ExtensionGUID]"">
@@ -746,24 +746,24 @@ namespace Sharpmake.Generators.VisualStudio
 
             public static class UserFile
             {
-                public static readonly string StartWithProject =
+                internal const string StartWithProject =
 @"    <StartAction>Project</StartAction>
     <StartArguments>[conf.CsprojUserFile.StartArguments]</StartArguments>
     <StartWorkingDirectory>[conf.CsprojUserFile.WorkingDirectory]</StartWorkingDirectory>";
 
-                public static readonly string StartWithProgram =
+                internal const string StartWithProgram =
 @"    <StartAction>Program</StartAction>
     <StartProgram>[conf.CsprojUserFile.StartProgram]</StartProgram>
     <StartArguments>[conf.CsprojUserFile.StartArguments]</StartArguments>
     <StartWorkingDirectory>[conf.CsprojUserFile.WorkingDirectory]</StartWorkingDirectory>";
 
-                public static readonly string StartWithUrl =
+                internal const string StartWithUrl =
 @"    <StartAction>URL</StartAction>
     <StartURL>[conf.CsprojUserFile.StartURL]</StartURL>
     <StartArguments>[conf.CsprojUserFile.StartArguments]</StartArguments>
     <StartWorkingDirectory>[conf.CsprojUserFile.WorkingDirectory]</StartWorkingDirectory>";
 
-                public static readonly string DebugUnmanaged =
+                internal const string DebugUnmanaged =
 @"    <EnableUnmanagedDebugging>[unmanagedDebugEnabled]</EnableUnmanagedDebugging>";
             }
         }

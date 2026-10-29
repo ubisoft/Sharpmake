@@ -14,9 +14,6 @@ namespace Sharpmake
                 typeof(Sharpmake.Project.Configuration.IConfigurationTasks)})]
         public sealed class AndroidAgdePlatform : Sharpmake.BasePlatform, Sharpmake.Generators.FastBuild.IClangPlatformBff, Sharpmake.Generators.FastBuild.IPlatformBff, Sharpmake.IFastBuildCompilerSettings, Sharpmake.Project.Configuration.IConfigurationTasks
         {
-            public static readonly string _compilerExtraOptionsTemplate;
-            public static readonly string _compilerOptimizationOptionsTemplate;
-            public static readonly string _linkerOptionsTemplate;
             public AndroidAgdePlatform() { }
             public override string BffPlatformDefine { get; }
             public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, string> BinPath { get; set; }
@@ -563,9 +560,6 @@ namespace Sharpmake
                 typeof(Sharpmake.Project.Configuration.IConfigurationTasks)})]
         public sealed class LinuxPlatform : Sharpmake.BasePlatform, Sharpmake.Generators.FastBuild.IClangPlatformBff, Sharpmake.Generators.FastBuild.IPlatformBff, Sharpmake.IFastBuildCompilerSettings, Sharpmake.Project.Configuration.IConfigurationTasks
         {
-            public static readonly string _compilerExtraOptions;
-            public static readonly string _compilerOptimizationOptions;
-            public static readonly string _linkerOptionsTemplate;
             public LinuxPlatform() { }
             public override string BffPlatformDefine { get; }
             public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, string> BinPath { get; set; }

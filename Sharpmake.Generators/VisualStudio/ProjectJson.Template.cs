@@ -7,65 +7,65 @@ namespace Sharpmake.Generators.VisualStudio
     {
         public static class Template
         {
-            public static string Begin =
+            internal const string Begin =
 @"{";
 
-            public static string End =
+            internal const string End =
 @"
 }";
 
-            public static string FrameworksBegin =
+            internal const string FrameworksBegin =
 @"
   ""frameworks"": {";
 
-            public static string FrameworksEnd =
+            internal const string FrameworksEnd =
 @"
   }";
 
-            public static string FrameworksItem =
+            internal const string FrameworksItem =
 @"
     ""[framework]"": { }";
 
-            public static string RuntimesBegin =
+            internal const string RuntimesBegin =
 @"
   ""runtimes"": {";
 
-            public static string RuntimesEnd =
+            internal const string RuntimesEnd =
 @"
   }";
-            public static string RuntimesItem =
+            internal const string RuntimesItem =
 @"
     ""[runtime]"": { }";
 
-            public static string DependenciesBegin =
+            internal const string DependenciesBegin =
 @"
   ""dependencies"": {";
 
-            public static string DependenciesEnd =
+            internal const string DependenciesEnd =
 @"
   }";
 
-            public static string DependenciesItem =
+            internal const string DependenciesItem =
 @"
     ""[dependency.Name]"": ""[dependency.Version]""";
 
             /// <remarks>
             /// See : https://github.com/NuGet/Home/wiki/%5BSpec%5D-Managing-dependency-package-assets#suppress-parent
             /// </remarks>
-            public static string BeginDependencyItem =
+            internal const string BeginDependencyItem =
 @"
     ""[dependency.Name]"": {
         ""version"": ""[dependency.Version]""";
 
-            public static string DependencyPrivateAssets =
+            internal const string DependencyPrivateAssets =
 @",
         ""suppressParent"": ""[privateAssets]""";
 
-            public static string DependencyReferenceType =
+            internal const string DependencyReferenceType =
 @",
         ""type"": ""[referenceType]""";
 
-            public static string EndDependencyItem =
+            internal const string EndDependencyItem =
 @"
     }";
         }

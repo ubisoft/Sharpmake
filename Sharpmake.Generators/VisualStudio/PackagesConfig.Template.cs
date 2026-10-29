@@ -7,15 +7,15 @@ namespace Sharpmake.Generators.VisualStudio
     {
         public static class Template
         {
-            public static string Begin =
+            internal const string Begin =
 @"<?xml version=""1.0"" encoding=""utf-8""?>
 <packages>";
 
-            public static string End =
+            internal const string End =
 @"
 </packages>";
 
-            public static string DependenciesItem =
+            internal const string DependenciesItem =
 @"
   <package id=""[dependency.Name]"" version=""[dependency.Version]"" targetFramework=""[framework]"" />";
         }

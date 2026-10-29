@@ -6,5 +6,8 @@
     <ProjectReference Include="..\Sharpmake\Sharpmake.csproj" />
   </ItemGroup>
 
+  <!-- Proprietary platforms (Sharpmake extended) declare their own InternalsVisibleTo items; they must be applied to this assembly -->
+  <Import Project="$(MSBuildThisFileDirectory)..\..\Sharpmake.Platforms\*\Properties\Sharpmake.InternalsVisibleTo.props" Condition="Exists('$(MSBuildThisFileDirectory)..\..\Sharpmake.Platforms')" />
+
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 </Project>
