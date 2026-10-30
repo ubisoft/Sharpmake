@@ -14,7 +14,7 @@ ifeq ($(config),debug)
   TARGETDIR  = ../../bin/linux_debug
   TARGET     = $(TARGETDIR)/libheader-only-lib.a
   DEFINES   += -D "_DEBUG"
-  INCLUDES  += -I../../../header-only-lib
+  INCLUDES  += -I../../../header-only-lib -isystem ../../../header-only-lib/system
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) -g -Wall 
   CXXFLAGS  += $(CFLAGS) -fno-exceptions -fno-rtti 
@@ -47,7 +47,7 @@ ifeq ($(config),release)
   TARGETDIR  = ../../bin/linux_release
   TARGET     = $(TARGETDIR)/libheader-only-lib.a
   DEFINES   += -D "NDEBUG"
-  INCLUDES  += -I../../../header-only-lib
+  INCLUDES  += -I../../../header-only-lib -isystem ../../../header-only-lib/system
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) -g -O3 -Wall 
   CXXFLAGS  += $(CFLAGS) -fno-exceptions -fno-rtti 
