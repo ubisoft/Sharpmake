@@ -29,7 +29,7 @@ Here the description for each properties:
 
 - *Name*: Name of the sample.
 - *CIs*: CI systems where the sample can be executed. Valid values: "github" and "gitlab". An empty array here will completely disable the sample on CI systems. gitlab is used internally at Ubisoft.
-- *OSs*: Operating systems where can be executed. Valid values: "linux", "macos", "windows-2019" and "windows-2022".
+- *OSs*: Operating systems where can be executed. Valid values: "linux", "macos", "windows-2019", "windows-2022" and "windows-2025-vs2026". Samples using "windows-2025-vs2026" must pass `-VsVersion latest` to `Compile.ps1`, since `{os}` can't be resolved to a Visual Studio version for that image.
 - *Frameworks*: .NET frameworks used by Sharpmake executable. Currently only "net6.0" is supported.
 - *Configuration*: Configurations that the sample support. Valid values: "debug" and "release".
 - *TestFolder*: Base directory of the sample files.
