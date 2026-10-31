@@ -7,73 +7,73 @@ namespace Sharpmake.Generators.VisualStudio
     {
         public static class Template
         {
-            public static string SolutionBegin =
+            internal const string SolutionBegin =
 @"<Solution>
 ";
-            public static string SolutionEnd =
+            internal const string SolutionEnd =
 @"</Solution>
 ";
-            public static string ConfigurationsBegin =
+            internal const string ConfigurationsBegin =
 @"  <Configurations>
 ";
-            public static string ConfigurationsEnd =
+            internal const string ConfigurationsEnd =
 @"  </Configurations>
 ";
-            public static string ConfigurationBuildType =
+            internal const string ConfigurationBuildType =
 @"    <BuildType Name=""[buildTypeName]"" />
 ";
-            public static string ConfigurationPlatform =
+            internal const string ConfigurationPlatform =
 @"    <Platform Name=""[platformName]"" />
 ";
 
             // Folder with nested content. [folderName] is the slnx path form, e.g. "/FastBuild/".
-            public static string FolderBegin =
+            internal const string FolderBegin =
 @"  <Folder Name=""[folderName]"">
 ";
-            public static string FolderEnd =
+            internal const string FolderEnd =
 @"  </Folder>
 ";
-            public static string FolderFile =
+            internal const string FolderFile =
 @"    <File Path=""[filePath]"" />
 ";
 
-            public static string DefaultStartupAttribute = @" DefaultStartup=""true""";
+            internal const string DefaultStartupAttribute = @" DefaultStartup=""true""";
 
             // Project at solution root (no folder).
-            public static string ProjectBegin =
+            internal const string ProjectBegin =
 @"  <Project Path=""[projectPath]""[defaultStartup]>
 ";
-            public static string ProjectEnd =
+            internal const string ProjectEnd =
 @"  </Project>
 ";
-            public static string ProjectSelfClosing =
+            internal const string ProjectSelfClosing =
 @"  <Project Path=""[projectPath]""[defaultStartup] />
 ";
             // Project nested inside a <Folder> (one extra indent level).
-            public static string FolderProjectBegin =
+            internal const string FolderProjectBegin =
 @"    <Project Path=""[projectPath]""[defaultStartup]>
 ";
-            public static string FolderProjectEnd =
+            internal const string FolderProjectEnd =
 @"    </Project>
 ";
-            public static string FolderProjectSelfClosing =
+            internal const string FolderProjectSelfClosing =
 @"    <Project Path=""[projectPath]""[defaultStartup] />
 ";
 
             // Per-(project x solution-config) rule elements. [indent] is "" at root, "  " inside a folder.
-            public static string RuleBuildType =
+            internal const string RuleBuildType =
 @"[indent]    <BuildType Solution=""[solutionConfig]"" Project=""[projectBuildType]"" />
 ";
-            public static string RulePlatform =
+            internal const string RulePlatform =
 @"[indent]    <Platform Solution=""[solutionConfig]"" Project=""[projectPlatform]"" />
 ";
-            public static string RuleBuildDisabled =
+            internal const string RuleBuildDisabled =
 @"[indent]    <Build Solution=""[solutionConfig]"" Project=""false"" />
 ";
-            public static string RuleDeploy =
+            internal const string RuleDeploy =
 @"[indent]    <Deploy Solution=""[solutionConfig]"" />
 ";
-            public static string BuildDependency =
+            internal const string BuildDependency =
 @"[indent]    <BuildDependency Project=""[dependencyProjectPath]"" />
 ";
         }
