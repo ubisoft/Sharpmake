@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using Sharpmake.Generators.FastBuild;
 using Sharpmake.UnitTests.BffUnityResolverTestUtils;
@@ -85,6 +86,25 @@ namespace Sharpmake.UnitTests
             Assert.That(unityLogNames, Is.EqualTo(expectedLogNames));
         }
 
+        [Test]
+        public void FragmentHashUnityResolverOverridingFragmentsValue()
+        {
+            GenerateAndBuildUsingResolver<VS2017FragmentHashUnityResolver>(DevEnv.vs2017 | DevEnv.vs2019);
+
+            var unityLogNames = GetProjectUnityLogNames();
+
+            // Same names for both DevEnvs, equal to the ones of the default resolver for vs2017.
+            var expectedLogNames = new List<string> {
+                    "SimpleProject_vs2017_Debug : SimpleProject_unity_08CA3A7A",
+                    "SimpleProject_vs2017_Release : SimpleProject_unity_08CA3A7A",
+                    "SimpleProject_vs2017_Retail : SimpleProject_unity_2C62C614",
+                    "SimpleProject_vs2019_Debug : SimpleProject_unity_08CA3A7A",
+                    "SimpleProject_vs2019_Release : SimpleProject_unity_08CA3A7A",
+                    "SimpleProject_vs2019_Retail : SimpleProject_unity_2C62C614",
+                };
+            Assert.That(unityLogNames, Is.EqualTo(expectedLogNames));
+        }
+
         protected void GenerateAndBuildUsingResolver<T>(DevEnv devEnv) where T : Bff.IUnityResolver, new()
         {
             Bff.IUnityResolver unityResolver = new T();
@@ -139,6 +159,22 @@ namespace Sharpmake.UnitTests
                 }
             }
         }
+        public class VS2017FragmentHashUnityResolver : Bff.FragmentHashUnityResolver
+        {
+            protected override int[] GetFragmentsValue(Project.Configuration conf)
+            {
+                int[] values = base.GetFragmentsValue(conf);
+
+                FieldInfo[] fragmentFields = conf.Target.GetFragmentFieldInfo();
+                for (int i = 0; i < values.Length; ++i)
+                {
+                    if (fragmentFields[i].FieldType == typeof(DevEnv))
+                        values[i] = (int)DevEnv.vs2017;
+                }
+                return values;
+            }
+        }
+
         public static class GlobalSettings
         {
             public static DevEnv DefaultDevEnvs = DevEnv.vs2017 | DevEnv.vs2019;

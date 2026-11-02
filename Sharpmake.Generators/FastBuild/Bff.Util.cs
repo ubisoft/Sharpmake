@@ -404,6 +404,13 @@ namespace Sharpmake.Generators.FastBuild
         // Cons: - Names are not user friendly.
         public class FragmentHashUnityResolver : IUnityResolver
         {
+            // Fragment values of a configuration used to name its unity, in the order of Target.GetFragmentFieldInfo().
+            // Override to name unities from other values than the ones of the target, without modifying the target.
+            protected virtual int[] GetFragmentsValue(Project.Configuration conf)
+            {
+                return conf.Target.GetFragmentsValue();
+            }
+
             public void ResolveUnities(Project project, string projectPath, ref Dictionary<Unity, List<Project.Configuration>> unities)
             {
                 // we need to compute the missing member values in the Unity objects:
@@ -417,7 +424,7 @@ namespace Sharpmake.Generators.FastBuild
                     var unity = unitySection.Key;
                     var configurations = unitySection.Value;
 
-                    var fragmentValuesPerConfig = configurations.Select(x => x.Target.GetFragmentsValue()).ToList();
+                    var fragmentValuesPerConfig = configurations.Select(GetFragmentsValue).ToList();
                     var unityFragments = GetMergedFragments(fragmentValuesPerConfig);
 
                     // get the fragment info from the first configuration target,

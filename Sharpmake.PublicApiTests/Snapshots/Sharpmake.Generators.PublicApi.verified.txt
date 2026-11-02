@@ -201,6 +201,7 @@ namespace Sharpmake.Generators.FastBuild
         public class FragmentHashUnityResolver : Sharpmake.Generators.FastBuild.Bff.IUnityResolver
         {
             public FragmentHashUnityResolver() { }
+            protected virtual int[] GetFragmentsValue(Sharpmake.Project.Configuration conf) { }
             public void ResolveUnities(Sharpmake.Project project, string projectPath, ref System.Collections.Generic.Dictionary<Sharpmake.Generators.FastBuild.Bff.Unity, System.Collections.Generic.List<Sharpmake.Project.Configuration>> unities) { }
         }
         public class FragmentUnityResolver : Sharpmake.Generators.FastBuild.Bff.IUnityResolver
