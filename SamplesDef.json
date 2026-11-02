@@ -435,7 +435,7 @@
         },
         {
             "Name": "SlnxHelloWorld",
-            "CIs": [ "github" ],
+            "CIs": [ "github", "gitlab" ],
             "OSs": [ "windows-2025-vs2026" ],
             "Frameworks": [ "net8.0" ],
             "Configurations": [ "debug", "release" ],
@@ -449,7 +449,7 @@
         },
         {
             "Name": "SlnxBuildRules",
-            "CIs": [ "github" ],
+            "CIs": [ "github", "gitlab" ],
             "OSs": [ "windows-2025-vs2026" ],
             "Frameworks": [ "net8.0" ],
             "Configurations": [ "debug", "release" ],
