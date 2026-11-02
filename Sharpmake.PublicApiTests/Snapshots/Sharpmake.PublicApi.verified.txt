@@ -5313,6 +5313,7 @@ namespace Sharpmake
         public enum SolutionFormat
         {
             Sln = 0,
+            Slnx = 1,
         }
         public delegate void GenerationCallback(string solutionPath, string solutionFile, string solutionExtension);
     }

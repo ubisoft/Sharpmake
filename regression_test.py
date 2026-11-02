@@ -158,6 +158,8 @@ def launch_tests():
             #Test("QTFileCustomBuild", "QTFileCustomBuild.sharpmake.cs"), # commented out since output has discrepancies between net472 and net5.0
             #Test("FastBuildSimpleExecutable", "FastBuildSimpleExecutable.sharpmake.cs"), # commented out since output contains paths based on the installed Visual Studio
             Test("SimpleExeLibDependency", "SimpleExeLibDependency.sharpmake.cs"),
+            Test("SlnxHelloWorld", "SlnxHelloWorld.sharpmake.cs"),
+            Test("SlnxBuildRules", "SlnxBuildRules.sharpmake.cs"),
             Test("NetCore\\DotNetCoreFrameworkHelloWorld", "HelloWorld.sharpmake.cs"),
             Test("NetCore\\DotNetFrameworkHelloWorld", "HelloWorld.sharpmake.cs"),
             Test("NetCore\\DotNetMultiFrameworksHelloWorld", "HelloWorld.sharpmake.cs"),

@@ -153,6 +153,7 @@ namespace Sharpmake.Generators
         public Sharpmake.Generators.FastBuild.MasterBff MasterBffGenerator { get; }
         public Sharpmake.Generators.VisualStudio.Pyproj PyprojGenerator { get; }
         public Sharpmake.Generators.VisualStudio.Sln SlnGenerator { get; }
+        public Sharpmake.Generators.VisualStudio.Slnx SlnxGenerator { get; }
         public Sharpmake.Generators.VisualStudio.Vcxproj VcxprojGenerator { get; }
         public Sharpmake.Generators.Apple.XCWorkspace XCWorkspaceGenerator { get; }
         public Sharpmake.Generators.Apple.XCodeProj XCodeProjectGenerator { get; }
@@ -539,6 +540,14 @@ namespace Sharpmake.Generators.VisualStudio
         {
             public static class Solution { }
         }
+    }
+    public class Slnx : Sharpmake.ISolutionGenerator
+    {
+        public const string SolutionExtension = ".slnx";
+        public Slnx() { }
+        public void Generate(Sharpmake.Builder builder, Sharpmake.Solution solution, System.Collections.Generic.List<Sharpmake.Solution.Configuration> configurations, string solutionFile, System.Collections.Generic.List<string> generatedFiles, System.Collections.Generic.List<string> skipFiles) { }
+        public static void ValidateDevEnv(string solutionName, Sharpmake.Solution.SolutionFormat format, Sharpmake.DevEnv devEnv) { }
+        public static class Template { }
     }
     public abstract class UserFileBase
     {
