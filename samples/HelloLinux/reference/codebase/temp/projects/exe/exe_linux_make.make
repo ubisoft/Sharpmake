@@ -14,7 +14,7 @@ ifeq ($(config),debug)
   TARGETDIR  = ../../bin/linux_debug
   TARGET     = $(TARGETDIR)/exe
   DEFINES   += -D "CREATION_DATE=\"October 2020\"" -D "UTIL_DLL_IMPORT" -D "_DEBUG"
-  INCLUDES  += -I../../../dll1 -I../../../header-only-lib -I../../../lib_group -I../../../static\ lib2
+  INCLUDES  += -I../../../dll1 -I../../../header-only-lib -I../../../lib_group -I../../../static\ lib2 -isystem ../../../header-only-lib/system
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) -g -Wall 
   CXXFLAGS  += $(CFLAGS) -fno-exceptions -fno-rtti 
@@ -47,7 +47,7 @@ ifeq ($(config),release)
   TARGETDIR  = ../../bin/linux_release
   TARGET     = $(TARGETDIR)/exe
   DEFINES   += -D "CREATION_DATE=\"October 2020\"" -D "NDEBUG" -D "UTIL_DLL_IMPORT"
-  INCLUDES  += -I../../../dll1 -I../../../header-only-lib -I../../../lib_group -I../../../static\ lib2
+  INCLUDES  += -I../../../dll1 -I../../../header-only-lib -I../../../lib_group -I../../../static\ lib2 -isystem ../../../header-only-lib/system
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) -g -O3 -Wall 
   CXXFLAGS  += $(CFLAGS) -fno-exceptions -fno-rtti 

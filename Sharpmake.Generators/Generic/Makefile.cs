@@ -457,6 +457,19 @@ namespace Sharpmake.Generators.Generic
             includePaths.Sort();
             options["Includes"] = includePaths.JoinStrings(" ");
 
+            // System includes
+            OrderableStrings systemIncludePaths = new OrderableStrings();
+            systemIncludePaths.AddRange(Util.PathGetRelative(projectFileInfo.DirectoryName, Util.PathGetCapitalized(conf.IncludeSystemPaths)));
+            systemIncludePaths.AddRange(Util.PathGetRelative(projectFileInfo.DirectoryName, Util.PathGetCapitalized(conf.DependenciesIncludeSystemPaths)));
+            if (systemIncludePaths.Count > 0)
+            {
+                PathMakeUnix(systemIncludePaths);
+                systemIncludePaths.InsertPrefix("-isystem ");
+                systemIncludePaths.Sort();
+                string systemIncludes = systemIncludePaths.JoinStrings(" ");
+                options["Includes"] = includePaths.Count > 0 ? options["Includes"] + " " + systemIncludes : systemIncludes;
+            }
+
             if (conf.ForcedIncludes.Count > 0)
             {
                 OrderableStrings relativeForceIncludes = new OrderableStrings(Util.PathGetRelative(projectFileInfo.DirectoryName, conf.ForcedIncludes));

@@ -5,6 +5,12 @@
 
 #include <uuid/uuid.h>
 
+// found through the system include path of header-only-lib
+#include <header-only-lib-system.h>
+#if !defined(HEADER_ONLY_LIB_SYSTEM_INCLUDED)
+#error header-only-lib system include path is missing
+#endif
+
 int main(int, char**)
 {
     std::cout << "Hello Linux World, from " CREATION_DATE "!" << std::endl;
