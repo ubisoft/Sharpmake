@@ -69,3 +69,6 @@ Sharpmake.Application.args.json
 
 # Keep everything under reference folders, no exceptions
 !**/reference/**
+
+# Scratch scripts
+tmp/
