@@ -48,6 +48,8 @@ if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 ::if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples SimpleExeLibDependency      SimpleExeLibDependency.sharpmake.cs        reference         SimpleExeLibDependency
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
+call :UpdateRef samples CustomModules               CustomModules.sharpmake.cs                 reference         CustomModules
+if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples SlnxHelloWorld              SlnxHelloWorld.sharpmake.cs                reference         SlnxHelloWorld
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples SlnxBuildRules              SlnxBuildRules.sharpmake.cs                reference         SlnxBuildRules

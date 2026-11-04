@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\codebase\Engine\Plugins\Core\Core.cpp">
+      <Filter>Plugins\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\codebase\Engine\Plugins\Foo\Foo.cpp">
+      <Filter>Plugins\Foo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\codebase\Engine\Plugins\Renderer\Renderer.cpp">
+      <Filter>Plugins\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\codebase\Engine\Source\Engine.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\codebase\Engine\Plugins\Core\Core.h">
+      <Filter>Plugins\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\codebase\Engine\Plugins\Foo\Foo.h">
+      <Filter>Plugins\Foo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\codebase\Engine\Plugins\Renderer\Renderer.h">
+      <Filter>Plugins\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\codebase\Engine\Source\Engine.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\codebase\Engine\Plugins\Core\Core.sharpmake.cs">
+      <Filter>Plugins\Core</Filter>
+    </None>
+    <None Include="..\codebase\Engine\Plugins\Foo\Foo.sharpmake.cs">
+      <Filter>Plugins\Foo</Filter>
+    </None>
+    <None Include="..\codebase\Engine\Plugins\Renderer\Renderer.sharpmake.cs">
+      <Filter>Plugins\Renderer</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Plugins">
+      <UniqueIdentifier>{6a0938bb-91b3-dc60-20d4-4f3ea6b44507}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\Core">
+      <UniqueIdentifier>{855625de-fcc7-8022-a4bf-c459c630ba6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\Foo">
+      <UniqueIdentifier>{e7a887ab-76af-b085-1893-0389d619cfb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\Renderer">
+      <UniqueIdentifier>{b1160f3a-a16f-7209-270a-89982ceeb78d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

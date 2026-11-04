@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game", "Game_vs2022_Win64.vcxproj", "{52C5B67E-75D1-C84E-DBC7-D1DC52FC365C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "Engine_vs2022_Win64.vcxproj", "{EC86BD02-9DC6-4E80-5284-043F55A2988B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Gameplay", "Gameplay_vs2022_Win64.vcxproj", "{9FE9AB38-B399-553D-382D-4F3CC67AB746}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{52C5B67E-75D1-C84E-DBC7-D1DC52FC365C}.Debug|x64.ActiveCfg = Debug|x64
+		{52C5B67E-75D1-C84E-DBC7-D1DC52FC365C}.Debug|x64.Build.0 = Debug|x64
+		{EC86BD02-9DC6-4E80-5284-043F55A2988B}.Debug|x64.ActiveCfg = Debug|x64
+		{EC86BD02-9DC6-4E80-5284-043F55A2988B}.Debug|x64.Build.0 = Debug|x64
+		{9FE9AB38-B399-553D-382D-4F3CC67AB746}.Debug|x64.ActiveCfg = Debug|x64
+		{9FE9AB38-B399-553D-382D-4F3CC67AB746}.Debug|x64.Build.0 = Debug|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
