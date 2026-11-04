@@ -67,8 +67,12 @@ Sharpmake.Application.args.json
 # Verify snapshot files
 *.received.*
 
+# Scratch scripts
+tmp/
+
 # Keep everything under reference folders, no exceptions
 !**/reference/**
 
-# Scratch scripts
-tmp/
+# Visual Studio state is not a reference output
+**/reference/**/.vs/
+**/reference/**/*.user

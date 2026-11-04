@@ -160,6 +160,7 @@ def launch_tests():
             Test("SimpleExeLibDependency", "SimpleExeLibDependency.sharpmake.cs"),
             Test("SlnxHelloWorld", "SlnxHelloWorld.sharpmake.cs"),
             Test("SlnxBuildRules", "SlnxBuildRules.sharpmake.cs"),
+            Test("CustomModules", "CustomModules.sharpmake.cs"),
             Test("NetCore\\DotNetCoreFrameworkHelloWorld", "HelloWorld.sharpmake.cs"),
             Test("NetCore\\DotNetFrameworkHelloWorld", "HelloWorld.sharpmake.cs"),
             Test("NetCore\\DotNetMultiFrameworksHelloWorld", "HelloWorld.sharpmake.cs"),
