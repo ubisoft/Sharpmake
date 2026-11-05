@@ -7,7 +7,7 @@ include:
   # WARNING: When this include is modified, we also need to modifify the corresponding include in Get-SamplesPipeline.ps1.
   - project: 'ubi/runner/ci/templates'
     file: 'ubi_runner.yml'
-    ref: '1.0.7'
+    ref: '1.0.9'
 
 stages:
   - build
@@ -45,7 +45,7 @@ compilation:windows:
 compilation:mac:
   extends:
     - .compilation:base
-    - .ubi_runner_mac
+    - .ubi_runner_mac_macos26_xcode26
 
 compilation:linux:
   extends: .compilation:base

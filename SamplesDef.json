@@ -515,6 +515,8 @@
             "TestFolder": "samples/HelloXCode",
             "Commands":
             [
+                "which clang",
+                "xcrun --find clang",
                 "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"HelloXCode.Main.sharpmake.cs\" -framework {framework}",
                 "./Compile.ps1 -slnOrPrjFile \"HelloXCode_macOS.xcworkspace\" -configuration {configuration} -WorkingDirectory \"{testFolder}/codebase/temp/solutions\" -compiler xcode -scheme exe_prelinked_macOS",
                 "./{testFolder}/codebase/temp/bin/mac_{configuration}/exe_prelinked",
@@ -609,8 +611,8 @@
                 "xcodebuild -version",
                 "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"HelloIOS.Main.sharpmake.cs\" -framework {framework}",
                 "xcrun simctl list devices",
-                "xcodebuild build-for-testing CODE_SIGNING_ALLOWED=NO -workspace {testFolder}/codebase/temp/solutions/HelloIOS_iOS.xcworkspace -configuration {configuration} -scheme exe_iOS -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16 Pro'",
-                "xcodebuild test-without-building  -workspace {testFolder}/codebase/temp/solutions/HelloIOS_iOS.xcworkspace -configuration {configuration} -scheme exe_iOS -destination 'platform=iOS Simulator,name=iPhone 16 Pro' -derivedDataPath {testFolder}/test; $global:LastExitCode = 0"
+                "xcodebuild build-for-testing CODE_SIGNING_ALLOWED=NO -workspace {testFolder}/codebase/temp/solutions/HelloIOS_iOS.xcworkspace -configuration {configuration} -scheme exe_iOS -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 17 Pro'",
+                "xcodebuild test-without-building  -workspace {testFolder}/codebase/temp/solutions/HelloIOS_iOS.xcworkspace -configuration {configuration} -scheme exe_iOS -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -derivedDataPath {testFolder}/test; $global:LastExitCode = 0"
             ]
         },
         {
