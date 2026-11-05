@@ -68,7 +68,8 @@ foreach ($sample in $samplesDef.Samples)
                             $osProperties = @{
                                 # Our samples are sensible to Xcode version.
                                 # Explicitly request Xcode 16.
-                                extends = @( '.ubi_runner_mac_macos15_xcode16' )
+                                extends = @( '.ubi_runner_mac_macos26_xcode26' )
+                                before_script = @( 'xcodebuild -downloadPlatform iOS' )
                             }
                             $osCompilationName = 'mac'
                         }
