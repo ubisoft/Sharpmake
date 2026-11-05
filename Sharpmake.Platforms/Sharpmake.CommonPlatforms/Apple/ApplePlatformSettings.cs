@@ -9,7 +9,8 @@ namespace Sharpmake
     {
         public static class Settings
         {
-            private static readonly string DefaultXcodeDeveloperPath = "/Applications/Xcode.app/Contents/Developer";
+            // Resolved from DEVELOPER_DIR / xcode-select on macOS (falls back to /Applications/Xcode.app/Contents/Developer).
+            private static readonly string DefaultXcodeDeveloperPath = XcodeLocator.DetectedDeveloperDir;
 
             private static string s_xcodeDevPath;
             public static string XCodeDeveloperPath
@@ -107,6 +108,14 @@ namespace Sharpmake
 
             private static string ComputeSdkPath(string xcodeDeveloperPath, string sdkBaseName)
             {
+                // The Command Line Tools have no Platforms folder, they only ship the macOS SDK under <dev>/SDKs.
+                if (sdkBaseName == "MacOSX"
+                    && !Util.DirectoryExists(Path.Combine(xcodeDeveloperPath, "Platforms"))
+                    && Util.DirectoryExists(Path.Combine(xcodeDeveloperPath, "SDKs")))
+                {
+                    return Path.Combine(xcodeDeveloperPath, "SDKs", $"{sdkBaseName}.sdk");
+                }
+
                 return Path.Combine(xcodeDeveloperPath, "Platforms", $"{sdkBaseName}.platform", "Developer", "SDKs", $"{sdkBaseName}.sdk");
             }
         }
