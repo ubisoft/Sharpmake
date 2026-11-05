@@ -45,9 +45,21 @@ namespace Sharpmake.PublicApiTests
             var assembly = typeof(Generators.CompilerSettings).Assembly;
             var publicApi = assembly.GeneratePublicApi();
 
+            // Sharpmake.Platforms projects (Sharpmake extended) add their own InternalsVisibleTo entries.
             return Verifier.Verify(publicApi)
                 .UseDirectory(SnapshotsDirectory)
+                .ScrubLines(IsExternalInternalsVisibleTo)
                 .UseFileName("Sharpmake.Generators.PublicApi");
+        }
+
+        private static bool IsExternalInternalsVisibleTo(string line)
+        {
+            const string prefix = "[assembly: System.Runtime.CompilerServices.InternalsVisibleTo(\"";
+            if (!line.StartsWith(prefix))
+                return false;
+
+            string assemblyName = line.Substring(prefix.Length).TrimEnd('"', ')', ']');
+            return assemblyName != "Sharpmake" && assemblyName != "Sharpmake.CommonPlatforms" && assemblyName != "Sharpmake.UnitTests";
         }
 
         [Test]

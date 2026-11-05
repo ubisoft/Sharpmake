@@ -82,6 +82,26 @@ These two locations are where you can add any additional platforms (or extension
 
 `Sharpmake.Application.csproj` (from Sharpmake *core*), automatically adds `.csproj` from these folders to its dependency list. This means they will automatically be built and copied to its output folder, and simply hitting the "Start Debugging" button will *just work*.
 
+A platform can also be split into several projects (for example the platform itself and its unit tests), each in its own subfolder of the platform folder. This is the layout used by SharpmakeExtended:
+```
+📁 Sharpmake.Platforms
+ - 📁 Sharpmake.Platform_A
+      - 📁 Sharpmake.Platform_A
+           - 📁 Properties
+                - Sharpmake.InternalsVisibleTo.props
+           - *.cs
+           - Sharpmake.Platform_A.csproj
+      - 📁 Sharpmake.Platform_A.Tests
+           - *.cs
+           - Sharpmake.Platform_A.Tests.csproj
+```
+
+A platform that needs access to the `internal` members of `Sharpmake.Generators` declares them in a `Sharpmake.InternalsVisibleTo.props` file, with an `InternalsVisibleTo` item for its assembly. `Sharpmake.Generators.csproj` imports every file matching `Sharpmake.Platforms/*/*/Properties/Sharpmake.InternalsVisibleTo.props`, so the file must be at exactly this depth.
+
+*Using a platform distributed as a zip*: the zip has no top-level folder, so extract it in a folder of `Sharpmake.Platforms` named after the zip. For example `Sharpmake.Platform_A.zip` goes in `Sharpmake.Platforms/Sharpmake.Platform_A`, which gives the layout above.
+- If the platform references another platform, extract the zip of that platform as well.
+- The `.Tests` project is shipped so you can validate the changes you make to the platform before sending them back. `Sharpmake.Application` ignores the projects named `*.Tests.csproj`: build and run them from your own solution, or with `dotnet test`.
+
 3. `Directory.build.props`
 
 This file is used automatically by your `.csproj` from your platforms and extensions folders.
@@ -101,3 +121,5 @@ We recommend to - at least - import the same file from the Sharpmake *core* fold
 4. `SharpmakeExtended.sln`
 
 This solution is only to ease development for humans. It allows to have in a single IDE all the projects from both Sharpmake *core* and the extended ones.
+
+It is not generated: create it with `dotnet new sln --name SharpmakeExtended --format sln` (recent SDKs default to `.slnx`), then add the `.csproj` files of Sharpmake *core* and of every project under `Sharpmake.Platforms` and `Sharpmake.Extensions`.
