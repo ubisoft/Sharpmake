@@ -608,6 +608,7 @@
             [
                 "xcodebuild -version",
                 "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"HelloIOS.Main.sharpmake.cs\" -framework {framework}",
+                "xcrun simctl list devices",
                 "xcodebuild build-for-testing CODE_SIGNING_ALLOWED=NO -workspace {testFolder}/codebase/temp/solutions/HelloIOS_iOS.xcworkspace -configuration {configuration} -scheme exe_iOS -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16 Pro'",
                 "xcodebuild test-without-building  -workspace {testFolder}/codebase/temp/solutions/HelloIOS_iOS.xcworkspace -configuration {configuration} -scheme exe_iOS -destination 'platform=iOS Simulator,name=iPhone 16 Pro' -derivedDataPath {testFolder}/test; $global:LastExitCode = 0"
             ]
