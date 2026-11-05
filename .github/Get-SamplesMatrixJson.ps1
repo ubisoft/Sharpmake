@@ -29,7 +29,7 @@ $matrixInclude = foreach ($sample in $samplesDef.Samples)
                 $runsOn = switch ( $os )
                 {
                     'linux' { 'ubuntu-latest' }
-                    'macos' { 'macos-15' }
+                    'macos' { 'macos-26' }
                     default { $os }
                 }
 
