@@ -52,7 +52,7 @@ namespace Sharpmake
                     if (Util.GetExecutingPlatform() == Platform.win64)
                         return ClangForWindows.Settings.LLVMInstallDir;
 
-                    return $"{ApplePlatform.Settings.XCodeDeveloperPath}/Toolchains/XcodeDefault.xctoolchain/usr";
+                    return XcodeLocator.ResolveToolchainUsrDir(ApplePlatform.Settings.XCodeDeveloperPath);
                 }
 
                 set
