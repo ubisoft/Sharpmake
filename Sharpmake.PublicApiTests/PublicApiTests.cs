@@ -3,6 +3,7 @@
 
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using DiffEngine;
 using NUnit.Framework;
 using PublicApiGenerator;
 using VerifyNUnit;
@@ -25,7 +26,10 @@ namespace Sharpmake.PublicApiTests
             // DiffEngine will automatically launch your preferred diff tool locally.
             // Control it via environment variables:
             //   DiffEngine_ToolOrder=VisualStudioCode  (or AraxisMerge, VisualStudioCode, WinMerge, etc.)
-            //   DiffEngine_Disabled=true               (to disable external diff tool entirely)
+
+            // You can set Disabled to false locally to launch your diff tool when a snapshot differs.
+            // Or you can manually diff the files specified in the test logs.
+            DiffRunner.Disabled = true;
         }
 
         [Test]
