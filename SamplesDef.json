@@ -612,11 +612,11 @@
                 "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"HelloIOS.Main.sharpmake.cs\" -framework {framework}",
                 "xcodebuild build-for-testing CODE_SIGNING_ALLOWED=NO -workspace {testFolder}/codebase/temp/solutions/HelloIOS_iOS.xcworkspace -configuration {configuration} -scheme exe_iOS -sdk iphonesimulator -destination 'generic/platform=iOS Simulator'",
                 "xcrun simctl list devices",
-                "$simJson = xcrun simctl list devices available iPhone -j",
-                "Write-Host $simJson",
-                "$simDevices = $simJson | ConvertFrom-Json",
-                "$udid = ($simDevices.devices.PSObject.Properties | Where-Object { $_.Name -like '*SimRuntime.iOS*' } | ForEach-Object { $_.Value } | Where-Object { $_.name -like 'iPhone*' } | Select-Object -Last 1).udid",
+                "$destinations = xcodebuild -showdestinations -workspace {testFolder}/codebase/temp/solutions/HelloIOS_iOS.xcworkspace -scheme exe_iOS",
+                "$destinations | Out-String | Write-Host",
+                "$udid = ($destinations | Select-String 'platform:iOS Simulator, arch:arm64, id:([0-9A-Fa-f-]{36}), OS:[0-9.]+, name:iPhone' | Select-Object -First 1).Matches[0].Groups[1].Value",
                 "Write-Host Selected UDID: $udid",
+                "if (-not $udid) { throw 'No iPhone simulator destination found for scheme exe_iOS' }",
                 "xcodebuild test-without-building -workspace {testFolder}/codebase/temp/solutions/HelloIOS_iOS.xcworkspace -configuration {configuration} -scheme exe_iOS -destination \"platform=iOS Simulator,id=$udid\" -derivedDataPath {testFolder}/test; $global:LastExitCode = 0"
             ]
         },
