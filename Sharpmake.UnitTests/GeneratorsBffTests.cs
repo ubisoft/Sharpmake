@@ -6,7 +6,9 @@ using Sharpmake;
 using static Sharpmake.Options;
 using Sharpmake.Generators.FastBuild;
 using static Sharpmake.Generators.FastBuild.Bff;
+using Sharpmake.Generators;
 using System;
+using System.Collections.Generic;
 
 namespace Sharpmake.UnitTests
 {
@@ -380,6 +382,25 @@ namespace Sharpmake.UnitTests
             CompilerVersionForClangCl expected = new CompilerVersionForClangCl(overridenMscVer);
 
             Assert.That(result, Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void JoinIncludeDirectoriesForC_EmptyList_StillOverridesCppList()
+        {
+            // A platform implementing ICPlatformIncludesBff with no include for C must not fall back to the C++ list:
+            // the result must be an explicit (empty) value, not the "remove line" sentinel that means "no override"
+            var result = Bff.JoinIncludeDirectoriesForC(new List<string>());
+
+            Assert.That(result, Is.Not.EqualTo(FileGeneratorUtilities.RemoveLineTag));
+            Assert.That(result, Is.Empty);
+        }
+
+        [Test]
+        public void JoinIncludeDirectoriesForC_NonEmptyList_JoinsWithBffContinuation()
+        {
+            var result = Bff.JoinIncludeDirectoriesForC(new List<string> { "-I a", "-I b" });
+
+            Assert.That(result, Is.EqualTo($"-I a'{Environment.NewLine}            + ' -I b"));
         }
     }
 }
