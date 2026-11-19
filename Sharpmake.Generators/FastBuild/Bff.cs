@@ -701,6 +701,10 @@ namespace Sharpmake.Generators.FastBuild
 
                             scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "ClangEnableObjC_ARC", FileGeneratorUtilities.RemoveLineTag));
 
+                            // Platforms can use different include paths for C files (see ICPlatformIncludesBff)
+                            if (confCmdLineOptions.TryGetValue("AdditionalIncludeDirectoriesForC", out string cIncludeDirs) && cIncludeDirs != FileGeneratorUtilities.RemoveLineTag)
+                                scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "AdditionalIncludeDirectories", cIncludeDirs));
+
                             if (clangPlatformBff != null)
                                 clangFileLanguage = "-x c "; // Compiler option to indicate that its a C file
                             fastBuildSourceFileType = "/TC";
@@ -1806,6 +1810,12 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
+        // An empty result is a valid explicit value (C files get no include dirs); only RemoveLineTag means "no override"
+        internal static string JoinIncludeDirectoriesForC(IEnumerable<string> cDirs)
+        {
+            return string.Join($"'{Environment.NewLine}            + ' ", cDirs);
+        }
+
         private static void FillIncludeDirectoriesOptions(BffGenerationContext context)
         {
             // TODO: really not ideal, refactor and move the properties we need from it someplace else
@@ -1828,11 +1838,25 @@ namespace Sharpmake.Generators.FastBuild
                 // Fill include dirs
                 var platformIncludePaths = platformVcxproj.GetPlatformIncludePathsWithPrefix(context);
 
+                // Shared by the C++ and C include dirs, which only differ by their platform specific part
+                var convertedIncludePaths = includePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p, defaultCmdLineIncludePrefix)).ToList();
+
                 var dirs = new List<string>();
-                dirs.AddRange(includePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p, defaultCmdLineIncludePrefix)));
+                dirs.AddRange(convertedIncludePaths);
                 dirs.AddRange(platformIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p.Path, p.CmdLinePrefix)));
                 if (dirs.Any())
                     context.CommandLineOptions["AdditionalIncludeDirectories"] = string.Join($"'{Environment.NewLine}            + ' ", dirs);
+
+                context.CommandLineOptions["AdditionalIncludeDirectoriesForC"] = FileGeneratorUtilities.RemoveLineTag;
+                var cPlatformIncludes = PlatformRegistry.Query<ICPlatformIncludesBff>(context.Configuration.Platform);
+                if (cPlatformIncludes != null)
+                {
+                    var cDirs = new List<string>();
+                    cDirs.AddRange(convertedIncludePaths);
+                    cDirs.AddRange(cPlatformIncludes.GetPlatformIncludePathsWithPrefixForC(context).Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p.Path, p.CmdLinePrefix)));
+                    // Always set, even when empty, so that C files never fall back to the C++ list
+                    context.CommandLineOptions["AdditionalIncludeDirectoriesForC"] = JoinIncludeDirectoriesForC(cDirs);
+                }
 
                 var applePlatformBff = PlatformRegistry.Query<IApplePlatformBff>(context.Configuration.Platform);
                 if (applePlatformBff != null && applePlatformBff.IsSwiftSupported())
