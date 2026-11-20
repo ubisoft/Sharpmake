@@ -275,6 +275,15 @@ namespace Sharpmake
         // Setting this to true will force dependencies regardless of different output types.
         public bool AllowInconsistentDependencies = false;
 
+        /// <summary>
+        /// Forces project references to be exported regardless of different output types.
+        /// </summary>
+        /// <remarks>
+        /// Sharpmake does not export project references for output types when it is unnecessary.
+        /// If you wish to export them, anyway, set this boolean to <c>true</c>.
+        /// </remarks>
+        public bool ForceReferencesExport = false;
+
         private string _blobPath = "[project.SourceRootPath]" + Path.DirectorySeparatorChar + "blob";
         public string BlobPath
         {
