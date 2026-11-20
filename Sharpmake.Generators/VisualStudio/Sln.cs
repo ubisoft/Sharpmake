@@ -356,27 +356,47 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
 
-            // Write extra solution items
+            // Write extra solution items.
+            // A nested ExtraItems key (e.g. "Docs/Plugins/MyPlugin") also needs its intermediate folders
+            // (Docs, Plugins) emitted as ProjectFolder entries, otherwise NestedProjects references a GUID
+            // with no entry and VS silently drops the nesting. We walk each key's folder chain root-to-leaf
+            // and emit every folder once: intermediates as bare entries, the leaf with its SolutionItems.
             // TODO: What happens if we define an existing folder?
+            var writtenFolders = new HashSet<SolutionFolder>();
             foreach (var items in solution.ExtraItems)
             {
-                var folder = _folderTree.GetSolutionFolder(items.Key);
+                SolutionFolder leaf = _folderTree.GetSolutionFolder(items.Key);
 
-                using (fileGenerator.Declare("folderName", folder.Name))
-                using (fileGenerator.Declare("folderGuid", folder.Guid))
-                using (fileGenerator.Declare("solution", solution))
+                var chain = new List<SolutionFolder>();
+                for (SolutionFolder folder = leaf; folder != null; folder = folder.Parent)
+                    chain.Add(folder);
+                chain.Reverse();
+
+                foreach (SolutionFolder folder in chain)
                 {
-                    fileGenerator.Write(Template.Solution.ProjectFolder);
+                    if (!writtenFolders.Add(folder))
+                        continue;
+
+                    using (fileGenerator.Declare("folderName", folder.Name))
+                    using (fileGenerator.Declare("folderGuid", folder.Guid))
+                    using (fileGenerator.Declare("solution", solution))
                     {
-                        fileGenerator.Write(Template.Solution.SolutionItemBegin);
-                        foreach (string file in items.Value)
+                        fileGenerator.Write(Template.Solution.ProjectFolder);
+
+                        // Only the leaf folder carries items
+                        // Intermediate ancestors are emitted as bare folders so the NestedProjects GUIDs resolve to a Project entry.
+                        if (folder == leaf)
                         {
-                            using (fileGenerator.Declare("solutionItemPath", Util.PathGetRelative(solutionPath, file)))
-                                fileGenerator.Write(Template.Solution.SolutionItem);
+                            fileGenerator.Write(Template.Solution.SolutionItemBegin);
+                            foreach (string file in items.Value)
+                            {
+                                using (fileGenerator.Declare("solutionItemPath", Util.PathGetRelative(solutionPath, file)))
+                                    fileGenerator.Write(Template.Solution.SolutionItem);
+                            }
+                            fileGenerator.Write(Template.Solution.ProjectSectionEnd);
                         }
-                        fileGenerator.Write(Template.Solution.ProjectSectionEnd);
+                        fileGenerator.Write(Template.Solution.ProjectEnd);
                     }
-                    fileGenerator.Write(Template.Solution.ProjectEnd);
                 }
             }
 
