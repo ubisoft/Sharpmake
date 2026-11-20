@@ -1,6 +1,7 @@
 // Copyright (c) Ubisoft. All Rights Reserved.
 // Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
@@ -46,6 +47,20 @@ namespace Sharpmake.UnitTests
             Assert.That(leaf.Path, Is.EqualTo("Engine" + Path.DirectorySeparatorChar + "Core"));
             Assert.That(tree.RootFolders, Is.EqualTo(new[] { leaf.Parent }));
             Assert.That(tree.AllFolders, Is.EquivalentTo(new[] { leaf.Parent, leaf }));
+        }
+
+        [Test]
+        public void DeeplyNestedPathCreatesEveryIntermediateFolder()
+        {
+            var tree = new SolutionFolderTree();
+
+            SolutionFolder leaf = tree.GetSolutionFolder("Docs/Plugins/MyPlugin");
+
+            Assert.That(leaf.Name, Is.EqualTo("MyPlugin"));
+            Assert.That(leaf.Parent.Name, Is.EqualTo("Plugins"));
+            Assert.That(leaf.Parent.Parent.Name, Is.EqualTo("Docs"));
+            Assert.That(leaf.Parent.Parent.Parent, Is.Null);
+            Assert.That(tree.AllFolders.Select(f => f.Name), Is.EquivalentTo(new[] { "Docs", "Plugins", "MyPlugin" }));
         }
 
         [TestCase("Engine/Core")]
@@ -165,6 +180,20 @@ namespace Sharpmake.UnitTests
             Assert.That(tree.RootFolders, Is.Empty);
             Assert.That(tree.AllFolders, Is.Empty);
             Assert.That(tree.GetSolutionFolder("Engine/Core"), Is.Not.SameAs(before));
+        }
+
+        [Test]
+        public void ParentChain_SiblingsShareTheSameAncestorNodes()
+        {
+            // Two ExtraItems keys sharing a prefix reference the *same* ancestor instances, so Sln.cs can
+            // dedup them with a single HashSet while walking each chain and emit each folder only once.
+            var tree = new SolutionFolderTree();
+            SolutionFolder a = tree.GetSolutionFolder("Docs/Plugins/PluginA");
+            SolutionFolder b = tree.GetSolutionFolder("Docs/Plugins/PluginB");
+
+            Assert.That(a.Parent, Is.SameAs(b.Parent), "Plugins is shared");
+            Assert.That(a.Parent.Parent, Is.SameAs(b.Parent.Parent), "Docs is shared");
+            Assert.That(a, Is.Not.SameAs(b), "leaves differ");
         }
     }
 }
