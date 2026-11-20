@@ -26,11 +26,6 @@ namespace Sharpmake
             #region IPlatformDescriptor implementation
             public override string SimplePlatformString => "Win64";
             public override string GetToolchainPlatformString(ITarget target) => "x64";
-
-            public override EnvironmentVariableResolver GetPlatformEnvironmentResolver(params VariableAssignment[] assignments)
-            {
-                return new Win64EnvironmentVariableResolver(assignments);
-            }
             #endregion
 
             #region IMicrosoftPlatformBff implementation

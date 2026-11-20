@@ -12,6 +12,13 @@ namespace Sharpmake
     {
         public abstract class BaseWindowsPlatform : BaseMicrosoftPlatform, IWindowsFastBuildCompilerSettings
         {
+            #region IPlatformDescriptor implementation
+            public override EnvironmentVariableResolver GetPlatformEnvironmentResolver(params VariableAssignment[] assignments)
+            {
+                return new Win64EnvironmentVariableResolver(assignments);
+            }
+            #endregion
+            
             #region IWindowsFastBuildCompilerSettings implementation
             public override bool IsPcPlatform => true;
             public IDictionary<DevEnv, string> BinPath { get; set; } = new Dictionary<DevEnv, string>();
