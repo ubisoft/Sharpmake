@@ -14,12 +14,10 @@ namespace CSharpVsix
                 new Target(
                     Platform.anycpu,
                     DevEnv.vs2022,
-                    Optimization.Debug | Optimization.Release,
-                    OutputType.Dll,
-                    Blob.NoBlob,
-                    BuildSystem.MSBuild,
-                    DotNetFramework.v4_7_2
-                )
+                    Optimization.Debug | Optimization.Release)
+                {
+                    OutputType = OutputType.Dll
+                }
             };
         }
     }

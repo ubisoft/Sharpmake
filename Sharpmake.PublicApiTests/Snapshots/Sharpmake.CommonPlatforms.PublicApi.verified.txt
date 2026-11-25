@@ -403,6 +403,7 @@ namespace Sharpmake
         protected const string RemoveLineTag = "REMOVE_LINE_TAG";
         protected BasePlatform() { }
         public virtual string BffPlatformDefine { get; }
+        public virtual Sharpmake.ProcessorArchitecture DefaultProcessorArchitecture { get; }
         public virtual bool ExcludesPrecompiledHeadersFromBuild { get; }
         public abstract string ExecutableFileFullExtension { get; }
         public abstract bool HasDotNetSupport { get; }
@@ -419,6 +420,7 @@ namespace Sharpmake
         public abstract string SimplePlatformString { get; }
         public virtual string StaticLibraryFileFullExtension { get; }
         public virtual string StaticOutputLibraryFileFullExtension { get; }
+        public virtual Sharpmake.ProcessorArchitecture SupportedProcessorArchitectures { get; }
         public abstract bool IsLinkerInvokedViaCompiler { get; set; }
         public virtual void AddCompilerSettings(System.Collections.Generic.IDictionary<string, Sharpmake.Generators.CompilerSettings> masterCompilerSettings, Sharpmake.Project.Configuration conf) { }
         public virtual string CConfigName(Sharpmake.Configuration conf) { }
@@ -466,6 +468,8 @@ namespace Sharpmake
         protected virtual string GetProjectStaticLinkVcxprojTemplate() { }
         public System.Collections.Generic.IEnumerable<string> GetResourceIncludePaths(Sharpmake.Generators.IGenerationContext context) { }
         protected virtual System.Collections.Generic.IEnumerable<string> GetResourceIncludePathsImpl(Sharpmake.Generators.IGenerationContext context) { }
+        public virtual string GetSolutionPlatformName(Sharpmake.ITarget target) { }
+        public virtual Sharpmake.InstructionSetLevel GetSupportedInstructionSetLevels(Sharpmake.ProcessorArchitecture architecture) { }
         public abstract string GetToolchainPlatformString(Sharpmake.ITarget target);
         public virtual bool HasPrecomp(Sharpmake.Generators.IGenerationContext context) { }
         public virtual void SelectAdditionalCompilerOptionsBff(Sharpmake.Generators.FastBuild.IBffGenerationContext context) { }
@@ -565,6 +569,7 @@ namespace Sharpmake
             public override string BffPlatformDefine { get; }
             public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, string> BinPath { get; set; }
             public System.Collections.Generic.IDictionary<Sharpmake.IFastBuildCompilerKey, Sharpmake.CompilerFamily> CompilerFamily { get; set; }
+            public override Sharpmake.ProcessorArchitecture DefaultProcessorArchitecture { get; }
             public override string ExecutableFileFullExtension { get; }
             public System.Collections.Generic.IDictionary<Sharpmake.DevEnv, Sharpmake.Strings> ExtraFiles { get; set; }
             public override bool HasDotNetSupport { get; }
@@ -581,6 +586,7 @@ namespace Sharpmake
             public override string SimplePlatformString { get; }
             public override string StaticLibraryFileFullExtension { get; }
             public override string StaticOutputLibraryFileFullExtension { get; }
+            public override Sharpmake.ProcessorArchitecture SupportedProcessorArchitectures { get; }
             public override bool IsLinkerInvokedViaCompiler { get; set; }
             public override void AddCompilerSettings(System.Collections.Generic.IDictionary<string, Sharpmake.Generators.CompilerSettings> masterCompilerSettings, Sharpmake.Project.Configuration conf) { }
             public override string CConfigName(Sharpmake.Configuration conf) { }
@@ -827,7 +833,9 @@ namespace Sharpmake
         public sealed class Win32Platform : Sharpmake.Windows.BaseWindowsPlatform
         {
             public Win32Platform() { }
+            public override Sharpmake.ProcessorArchitecture DefaultProcessorArchitecture { get; }
             public override string SimplePlatformString { get; }
+            public override Sharpmake.ProcessorArchitecture SupportedProcessorArchitectures { get; }
             public override System.Collections.Generic.IEnumerable<string> GetImplicitlyDefinedSymbols(Sharpmake.Generators.IGenerationContext context) { }
             public override string GetToolchainPlatformString(Sharpmake.ITarget target) { }
             public override void SelectPlatformAdditionalDependenciesOptions(Sharpmake.Generators.IGenerationContext context) { }
@@ -851,8 +859,10 @@ namespace Sharpmake
         {
             public Win64Platform() { }
             public override string BffPlatformDefine { get; }
+            public override Sharpmake.ProcessorArchitecture DefaultProcessorArchitecture { get; }
             public override bool HasEditAndContinueDebuggingSupport { get; }
             public override string SimplePlatformString { get; }
+            public override Sharpmake.ProcessorArchitecture SupportedProcessorArchitectures { get; }
             public override bool SupportsResourceFiles { get; }
             public override void AddCompilerSettings(System.Collections.Generic.IDictionary<string, Sharpmake.Generators.CompilerSettings> masterCompilerSettings, Sharpmake.Project.Configuration conf) { }
             public override string CConfigName(Sharpmake.Configuration conf) { }
@@ -860,9 +870,14 @@ namespace Sharpmake
             public override void GeneratePlatformSpecificProjectDescription(Sharpmake.Generators.VisualStudio.IVcxprojGenerationContext context, Sharpmake.IFileGenerator generator) { }
             public override System.Collections.Generic.IEnumerable<string> GetImplicitlyDefinedSymbols(Sharpmake.Generators.IGenerationContext context) { }
             protected override System.Collections.Generic.IEnumerable<string> GetIncludePathsImpl(Sharpmake.Generators.IGenerationContext context) { }
+            [System.Obsolete(("Use the GetMasterCompilerSettings overload that takes a ProcessorArchitecture arg" +
+                "ument."), true)]
             public Sharpmake.Generators.CompilerSettings GetMasterCompilerSettings(System.Collections.Generic.IDictionary<string, Sharpmake.Generators.CompilerSettings> masterCompilerSettings, string compilerName, Sharpmake.DevEnv devEnv, string projectRootPath, Sharpmake.Options.Vc.General.PlatformToolset platformToolset, bool useCCompiler) { }
+            public Sharpmake.Generators.CompilerSettings GetMasterCompilerSettings(System.Collections.Generic.IDictionary<string, Sharpmake.Generators.CompilerSettings> masterCompilerSettings, string compilerName, Sharpmake.DevEnv devEnv, string projectRootPath, Sharpmake.Options.Vc.General.PlatformToolset platformToolset, bool useCCompiler, Sharpmake.ProcessorArchitecture architecture) { }
             public override Sharpmake.EnvironmentVariableResolver GetPlatformEnvironmentResolver(params Sharpmake.VariableAssignment[] assignments) { }
             protected override System.Collections.Generic.IEnumerable<Sharpmake.Generators.VisualStudio.IncludeWithPrefix> GetPlatformIncludePathsWithPrefixImpl(Sharpmake.Generators.IGenerationContext context) { }
+            public override string GetSolutionPlatformName(Sharpmake.ITarget target) { }
+            public override Sharpmake.InstructionSetLevel GetSupportedInstructionSetLevels(Sharpmake.ProcessorArchitecture architecture) { }
             public override string GetToolchainPlatformString(Sharpmake.ITarget target) { }
             public override void SelectPlatformAdditionalDependenciesOptions(Sharpmake.Generators.IGenerationContext context) { }
             public override void SetupPlatformTargetOptions(Sharpmake.Generators.IGenerationContext context) { }

@@ -23,13 +23,12 @@ namespace FastBuildDuplicateFile
             StripFastBuildSourceFiles = false;
 
             AddTargets(new Target(
-                        Platform.win64,
-                        DevEnv.vs2019 | DevEnv.vs2022,
-                        Optimization.Debug | Optimization.Release,
-                        OutputType.Lib,
-                        Blob.NoBlob,
-                        BuildSystem.FastBuild | BuildSystem.MSBuild
-            ));
+                Platform.win64,
+                DevEnv.vs2019 | DevEnv.vs2022,
+                Optimization.Debug | Optimization.Release)
+            {
+                BuildSystem = BuildSystem.FastBuild | BuildSystem.MSBuild
+            });
 
             SourceRootPath = @"[project.SharpmakeCsPath]\codebase";
         }
@@ -72,13 +71,12 @@ namespace FastBuildDuplicateFile
             Name = "FastBuildSample";
 
             AddTargets(new Target(
-                        Platform.win64,
-                        DevEnv.vs2019 | DevEnv.vs2022,
-                        Optimization.Debug | Optimization.Release,
-                        OutputType.Lib,
-                        Blob.NoBlob,
-                        BuildSystem.FastBuild | BuildSystem.MSBuild
-            ));
+                Platform.win64,
+                DevEnv.vs2019 | DevEnv.vs2022,
+                Optimization.Debug | Optimization.Release)
+            {
+                BuildSystem = BuildSystem.FastBuild | BuildSystem.MSBuild
+            });
         }
 
         [Configure()]

@@ -17,7 +17,8 @@ namespace Sharpmake
         /// <summary>
         /// Returns the name used by the toolchain to identify the platform under a given build target.
         /// In Visual Studio, this is the second part of the configuration name; for example, for
-        /// "Debug|x64" you would receive "x64" even though Sharpmake calls this platform "Win64".
+        /// "Debug|x64" you would receive "x64" even though Sharpmake calls this platform "Win64". It depends on the
+        /// target: a Win64 target with the arm64 architecture gives "ARM64".
         /// </summary>
         string GetToolchainPlatformString(ITarget target);
 
@@ -62,5 +63,46 @@ namespace Sharpmake
         /// <param name="variables">A list of <see cref="VariableAssignment"/> that describe the environment variables to resolve.</param>
         /// <returns>An <see cref="EnvironmentVariableResolver"/> instance suited for the platform.</returns>
         EnvironmentVariableResolver GetPlatformEnvironmentResolver(params VariableAssignment[] variables);
+
+        /// <summary>
+        /// Gets the processor architecture used by targets of this platform that don't set a
+        /// <see cref="ProcessorArchitecture"/> fragment. 0 means the descriptor doesn't declare the platform's architecture yet.
+        /// </summary>
+        /// <remarks>
+        /// Descriptors written before <see cref="ProcessorArchitecture"/> existed keep the default (0):
+        /// they accept no explicit architecture and only <see cref="InstructionSetLevel.Baseline"/>,
+        /// so new combinations are rejected rather than silently generated wrong.
+        /// </remarks>
+        ProcessorArchitecture DefaultProcessorArchitecture => 0;
+
+        /// <summary>
+        /// Gets the processor architectures that targets of this platform may set explicitly.
+        /// </summary>
+        ProcessorArchitecture SupportedProcessorArchitectures => 0;
+
+        /// <summary>
+        /// Gets the instruction set levels that targets of this platform may use with the given architecture.
+        /// </summary>
+        InstructionSetLevel GetSupportedInstructionSetLevels(ProcessorArchitecture architecture) => InstructionSetLevel.Baseline;
+
+        /// <summary>
+        /// Gets the platform name of the solution configuration of a target, shown in the Visual Studio platform dropdown.
+        /// Defaults to <see cref="GetToolchainPlatformString(ITarget)"/>. Differs from it when targets share a toolchain
+        /// platform but must be selectable separately (e.g. "x64-APX" next to "x64").
+        /// Not the project-level platform written in the .vcxproj: that one is <see cref="GetToolchainPlatformString(ITarget)"/>.
+        /// </summary>
+        string GetSolutionPlatformName(ITarget target) => GetToolchainPlatformString(target);
+
+        /// <summary>
+        /// Like <see cref="SimplePlatformString"/>, but for a given target: adds a token for a non-default
+        /// architecture or instruction set level (e.g. "Win64APX"). Used to build folder paths, so it never contains spaces.
+        /// </summary>
+        string GetDisambiguatedPlatformString(ITarget target) => Util.AppendArchitectureTokens(SimplePlatformString, target);
+
+        /// <summary>
+        /// Gets the suffix, with its leading space, appended to the project configuration name of targets that
+        /// share a toolchain platform with another instruction set level (e.g. " APX" gives "Release APX|x64").
+        /// </summary>
+        string GetConfigurationNameSuffix(ITarget target) => Util.DefaultConfigurationNameSuffix(target);
     }
 }

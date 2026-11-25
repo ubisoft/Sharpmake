@@ -51,15 +51,18 @@ namespace Sharpmake.Generators.VisualStudio
             var distinctSectionNames = configurationSectionNames.Distinct().ToList();
             if (count != distinctSectionNames.Count)
             {
+                string hint = GetDuplicateNamesHint(solutionConfigurations);
+
                 throw new Error(
-                    "Solution '{0}' contains distinct configurations with the same name, please add something to distinguish them:\n- {1}",
+                    "Solution '{0}' contains distinct configurations with the same name, please add something to distinguish them:\n- {1}{2}",
                     solutionFile,
                     string.Join(
                         Environment.NewLine + "- ",
                         solutionConfigurations.Select(
                             sc => $"{sc.Name}|{sc.PlatformName} => '{sc}'"
                         ).OrderBy(name => name)
-                    )
+                    ),
+                    hint.Length == 0 ? "" : Environment.NewLine + hint
                 );
             }
         }
@@ -91,6 +94,48 @@ namespace Sharpmake.Generators.VisualStudio
             }
         }
 
+        // Explains a "same name" error when it is caused by configurations that only differ by processor architecture
+        // or instruction set level, which a custom PlatformName that ignores them cannot tell apart. Empty otherwise.
+        internal static string GetDuplicateNamesHint(IEnumerable<Solution.Configuration> solutionConfigurations)
+        {
+            var duplicates = solutionConfigurations
+                .GroupBy(sc => $"{sc.Name}|{sc.PlatformName}")
+                .Where(g => g.Count() > 1);
+
+            foreach (var group in duplicates)
+            {
+                var targets = group.Select(sc => sc.Target).ToList();
+                bool differByArchitecture = targets.Select(t => Util.GetProcessorArchitecture(t)).Distinct().Count() > 1 ||
+                    targets.Select(t => Util.GetInstructionSetLevel(t)).Distinct().Count() > 1;
+                if (differByArchitecture)
+                {
+                    return $"The configurations of '{group.Key}' differ by processor architecture or instruction set level: " +
+                        "a custom PlatformName does not include them, append Util.GetArchitectureDisplaySuffix(target) to it " +
+                        "(empty for the defaults, \"APX\" or \"ARM64\" otherwise).";
+                }
+            }
+
+            return string.Empty;
+        }
+
+        // The platform of the project configuration a solution configuration is mapped to: it comes from the matched
+        // project target, which can have a different architecture than the solution's when the project lacks the exact one.
+        internal static string GetProjectPlatform(Solution.Configuration solutionConfiguration, SolutionProjectConfigMatch match, Solution.ResolvedProject solutionProject)
+        {
+            return Util.GetToolchainPlatformString(match.ProjectTarget.GetPlatform(), solutionProject.Project, match.ProjectTarget, true);
+        }
+
+        private static bool HasExplicitArchitectureOrLevel(ITarget target)
+        {
+            return (target.TryGetFragment(out ProcessorArchitecture architecture) && architecture != 0) ||
+                (target.TryGetFragment(out InstructionSetLevel level) && level != 0);
+        }
+
+        private static int[] GetFragmentsToCompare(ITarget target, bool effectiveValues)
+        {
+            return effectiveValues ? target.GetEffectiveFragmentsValue() : target.GetFragmentsValue();
+        }
+
         public static SolutionProjectConfigMatch Match(Solution solution, Solution.Configuration solutionConfiguration, Solution.ResolvedProject solutionProject)
         {
             ITarget solutionTarget = solutionConfiguration.Target;
@@ -107,7 +152,13 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 // try to find the target in the project that is the closest match from the solution one
                 int maxEqualFragments = 0;
-                int[] solutionTargetValues = solutionTarget.GetFragmentsValue();
+                // When architectures or levels are in use, an unset one must equal the explicit default, so
+                // the effective values are compared. Otherwise (every target leaves them unset) they are left out
+                // of the comparison, as before: counting the shared defaults would change which configuration
+                // wins the ties of existing win32/win64 projects.
+                bool compareEffectiveValues = HasExplicitArchitectureOrLevel(solutionTarget) ||
+                    solutionProject.Configurations.Any(c => HasExplicitArchitectureOrLevel(c.Target));
+                int[] solutionTargetValues = GetFragmentsToCompare(solutionTarget, compareEffectiveValues);
 
                 Platform previousPlatform = Platform._reserved1;
 
@@ -115,7 +166,7 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     Platform currentTargetPlatform = conf.Target.GetPlatform();
 
-                    int[] candidateTargetValues = conf.Target.GetFragmentsValue();
+                    int[] candidateTargetValues = GetFragmentsToCompare(conf.Target, compareEffectiveValues);
                     if (solutionTargetValues.Length != candidateTargetValues.Length)
                         continue;
 

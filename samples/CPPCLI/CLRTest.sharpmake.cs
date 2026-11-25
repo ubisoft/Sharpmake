@@ -17,21 +17,18 @@ namespace CLR_SharpmakeTest
             new Target(
                 Platform.win32,
                 DevEnv.vs2019,
-                Optimization.Debug | Optimization.Release,
-                OutputType.Dll,
-                Blob.NoBlob,
-                BuildSystem.MSBuild,
-                DotNetFramework.v4_7_2
-            ),
+                Optimization.Debug | Optimization.Release)
+            {
+                OutputType = OutputType.Dll
+            },
             new Target(
                 Platform.win32,
                 DevEnv.vs2022,
-                Optimization.Debug | Optimization.Release,
-                OutputType.Dll,
-                Blob.NoBlob,
-                BuildSystem.MSBuild,
-                DotNetFramework.v4_8
-            )
+                Optimization.Debug | Optimization.Release)
+            {
+                OutputType = OutputType.Dll,
+                Framework = DotNetFramework.v4_8
+            }
         };
     }
 

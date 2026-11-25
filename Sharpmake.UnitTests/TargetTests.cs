@@ -2,6 +2,7 @@
 // Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System;
+using System.Linq;
 using NUnit.Framework;
 
 namespace Sharpmake.UnitTests
@@ -157,6 +158,113 @@ namespace Sharpmake.UnitTests
             var result = target.AndMask(test);
 
             Assert.That(result, Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void ProcessorArchitectureAndInstructionSetLevel_DefaultToZero()
+        {
+            var target = new Target(Platform.win64, DevEnv.vs2022, Optimization.Release);
+
+            Assert.That((int)target.ProcessorArchitecture, Is.EqualTo(0));
+            Assert.That((int)target.InstructionSetLevel, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void Initializer_WithArchitectureAndLevel_SetsFragments()
+        {
+            var target = new Target(Platform.win64, DevEnv.vs2026, Optimization.Release) { ProcessorArchitecture = ProcessorArchitecture.x64, InstructionSetLevel = InstructionSetLevel.APX };
+
+            Assert.That(target.GetFragment<ProcessorArchitecture>(), Is.EqualTo(ProcessorArchitecture.x64));
+            Assert.That(target.GetFragment<InstructionSetLevel>(), Is.EqualTo(InstructionSetLevel.APX));
+        }
+
+        [Test]
+        public void GetTargetString_WithDefaultArchitectureAndLevel_IsUnchanged()
+        {
+            var legacy = new Target(Platform.win64, DevEnv.vs2022, Optimization.Release);
+            var explicitZero = new Target(Platform.win64, DevEnv.vs2022, Optimization.Release) { ProcessorArchitecture = 0, InstructionSetLevel = 0 };
+
+            Assert.That(explicitZero.GetTargetString(), Is.EqualTo(legacy.GetTargetString()));
+        }
+
+        [Test]
+        public void GetTargetString_WithArchitectureOrLevel_IsDistinct()
+        {
+            var baseline = new Target(Platform.win64, DevEnv.vs2026, Optimization.Release);
+            var arm64 = new Target(Platform.win64, DevEnv.vs2026, Optimization.Release) { ProcessorArchitecture = ProcessorArchitecture.arm64 };
+            var apx = new Target(Platform.win64, DevEnv.vs2026, Optimization.Release) { InstructionSetLevel = InstructionSetLevel.APX };
+
+            var strings = new[] { baseline.GetTargetString(), arm64.GetTargetString(), apx.GetTargetString() };
+            Assert.That(strings, Is.Unique);
+        }
+
+        [Test]
+        public void Clone_PreservesArchitectureAndLevel()
+        {
+            var target = new Target(Platform.win64, DevEnv.vs2026, Optimization.Release) { ProcessorArchitecture = ProcessorArchitecture.x64, InstructionSetLevel = InstructionSetLevel.APX };
+
+            var clone = (Target)target.Clone();
+
+            Assert.That(clone.ProcessorArchitecture, Is.EqualTo(ProcessorArchitecture.x64));
+            Assert.That(clone.InstructionSetLevel, Is.EqualTo(InstructionSetLevel.APX));
+        }
+
+        [Test]
+        public void Targets_ArchitectureMask_ExpandsToOneTargetPerValue()
+        {
+            var targets = new Targets(typeof(Target),
+                new Target(Platform.win64, DevEnv.vs2026, Optimization.Release) { ProcessorArchitecture = ProcessorArchitecture.x64 | ProcessorArchitecture.arm64 });
+
+            Assert.That(targets.TargetObjects.Count(), Is.EqualTo(2));
+            Assert.That(targets.TargetObjects.Select(t => ((Target)t).ProcessorArchitecture),
+                Is.EquivalentTo(new[] { ProcessorArchitecture.x64, ProcessorArchitecture.arm64 }));
+        }
+
+        [Test]
+        public void Targets_LevelMask_ExpandsToOneTargetPerValue()
+        {
+            var targets = new Targets(typeof(Target),
+                new Target(Platform.win64, DevEnv.vs2026, Optimization.Release) { InstructionSetLevel = InstructionSetLevel.Baseline | InstructionSetLevel.APX });
+
+            Assert.That(targets.TargetObjects.Count(), Is.EqualTo(2));
+            Assert.That(targets.TargetObjects.Select(t => ((Target)t).InstructionSetLevel),
+                Is.EquivalentTo(new[] { InstructionSetLevel.Baseline, InstructionSetLevel.APX }));
+        }
+
+        [Test]
+        public void Targets_WithoutArchitectureOrLevel_KeepsThemUnset()
+        {
+            var targets = new Targets(typeof(Target),
+                new Target(Platform.win64, DevEnv.vs2022, Optimization.Debug | Optimization.Release));
+
+            Assert.That(targets.TargetObjects.Count(), Is.EqualTo(2));
+            Assert.That(targets.TargetObjects.All(t => (int)((Target)t).ProcessorArchitecture == 0 && (int)((Target)t).InstructionSetLevel == 0));
+        }
+
+        [Test]
+        public void AddTargetsFromTargets_KeepsTheCallerOfTheSource()
+        {
+            var source = new Targets(typeof(Target));
+            source.AddTargets("Source.cs(1): ", new Target(Platform.win64, DevEnv.vs2022, Optimization.Debug | Optimization.Release));
+            var destination = new Targets(typeof(Target));
+
+            destination.AddTargets("Destination.cs(2): ", source);
+
+            string message = destination.DescribeInvalidTarget(new Target(Platform.win64, DevEnv.vs2022, Optimization.Debug), "bad target");
+            Assert.That(message, Does.StartWith("Source.cs(1): "));
+        }
+
+        [Test]
+        public void AddTargetsFromTargets_WithoutSourceCaller_FallsBackToThisCall()
+        {
+            // The Targets constructor records no caller
+            var source = new Targets(typeof(Target), new Target(Platform.win64, DevEnv.vs2022, Optimization.Debug | Optimization.Release));
+            var destination = new Targets(typeof(Target));
+
+            destination.AddTargets("Destination.cs(2): ", source);
+
+            string message = destination.DescribeInvalidTarget(new Target(Platform.win64, DevEnv.vs2022, Optimization.Debug), "bad target");
+            Assert.That(message, Does.StartWith("Destination.cs(2): "));
         }
     }
 }

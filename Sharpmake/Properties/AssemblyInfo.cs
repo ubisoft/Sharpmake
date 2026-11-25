@@ -4,5 +4,6 @@
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Sharpmake.Application")]
+[assembly: InternalsVisibleTo("Sharpmake.CommonPlatforms")]
 [assembly: InternalsVisibleTo("Sharpmake.Generators")]
 [assembly: InternalsVisibleTo("Sharpmake.UnitTests")]

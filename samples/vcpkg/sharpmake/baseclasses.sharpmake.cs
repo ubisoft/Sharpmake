@@ -17,8 +17,10 @@ namespace VCPKGSample
                 return new Target[]{ new Target(
                     Platform.win64,
                     DevEnv.vs2019  | DevEnv.vs2022,
-                    Optimization.Debug | Optimization.Release,
-                    buildSystem: BuildSystem.MSBuild | BuildSystem.FastBuild)};
+                    Optimization.Debug | Optimization.Release)
+                {
+                    BuildSystem = BuildSystem.MSBuild | BuildSystem.FastBuild
+                }};
             }
         }
     }

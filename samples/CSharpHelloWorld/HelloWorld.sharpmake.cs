@@ -15,23 +15,26 @@ namespace CSharpHelloWorld
                 new Target(
                     Platform.anycpu,
                     DevEnv.vs2017,
-                    Optimization.Debug | Optimization.Release,
-                    OutputType.Dll,
-                    Blob.NoBlob,
-                    BuildSystem.MSBuild,
-                    DotNetFramework.v4_7_2),
+                    Optimization.Debug | Optimization.Release)
+                {
+                    OutputType = OutputType.Dll
+                },
                 new Target(
                     Platform.anycpu,
                     DevEnv.vs2022,
-                    Optimization.Debug | Optimization.Release,
-                    OutputType.Dll,
-                    framework: DotNetFramework.net6_0),
+                    Optimization.Debug | Optimization.Release)
+                {
+                    OutputType = OutputType.Dll,
+                    Framework = DotNetFramework.net6_0
+                },
                 new Target(
                     Platform.anycpu,
                     DevEnv.vs2026,
-                    Optimization.Debug | Optimization.Release,
-                    OutputType.Dll,
-                    framework: DotNetFramework.net8_0)
+                    Optimization.Debug | Optimization.Release)
+                {
+                    OutputType = OutputType.Dll,
+                    Framework = DotNetFramework.net8_0
+                }
             };
         }
     }

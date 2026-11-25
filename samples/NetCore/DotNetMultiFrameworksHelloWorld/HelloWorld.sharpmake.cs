@@ -15,11 +15,11 @@ namespace NetCore
                 new Target(
                     Platform.anycpu,
                     DevEnv.vs2019,
-                    Optimization.Debug | Optimization.Release,
-                    OutputType.Dll,
-                    Blob.NoBlob,
-                    BuildSystem.MSBuild,
-                    DotNetFramework.v4_7_2 | DotNetFramework.v4_8 | DotNetFramework.netstandard2_0 | DotNetFramework.net5_0)
+                    Optimization.Debug | Optimization.Release)
+                {
+                    OutputType = OutputType.Dll,
+                    Framework = DotNetFramework.v4_7_2 | DotNetFramework.v4_8 | DotNetFramework.netstandard2_0 | DotNetFramework.net5_0
+                }
             };
 
             // vs2026 targets used only by the .slnx solution, so the vs2019 outputs stay unchanged.
@@ -27,11 +27,11 @@ namespace NetCore
                 new Target(
                     Platform.anycpu,
                     DevEnv.vs2026,
-                    Optimization.Debug | Optimization.Release,
-                    OutputType.Dll,
-                    Blob.NoBlob,
-                    BuildSystem.MSBuild,
-                    DotNetFramework.v4_7_2 | DotNetFramework.v4_8 | DotNetFramework.netstandard2_0 | DotNetFramework.net5_0)
+                    Optimization.Debug | Optimization.Release)
+                {
+                    OutputType = OutputType.Dll,
+                    Framework = DotNetFramework.v4_7_2 | DotNetFramework.v4_8 | DotNetFramework.netstandard2_0 | DotNetFramework.net5_0
+                }
             };
 
             public HelloWorldLib()
@@ -80,11 +80,11 @@ namespace NetCore
                 new Target(
                     Platform.anycpu,
                     DevEnv.vs2019,
-                    Optimization.Debug | Optimization.Release,
-                    OutputType.Dll,
-                    Blob.NoBlob,
-                    BuildSystem.MSBuild,
-                    DotNetFramework.v4_7_2 | DotNetFramework.v4_8 | DotNetFramework.netcore3_1)
+                    Optimization.Debug | Optimization.Release)
+                {
+                    OutputType = OutputType.Dll,
+                    Framework = DotNetFramework.v4_7_2 | DotNetFramework.v4_8 | DotNetFramework.netcore3_1
+                }
             };
 
             // vs2026 targets used only by the .slnx solution, so the vs2019 outputs stay unchanged.
@@ -92,11 +92,11 @@ namespace NetCore
                 new Target(
                     Platform.anycpu,
                     DevEnv.vs2026,
-                    Optimization.Debug | Optimization.Release,
-                    OutputType.Dll,
-                    Blob.NoBlob,
-                    BuildSystem.MSBuild,
-                    DotNetFramework.v4_7_2 | DotNetFramework.v4_8 | DotNetFramework.netcore3_1)
+                    Optimization.Debug | Optimization.Release)
+                {
+                    OutputType = OutputType.Dll,
+                    Framework = DotNetFramework.v4_7_2 | DotNetFramework.v4_8 | DotNetFramework.netcore3_1
+                }
             };
 
             public HelloWorldMultiFrameworks()

@@ -1547,9 +1547,9 @@ namespace Sharpmake.UnitTests
         [Test]
         public void MakeDifferenceString()
         {
-            ITarget target1 = new Target(Platform.win64, DevEnv.vs2017, Optimization.Release, OutputType.Dll, Blob.Blob, BuildSystem.FastBuild, DotNetFramework.net8_0);
-            ITarget target2 = new Target(Platform.win64, DevEnv.vs2017, Optimization.Release, OutputType.Dll, Blob.Blob, BuildSystem.FastBuild, DotNetFramework.net8_0);
-            ITarget target3 = new Target(Platform.win64, DevEnv.vs2017, Optimization.Debug, OutputType.Dll, Blob.Blob, BuildSystem.FastBuild, DotNetFramework.net10_0);
+            ITarget target1 = new Target(Platform.win64, DevEnv.vs2017, Optimization.Release) { OutputType = OutputType.Dll, Blob = Blob.Blob, BuildSystem = BuildSystem.FastBuild, Framework = DotNetFramework.net8_0 };
+            ITarget target2 = new Target(Platform.win64, DevEnv.vs2017, Optimization.Release) { OutputType = OutputType.Dll, Blob = Blob.Blob, BuildSystem = BuildSystem.FastBuild, Framework = DotNetFramework.net8_0 };
+            ITarget target3 = new Target(Platform.win64, DevEnv.vs2017, Optimization.Debug) { OutputType = OutputType.Dll, Blob = Blob.Blob, BuildSystem = BuildSystem.FastBuild, Framework = DotNetFramework.net10_0 };
 
             Assert.That(Util.MakeDifferenceString(target1, target2).Length == 0, Is.True);
             Assert.That(Util.MakeDifferenceString(target1, target3).Contains("\"net8.0\" and \"net10.0\""), Is.True);

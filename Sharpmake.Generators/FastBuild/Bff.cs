@@ -107,7 +107,8 @@ namespace Sharpmake.Generators.FastBuild
 
         public static string GetShortProjectName(Project project, Project.Configuration conf)
         {
-            string platformString = Util.GetSimplePlatformString(conf.Platform);
+            // Includes the architecture / instruction set level of the target when not default (e.g. Win64Armv8)
+            string platformString = Util.GetDisambiguatedPlatformString(conf.Target);
             if (conf.Platform != Platform.win64) // this is to reduce changes compared to old format
             {
                 // Append the toolchain-specific platform name if it differs from the simple name,

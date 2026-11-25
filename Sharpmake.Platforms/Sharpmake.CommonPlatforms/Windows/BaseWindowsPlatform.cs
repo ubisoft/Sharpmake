@@ -70,6 +70,19 @@ namespace Sharpmake
                 yield return "odbccp32.lib";
             }
 
+            // Platforms that don't declare a processor architecture yet (descriptors written before it existed) keep the Platform-based lookups
+            private static string GetWindowsExecutablePath(DevEnv devEnv, Project.Configuration conf)
+            {
+                ProcessorArchitecture architecture = Util.GetProcessorArchitecture(conf.Target);
+                return architecture != 0 ? devEnv.GetWindowsExecutablePath(architecture) : devEnv.GetWindowsExecutablePath(conf.Platform);
+            }
+
+            private static string GetWindowsLibraryPath(DevEnv devEnv, Project.Configuration conf, DotNetFramework? dotNetFramework)
+            {
+                ProcessorArchitecture architecture = Util.GetProcessorArchitecture(conf.Target);
+                return architecture != 0 ? devEnv.GetWindowsLibraryPath(architecture, dotNetFramework) : devEnv.GetWindowsLibraryPath(conf.Platform, dotNetFramework);
+            }
+
             public override void SetupSdkOptions(IGenerationContext context)
             {
                 var conf = context.Configuration;
@@ -79,7 +92,7 @@ namespace Sharpmake
                 // correctly set the WindowsSDK_ExecutablePath to the bin folder of its current version.
                 if (devEnv == DevEnv.vs2015 && !KitsRootPaths.UsesDefaultKitRoot(devEnv))
                 {
-                    context.Options["ExecutablePath"] = devEnv.GetWindowsExecutablePath(conf.Platform);
+                    context.Options["ExecutablePath"] = GetWindowsExecutablePath(devEnv, conf);
                 }
 
                 Options.Vc.General.PlatformToolset platformToolset = Options.GetObject<Options.Vc.General.PlatformToolset>(conf);
@@ -91,11 +104,11 @@ namespace Sharpmake
 
                     devEnv = platformToolset.GetDefaultDevEnvForToolset() ?? devEnv;
 
-                    context.Options["ExecutablePath"] = ClangForWindows.GetWindowsClangExecutablePath() + ";" + devEnv.GetWindowsExecutablePath(conf.Platform);
+                    context.Options["ExecutablePath"] = ClangForWindows.GetWindowsClangExecutablePath() + ";" + GetWindowsExecutablePath(devEnv, conf);
                     if (Options.GetObject<Options.Vc.LLVM.UseClangCl>(conf) == Options.Vc.LLVM.UseClangCl.Enable)
                     {
                         context.Options["IncludePath"] = ClangForWindows.GetWindowsClangIncludePath() + ";" + devEnv.GetWindowsIncludePath();
-                        context.Options["LibraryPath"] = ClangForWindows.GetWindowsClangLibraryPath() + ";" + devEnv.GetWindowsLibraryPath(conf.Platform, Util.IsDotNet(conf) ? conf.Target.GetFragment<DotNetFramework>() : default(DotNetFramework?));
+                        context.Options["LibraryPath"] = ClangForWindows.GetWindowsClangLibraryPath() + ";" + GetWindowsLibraryPath(devEnv, conf, Util.IsDotNet(conf) ? conf.Target.GetFragment<DotNetFramework>() : default(DotNetFramework?));
                     }
                 }
 

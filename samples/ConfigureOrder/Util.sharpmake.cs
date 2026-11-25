@@ -17,12 +17,10 @@ namespace ConfigureOrdering
                     s_defaultTarget = new Target(
                         Platform.win32,
                         DevEnv.vs2022,
-                        Optimization.Release,
-                        OutputType.Lib,
-                        Blob.NoBlob,
-                        BuildSystem.MSBuild,
-                        DotNetFramework.net8_0
-                    );
+                        Optimization.Release)
+                    {
+                        Framework = DotNetFramework.net8_0
+                    };
                 }
                 return s_defaultTarget;
             }

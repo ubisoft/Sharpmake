@@ -25,7 +25,32 @@ namespace Sharpmake
         {
             #region IPlatformDescriptor implementation
             public override string SimplePlatformString => "Win64";
-            public override string GetToolchainPlatformString(ITarget target) => "x64";
+            public override string GetToolchainPlatformString(ITarget target)
+            {
+                // Other platforms (consoles) ask for this with their own target and always want x64
+                bool isWin64Arm64 = target != null
+                    && target.TryGetFragment(out Platform platform) && platform == Platform.win64
+                    && Util.GetProcessorArchitecture(target) == ProcessorArchitecture.arm64;
+                return isWin64Arm64 ? "ARM64" : "x64";
+            }
+
+            // APX is not a Visual Studio platform (it builds as x64), but it is selectable on its own in solutions
+            public override string GetSolutionPlatformName(ITarget target)
+            {
+                bool isApx = target != null
+                    && target.TryGetFragment(out Platform platform) && platform == Platform.win64
+                    && Util.GetInstructionSetLevel(target) == InstructionSetLevel.APX;
+                return isApx ? "x64-APX" : GetToolchainPlatformString(target);
+            }
+            public override ProcessorArchitecture DefaultProcessorArchitecture => ProcessorArchitecture.x64;
+            public override ProcessorArchitecture SupportedProcessorArchitectures => ProcessorArchitecture.x64 | ProcessorArchitecture.arm64;
+
+            public override InstructionSetLevel GetSupportedInstructionSetLevels(ProcessorArchitecture architecture)
+            {
+                return architecture == ProcessorArchitecture.x64
+                    ? InstructionSetLevel.Baseline | InstructionSetLevel.APX
+                    : InstructionSetLevel.Baseline;
+            }
 
             public override EnvironmentVariableResolver GetPlatformEnvironmentResolver(params VariableAssignment[] assignments)
             {
@@ -59,7 +84,8 @@ namespace Sharpmake
                         platformToolsetString += $"_{overridenPlatformToolset}";
                 }
 
-                return $".win64{platformToolsetString}{lldString}Config";
+                string platformConfigName = GetArchitecture(conf) == ProcessorArchitecture.arm64 ? "winarm64" : "win64";
+                return $".{platformConfigName}{platformToolsetString}{lldString}Config";
             }
 
             public override string CppConfigName(Configuration conf)
@@ -99,11 +125,20 @@ namespace Sharpmake
                 else
                     compilerName += "-" + devEnv;
 
-                CompilerSettings compilerSettings = GetMasterCompilerSettings(masterCompilerSettings, compilerName, devEnv, projectRootPath, platformToolset, false);
+                ProcessorArchitecture architecture = GetArchitecture(conf);
+                CompilerSettings compilerSettings = GetMasterCompilerSettings(masterCompilerSettings, compilerName, devEnv, projectRootPath, platformToolset, false, architecture);
                 compilerSettings.PlatformFlags |= Platform.win64;
-                SetConfiguration(conf, compilerSettings.Configurations, CppConfigName(conf), projectRootPath, devEnv, false);
+                SetConfiguration(conf, compilerSettings.Configurations, CppConfigName(conf), projectRootPath, devEnv, false, architecture);
             }
 
+            // Win64 is x64 unless the target says otherwise
+            private static ProcessorArchitecture GetArchitecture(Configuration conf)
+            {
+                ProcessorArchitecture architecture = Util.GetProcessorArchitecture(conf.Target);
+                return architecture == ProcessorArchitecture.arm64 ? architecture : ProcessorArchitecture.x64;
+            }
+
+            [Obsolete("Use the GetMasterCompilerSettings overload that takes a ProcessorArchitecture argument.", error: true)]
             public CompilerSettings GetMasterCompilerSettings(
                 IDictionary<string, CompilerSettings> masterCompilerSettings,
                 string compilerName,
@@ -111,6 +146,24 @@ namespace Sharpmake
                 string projectRootPath,
                 Options.Vc.General.PlatformToolset platformToolset,
                 bool useCCompiler
+            )
+            {
+                return GetMasterCompilerSettings(masterCompilerSettings, compilerName, devEnv, projectRootPath, platformToolset, useCCompiler, ProcessorArchitecture.x64);
+            }
+
+            /// <summary>
+            /// Like the overload without an architecture (which is for x64), for the given processor architecture
+            /// (x64 or arm64): the Microsoft compiler is taken from the folder that builds for that architecture.
+            /// The caller names the settings (<paramref name="compilerName"/>) so that architectures do not share an entry.
+            /// </summary>
+            public CompilerSettings GetMasterCompilerSettings(
+                IDictionary<string, CompilerSettings> masterCompilerSettings,
+                string compilerName,
+                DevEnv devEnv,
+                string projectRootPath,
+                Options.Vc.General.PlatformToolset platformToolset,
+                bool useCCompiler,
+                ProcessorArchitecture architecture
             )
             {
                 CompilerSettings compilerSettings;
@@ -153,7 +206,7 @@ namespace Sharpmake
                     if (compilerDevEnv.HasValue)
                     {
                         platformToolSetPath = Path.Combine(compilerDevEnv.Value.GetVisualStudioDir(), "VC");
-                        pathToCompiler = compilerDevEnv.Value.GetVisualStudioBinPath(Platform.win64);
+                        pathToCompiler = compilerDevEnv.Value.GetVisualStudioBinPath(architecture);
                         compilerExeName = "cl.exe";
 
                         var compilerFamilyKey = new FastBuildWindowsCompilerFamilyKey(devEnv, platformToolset);
@@ -187,9 +240,9 @@ namespace Sharpmake
                                 var windowsTargetPlatformVersion = KitsRootPaths.GetWindowsTargetPlatformVersionForDevEnv(compilerDevEnv.Value);
                                 string redistDirectory;
                                 if (windowsTargetPlatformVersion <= Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17134_0)
-                                    redistDirectory = @"Redist\ucrt\DLLs\x64\";
+                                    redistDirectory = $@"Redist\ucrt\DLLs\{architecture}\";
                                 else
-                                    redistDirectory = $@"Redist\{windowsTargetPlatformVersion.ToVersionString()}\ucrt\DLLs\x64\";
+                                    redistDirectory = $@"Redist\{windowsTargetPlatformVersion.ToVersionString()}\ucrt\DLLs\{architecture}\";
 
                                 systemDllPath = Path.Combine(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot10), redistDirectory);
                             }
@@ -222,7 +275,7 @@ namespace Sharpmake
                                     @"$ExecutableRootPath$\msvcp140.dll",
                                     @"$ExecutableRootPath$\pgodb140.dll",
                                     @"$ExecutableRootPath$\vcruntime140.dll",
-                                    Path.Combine(platformToolSetPath, @"Auxiliary\Build\vcvars64.bat")
+                                    Path.Combine(platformToolSetPath, architecture == ProcessorArchitecture.arm64 ? @"Auxiliary\Build\vcvarsamd64_arm64.bat" : @"Auxiliary\Build\vcvars64.bat")
                                 );
                             }
 
@@ -268,7 +321,8 @@ namespace Sharpmake
                 string configName,
                 string projectRootPath,
                 DevEnv devEnv,
-                bool useCCompiler)
+                bool useCCompiler,
+                ProcessorArchitecture architecture)
             {
                 if (configurations.ContainsKey(configName))
                     return;
@@ -281,7 +335,7 @@ namespace Sharpmake
                 var fastBuildCompilerSettings = PlatformRegistry.Get<IWindowsFastBuildCompilerSettings>(Platform.win64);
                 string binPath;
                 if (!fastBuildCompilerSettings.BinPath.TryGetValue(devEnv, out binPath))
-                    binPath = devEnv.GetVisualStudioBinPath(Platform.win64);
+                    binPath = devEnv.GetVisualStudioBinPath(architecture);
 
                 string linkerPath;
                 if (!string.IsNullOrEmpty(linkerPathOverride))
@@ -303,7 +357,7 @@ namespace Sharpmake
 
                 string resCompiler;
                 if (!fastBuildCompilerSettings.ResCompiler.TryGetValue(devEnv, out resCompiler))
-                    resCompiler = devEnv.GetWindowsResourceCompiler(Platform.win64);
+                    resCompiler = architecture == ProcessorArchitecture.x64 ? devEnv.GetWindowsResourceCompiler(Platform.win64) : devEnv.GetWindowsResourceCompiler(architecture);
 
                 string capitalizedBinPath = Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, binPath));
                 configurations.Add(
@@ -324,7 +378,7 @@ namespace Sharpmake
                     compiler: "ML" + masmConfigurationName,
                     usingOtherConfiguration: configName
                 );
-                masmConfiguration.Masm = Path.Combine(capitalizedBinPath, "ml64.exe");
+                masmConfiguration.Masm = Path.Combine(capitalizedBinPath, architecture == ProcessorArchitecture.arm64 ? "armasm64.exe" : "ml64.exe");
 
                 configurations.Add(
                     masmConfigurationName,
@@ -357,10 +411,27 @@ namespace Sharpmake
                 return defines;
             }
 
+            private static void VerifyInstructionSetLevelToolchain(Project.Configuration conf)
+            {
+                var platformToolset = Options.GetObject<Options.Vc.General.PlatformToolset>(conf);
+                bool usesClangCl = platformToolset.IsLLVMToolchain() && Options.GetObject<Options.Vc.LLVM.UseClangCl>(conf) == Options.Vc.LLVM.UseClangCl.Enable;
+                DevEnv devEnv = conf.Target.GetFragment<DevEnv>();
+
+                InstructionSetLevelSwitches.VerifyToolchain(
+                    conf.Target,
+                    platformToolset,
+                    usesClangCl,
+                    () => platformToolset == Options.Vc.General.PlatformToolset.ClangCL ? ClangForWindows.Settings.ClangVersionVsEmbedded(devEnv) : ClangForWindows.Settings.ClangVersion
+                );
+            }
+
             public override void SetupPlatformTargetOptions(IGenerationContext context)
             {
-                context.Options["TargetMachine"] = "MachineX64";
-                context.CommandLineOptions["TargetMachine"] = "/MACHINE:X64";
+                VerifyInstructionSetLevelToolchain(context.Configuration);
+
+                bool isArm64 = Util.GetProcessorArchitecture(context.Configuration.Target) == ProcessorArchitecture.arm64;
+                context.Options["TargetMachine"] = isArm64 ? "MachineARM64" : "MachineX64";
+                context.CommandLineOptions["TargetMachine"] = isArm64 ? "/MACHINE:ARM64" : "/MACHINE:X64";
                 context.CommandLineOptions["NasmCompilerFormat"] = "-fwin64";
             }
 
@@ -478,11 +549,23 @@ namespace Sharpmake
                     if (context.DevelopmentEnvironmentsRange.MinDevEnv != context.DevelopmentEnvironmentsRange.MaxDevEnv)
                         throw new Error("Different vs versions not supported in the same vcxproj");
 
-                    using (generator.Declare("platformName", GetToolchainPlatformString(null)))
+                    // The overrides apply to every Visual Studio platform the project has for win64 (x64 and/or ARM64)
+                    var platformNames = context.ProjectConfigurations
+                        .Where(c => c.Platform == Platform.win64)
+                        .Select(c => GetToolchainPlatformString(c.Target))
+                        .Distinct()
+                        .ToList();
+                    if (platformNames.Count == 0)
+                        platformNames.Add(GetToolchainPlatformString(null));
+
+                    foreach (string platformName in platformNames)
                     {
-                        generator.Write(Vcxproj.Template.Project.ProjectDescriptionStartPlatformConditional);
-                        generator.WriteVerbatim(propertyGroups);
-                        generator.Write(Vcxproj.Template.Project.PropertyGroupEnd);
+                        using (generator.Declare("platformName", platformName))
+                        {
+                            generator.Write(Vcxproj.Template.Project.ProjectDescriptionStartPlatformConditional);
+                            generator.WriteVerbatim(propertyGroups);
+                            generator.Write(Vcxproj.Template.Project.PropertyGroupEnd);
+                        }
                     }
                 }
             }

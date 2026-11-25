@@ -1486,6 +1486,8 @@ namespace Sharpmake
 
             /// <summary>
             /// Target path, where the output files will be compiled, ex: exe, dll, self, xex
+            /// The default ends with [target.Platform] and [conf.Name], except for an instruction set level other than the
+            /// baseline: its configuration name has a space (e.g. "Release APX"), so it ends with [target.Name] instead.
             /// </summary>
             public string TargetPath = Path.Combine("[conf.ProjectPath]", "output", "[target.Platform]", "[conf.Name]");
 
@@ -2857,6 +2859,11 @@ namespace Sharpmake
                 if (target.TestFragment(Optimization.Release) || target.TestFragment(Optimization.Retail))
                     DefaultOption = Sharpmake.Options.DefaultTarget.Release;
                 Project project = (Project)owner;
+
+                // The configuration name of a non-baseline instruction set level has a space ("Release APX"),
+                // which must not end up in folders: use the target name, the level is already in [target.Platform].
+                if (Util.GetInstructionSetLevel(target) != InstructionSetLevel.Baseline)
+                    TargetPath = Path.Combine("[conf.ProjectPath]", "output", "[target.Platform]", "[target.Name]");
 
                 // Change Output default for Export
                 if (project.SharpmakeProjectType == ProjectTypeAttribute.Export)

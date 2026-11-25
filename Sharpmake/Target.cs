@@ -88,7 +88,8 @@ namespace Sharpmake
         win32 = 1 << 0,
 
         /// <summary>
-        /// Windows 64-bit
+        /// Windows 64-bit. Builds for x64 unless the <see cref="ProcessorArchitecture"/> of the target says
+        /// otherwise (arm64).
         /// </summary>
         win64 = 1 << 1,
 
@@ -305,6 +306,29 @@ namespace Sharpmake
         FastBuildUnitys = 0x04,
     }
 
+    /// <summary>
+    /// Processor architecture an executable is built for. Optional: when unset (0), the platform's
+    /// default architecture is used.
+    /// </summary>
+    [Fragment, Flags]
+    public enum ProcessorArchitecture
+    {
+        x86 = 1 << 0,
+        x64 = 1 << 1,
+        arm64 = 1 << 2,
+    }
+
+    /// <summary>
+    /// Instruction set tier an executable requires. One tier per executable, they are not combinable
+    /// features. Optional: when unset (0), <see cref="Baseline"/> is used.
+    /// </summary>
+    [Fragment, Flags]
+    public enum InstructionSetLevel
+    {
+        Baseline = 1 << 0,
+        APX = 1 << 1,
+    }
+
     public enum KitsRootEnum
     {
         KitsRoot,
@@ -325,13 +349,46 @@ namespace Sharpmake
         public string FrameworkFolder { get { return Framework.ToFolderName(); } }
         public Blob Blob;
 
+        /// <summary>
+        /// Processor architecture the target is built for. 0 (unset) means the default of the platform.
+        /// </summary>
+        public ProcessorArchitecture ProcessorArchitecture;
+
+        /// <summary>
+        /// Instruction set level the target requires. 0 (unset) means <see cref="Sharpmake.InstructionSetLevel.Baseline"/>.
+        /// </summary>
+        public InstructionSetLevel InstructionSetLevel;
+
         public override string Name
         {
             get { return Optimization.ToString(); }
         }
 
+        // Targets of a non-baseline instruction set level share their Visual Studio platform with the
+        // baseline ones, so the configuration name carries the difference (e.g. "Release APX|x64").
+        public override string ProjectConfigurationName
+        {
+            get { return Name + Util.GetConfigurationNameSuffix(this); }
+        }
+
         public Target() { }
 
+        public Target(
+            Platform platform,
+            DevEnv devEnv,
+            Optimization optimization
+        )
+        {
+            Platform = platform;
+            DevEnv = devEnv;
+            Optimization = optimization;
+            OutputType = OutputType.Lib;
+            Blob = Blob.NoBlob;
+            BuildSystem = BuildSystem.MSBuild;
+            Framework = DotNetFramework.v4_7_2;
+        }
+
+        [Obsolete("Use the Target(Platform, DevEnv, Optimization) constructor and set optional fragments in an object initializer instead.", error: false)]
         public Target(
             Platform platform,
             DevEnv devEnv,
@@ -346,9 +403,9 @@ namespace Sharpmake
             DevEnv = devEnv;
             Optimization = optimization;
             OutputType = outputType;
-            Framework = framework;
-            BuildSystem = buildSystem;
             Blob = blob;
+            BuildSystem = buildSystem;
+            Framework = framework;
         }
     }
 
@@ -369,7 +426,7 @@ namespace Sharpmake
             FieldInfo[] fieldInfos = GetFragmentFieldInfo();
 
             var fieldInfoValues = fieldInfos.Select(f => f.GetValue(this));
-            var nonZeroValues = fieldInfoValues.Where(f => ((int)f) != 0);
+            var nonZeroValues = fieldInfoValues.Where(f => ((int)f) != 0 && !Util.IsOmittedAsDefault(this, f));
             string result = string.Join(
                 "_",
                 nonZeroValues.Select(f => s_cachedFieldValueToString.GetOrAdd(f, value =>
@@ -390,6 +447,10 @@ namespace Sharpmake
             get { return GetTargetString(); }
         }
 
+        /// <summary>
+        /// The configuration name written in the project files (the first part of "Release|x64"). It is the
+        /// <see cref="Name"/>, plus what tells apart targets that share a Visual Studio platform (e.g. "Release APX").
+        /// </summary>
         public virtual string ProjectConfigurationName
         {
             get { return Name; }
@@ -574,7 +635,7 @@ namespace Sharpmake
             {
                 if (fragmentMaskType.IsAssignableFrom(fragmentField.FieldType))
                 {
-                    int targetValue = (int)fragmentField.GetValue(this);
+                    int targetValue = ResolveDefaultedFragment(fragmentField.FieldType, (int)fragmentField.GetValue(this));
                     int maskValue = (int)fragmentMask;
                     if ((targetValue == 0) || (targetValue & maskValue) != targetValue)
                     {
@@ -590,6 +651,7 @@ namespace Sharpmake
             if (GetType() != other.GetType())
                 return false;
 
+            FieldInfo[] fragmentFields = GetFragmentFieldInfo();
             int[] target1Values = GetFragmentsValue();
             int[] target2Values = other.GetFragmentsValue();
 
@@ -597,10 +659,39 @@ namespace Sharpmake
 
             for (int i = 0; i < target1Values.Length; ++i)
             {
-                if ((target1Values[i] & target2Values[i]) == 0)
+                int value1 = target1Values[i];
+                int value2 = target2Values[i];
+                if (IsDefaultedFragment(fragmentFields[i].FieldType))
+                {
+                    value1 = ResolveDefaultedFragment(fragmentFields[i].FieldType, value1);
+                    value2 = other.ResolveDefaultedFragment(fragmentFields[i].FieldType, value2);
+
+                    // Platforms whose descriptor doesn't declare an architecture yet resolve to 0 on both sides, which is a match
+                    if (value1 == 0 && value2 == 0)
+                        continue;
+                }
+
+                if ((value1 & value2) == 0)
                     return false;
             }
             return true;
+        }
+
+        private static bool IsDefaultedFragment(Type fragmentType)
+        {
+            return fragmentType == typeof(ProcessorArchitecture) || fragmentType == typeof(InstructionSetLevel);
+        }
+
+        // An unset (0) architecture or instruction set level stands for the platform default
+        private int ResolveDefaultedFragment(Type fragmentType, int value)
+        {
+            if (value != 0)
+                return value;
+            if (fragmentType == typeof(ProcessorArchitecture))
+                return (int)Util.GetProcessorArchitecture(this);
+            if (fragmentType == typeof(InstructionSetLevel))
+                return (int)InstructionSetLevel.Baseline;
+            return value;
         }
 
         public bool IsIncludeIn(Targets others)
@@ -625,6 +716,21 @@ namespace Sharpmake
                 int fragmentValue = (int)fragmentField.GetValue(this);
                 values[i] = fragmentValue;
             }
+            return values;
+        }
+
+        /// <summary>
+        /// Like <see cref="GetFragmentsValue"/>, but an unset architecture or instruction set level is replaced by
+        /// the platform default, so that unset and explicit defaults compare equal.
+        /// </summary>
+        internal int[] GetEffectiveFragmentsValue()
+        {
+            FieldInfo[] fragmentFields = GetFragmentFieldInfo();
+            int[] values = GetFragmentsValue();
+
+            for (int i = 0; i < values.Length; ++i)
+                values[i] = ResolveDefaultedFragment(fragmentFields[i].FieldType, values[i]);
+
             return values;
         }
 
@@ -667,7 +773,8 @@ namespace Sharpmake
 
         // Target possibilities contains target with fragments bitfield,
         // will be expose for every possibles combinations of unique target value
-        private List<ITarget> _targetPossibilities = new List<ITarget>();
+        // Each one is kept with the AddTargets call that added it, to point at it in errors
+        private List<(ITarget Mask, string Caller)> _targetPossibilities = new List<(ITarget, string)>();
 
         private Dictionary<Type, List<int>> _fragmentMasks;
 
@@ -676,7 +783,7 @@ namespace Sharpmake
 
         public IEnumerable<ITarget> TargetObjects => _targetObjects;
 
-        public IEnumerable<ITarget> TargetPossibilities => _targetPossibilities;
+        public IEnumerable<ITarget> TargetPossibilities => _targetPossibilities.Select(p => p.Mask);
 
         public Targets()
         { }
@@ -818,16 +925,62 @@ namespace Sharpmake
                     throw new Error(callerInfo + "error: Target must be all of the same type " + TargetType + " != " + targetMask.GetType() +
                         "; Are you missing base(typeof(" + targetMask.GetType() + ") in your Project class?");
 
-            _targetPossibilities.AddRange(targetsMask);
+            foreach (ITarget mask in targetsMask)
+                _targetPossibilities.Add((mask, callerInfo));
         }
 
         internal void AddTargets(string callerInfo, Targets targets)
         {
-            foreach (ITarget targetMask in targets._targetPossibilities)
+            foreach (var (targetMask, _) in targets._targetPossibilities)
                 if (TargetType != targetMask.GetType())
                     throw new Error(callerInfo + "error: Target must be all of the same type " + TargetType + " != " + targetMask.GetType());
 
-            _targetPossibilities.AddRange(targets._targetPossibilities);
+            // Keep the caller recorded by the source Targets; fall back to this call
+            foreach (var (mask, caller) in targets._targetPossibilities)
+                _targetPossibilities.Add((mask, string.IsNullOrEmpty(caller) ? callerInfo : caller));
+        }
+
+        // Raw comparison: an unset fragment of a mask has no platform default to resolve (a mask can span platforms)
+        private bool IsExpandedFrom(ITarget target, ITarget mask)
+        {
+            foreach (FieldInfo field in TargetType.GetFields())
+            {
+                int targetValue = (int)field.GetValue(target);
+                int maskValue = (int)field.GetValue(mask);
+                if (maskValue == 0 ? targetValue != 0 : (targetValue & maskValue) != targetValue)
+                    return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Rewrites the error of an invalid expanded target so that it points at the AddTargets call that added it.
+        /// When the target comes from a mask (a fragment holding several values), the mask is what the message is about.
+        /// Returns null if the target comes from no known AddTargets call.
+        /// </summary>
+        internal string DescribeInvalidTarget(ITarget target, string error)
+        {
+            foreach (var (mask, caller) in _targetPossibilities)
+            {
+                if (mask.GetType() != target.GetType() || !IsExpandedFrom(target, mask))
+                    continue;
+
+                var maskedFragments = new List<string>();
+                foreach (FieldInfo field in TargetType.GetFields())
+                {
+                    int value = (int)field.GetValue(mask);
+                    if (value != 0 && (value & (value - 1)) != 0)
+                        maskedFragments.Add($"{field.FieldType.Name} = {Enum.ToObject(field.FieldType, value)}");
+                }
+
+                if (maskedFragments.Count == 0)
+                    return $"{caller}{error} (target added by this AddTargets call)";
+
+                return $"{caller}this AddTargets call adds a mask ({string.Join("; ", maskedFragments)}) that expands to an invalid combination: {error} " +
+                    "Split the AddTargets call so that it only generates valid combinations.";
+            }
+
+            return null;
         }
 
         internal bool IsFragmentValueValid(Type fragmentType, int fragmentValue)
@@ -934,7 +1087,7 @@ namespace Sharpmake
 
             var fragments = TargetType.GetFields();
 
-            var selectCP = _targetPossibilities.Select(tp =>
+            var selectCP = _targetPossibilities.Select(p => p.Mask).Select(tp =>
             {
                 var tuples = fragments.Select(f =>
                 {

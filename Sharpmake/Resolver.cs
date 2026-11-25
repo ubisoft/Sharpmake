@@ -674,10 +674,12 @@ namespace Sharpmake
             object parameter = refCountedReference.Value;
 
             string name = "";
+            object owner = null;
             for (int i = 1; i < names.Length && parameter != null; ++i)
             {
                 bool found = false;
 
+                owner = parameter;
                 string nameChunk = names[i];
 
                 Type parameterType = parameter.GetType();
@@ -747,10 +749,48 @@ namespace Sharpmake
             // Handle platform names in case they are provided by a platform extension, this allows "[target.Platform]" to be properly resolved
             if (parameter is Platform platformParameter)
             {
-                parameter = Util.GetSimplePlatformString(platformParameter);
+                // When the platform comes from a target, the target's architecture and instruction set level
+                // are part of the name (e.g. "Win64APX"); default ones are omitted so existing paths are unchanged.
+                if (owner is ITarget owningTarget && owningTarget.TryGetFragment(out Platform targetPlatform) && targetPlatform == platformParameter)
+                    parameter = Util.GetDisambiguatedPlatformString(owningTarget);
+                else
+                    parameter = Util.GetSimplePlatformString(platformParameter);
+            }
+
+            // Like the platform, the architecture and level of a target are resolved from their effective value,
+            // so that an unset fragment and an explicit default give the same string (not "0" or "Baseline").
+            if (owner is ITarget owningTargetFragment)
+            {
+                if (parameter is ProcessorArchitecture)
+                    parameter = ResolveTargetArchitecture(owningTargetFragment, parameterName + name);
+                else if (parameter is InstructionSetLevel)
+                    parameter = ResolveTargetInstructionSetLevel(owningTargetFragment, parameterName + name);
             }
 
             return ApplyModifier(modifier, parameter.ToString());
+        }
+
+        private static string ResolveTargetArchitecture(ITarget target, string path)
+        {
+            ProcessorArchitecture architecture = Util.GetProcessorArchitecture(target);
+            if (architecture == 0)
+            {
+                throw new Error("Cannot resolve '{0}' for target \"{1}\": its platform does not declare a processor architecture yet. Use [target.Platform] to build paths.", path, target);
+            }
+
+            return architecture.ToString();
+        }
+
+        private static string ResolveTargetInstructionSetLevel(ITarget target, string path)
+        {
+            // The baseline has no name token, it is omitted from every string (it would be an empty path chunk)
+            string token = InstructionSetLevelInfo.GetNameToken(Util.GetInstructionSetLevel(target));
+            if (string.IsNullOrEmpty(token))
+            {
+                throw new Error("Cannot resolve '{0}' for target \"{1}\": the baseline instruction set level has no name, it is omitted from paths and names. Use [target.Platform], which includes the level when it is not the baseline.", path, target);
+            }
+
+            return token;
         }
 
         private static bool CanWriteFieldValue(FieldInfo fieldInfo)

@@ -17,9 +17,7 @@ namespace SimpleExeLibDependency
             AddTargets(new Target(
                 Platform.win64,
                 DevEnv.vs2022,
-                Optimization.Debug,
-                OutputType.Lib
-            ));
+                Optimization.Debug));
 
             SourceRootPath = "[project.BasePath]";
 

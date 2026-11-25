@@ -47,6 +47,12 @@ namespace Sharpmake.UnitTests
             WarningCount = 0;
         }
 
+        // Lets a fixture swap the context, e.g. to read the generated files
+        protected virtual BuildContext.BaseBuildContext CreateBuildContext(bool debugLog, bool writeFiles)
+        {
+            return new BuildContext.GenerateAll(debugLog, writeFiles);
+        }
+
         protected void Init()
         {
             bool debugLog = true;
@@ -58,7 +64,7 @@ namespace Sharpmake.UnitTests
             DependencyTracker.GraphWriteLegend = false;
 
             Builder = new Builder(
-                new BuildContext.GenerateAll(debugLog, writeFiles),
+                CreateBuildContext(debugLog, writeFiles),
                 multithreaded,
                 dumpDependency,
                 false,

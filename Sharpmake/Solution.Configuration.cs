@@ -77,13 +77,22 @@ namespace Sharpmake
             /// </summary>
             public string MasterBffFilePath => Path.Combine(MasterBffDirectory, MasterBffFileName);
 
-            // Can be set to customize solution platform name
             private string _platformName = null;
+            /// <summary>
+            /// The solution platform name of this configuration: the entry of the Visual Studio platform dropdown
+            /// that selects it (e.g. "x64", "x64-APX", "ARM64").
+            /// Unless set, it comes from <see cref="IPlatformDescriptor.GetSolutionPlatformName(ITarget)"/>, which
+            /// gives each architecture and instruction set level its own name.
+            /// A value set here is used as is and never modified by Sharpmake, so it must tell the architectures and
+            /// levels of the targets apart itself, for example by appending
+            /// <see cref="Util.GetArchitectureDisplaySuffix(ITarget)"/> (which gives "", "x64-APX" or "ARM64").
+            /// Two targets that end up with the same platform name in a solution are reported as duplicates.
+            /// </summary>
             public string PlatformName
             {
                 get
                 {
-                    return string.IsNullOrEmpty(_platformName) ? Util.GetToolchainPlatformString(Platform, null, Target) : _platformName;
+                    return string.IsNullOrEmpty(_platformName) ? Util.GetSolutionPlatformName(Target) : _platformName;
                 }
                 set
                 {

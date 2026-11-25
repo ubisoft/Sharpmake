@@ -509,11 +509,12 @@ namespace QTFileCustomBuild
             SourceFilesExtensions.Add(".qrc", ".ui");
 
             AddTargets(new Target(
-                    Platform.win64,
-                    DevEnv.vs2019,
-                    Optimization.Debug | Optimization.Release | Optimization.Retail,
-                    OutputType.Dll
-            ));
+                Platform.win64,
+                DevEnv.vs2019,
+                Optimization.Debug | Optimization.Release | Optimization.Retail)
+            {
+                OutputType = OutputType.Dll
+            });
 
             // Fast build fails regression tests because it embeds system and user paths, which aren't
             // the same on each user's machine.
@@ -575,11 +576,12 @@ namespace QTFileCustomBuild
             Name = "QTFileCustomBuild";
 
             AddTargets(new Target(
-                    Platform.win64,
-                    DevEnv.vs2019,
-                    Optimization.Debug | Optimization.Release | Optimization.Retail,
-                    OutputType.Dll
-            ));
+                Platform.win64,
+                DevEnv.vs2019,
+                Optimization.Debug | Optimization.Release | Optimization.Retail)
+            {
+                OutputType = OutputType.Dll
+            });
 
             // Fast build fails regression tests because it embeds system and user paths, which aren't
             // the same on each user's machine.
