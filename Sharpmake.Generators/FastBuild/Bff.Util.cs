@@ -350,7 +350,7 @@ namespace Sharpmake.Generators.FastBuild
             {
                 // we need to compute the missing member values in the Unity objects:
                 // UnityName and UnityOutputPattern
-                var masks = new List<Tuple<Unity, int[]>>();
+                var masks = new List<Tuple<Unity, int[], ITarget>>();
 
                 List<FieldInfo> fragmentsInfos = null;
 
@@ -366,7 +366,7 @@ namespace Sharpmake.Generators.FastBuild
                         fragmentsInfos = new List<FieldInfo>(configurations.First().Target.GetFragmentFieldInfo());
 
                     var unityMerged = GetMergedFragments(unityFragments);
-                    masks.Add(Tuple.Create(unitySection.Key, unityMerged));
+                    masks.Add(Tuple.Create(unitySection.Key, unityMerged, configurations.First().Target));
                 }
 
                 // get the fragment values for the whole project: could span multiple bff files
@@ -378,13 +378,25 @@ namespace Sharpmake.Generators.FastBuild
                 {
                     var unity = unitySection.Item1;
                     var unityFragments = unitySection.Item2;
+                    var unityTarget = unitySection.Item3;
                     var differentFragmentIndices = GetDifferentFragmentIndices(merged, unityFragments);
 
                     string fragmentString = string.Empty;
-                    for (int i = 0; i < unityFragments.Length; ++i)
+                    foreach (int i in GetUnityNameFragmentOrder(fragmentsInfos))
                     {
                         // if not a differentiating fragment, skip
                         if (!differentFragmentIndices.Contains(i))
+                            continue;
+
+                        // An explicit Baseline level is the same target as an unset one, and the target string
+                        // omits it, so the unity name must not mention it either. Otherwise an explicit
+                        // "x64 + Baseline" target would be named "..._Baseline_x64_unity" while the same target
+                        // left unset is just "..._x64_unity".
+                        // The target of the first configuration is enough to know the platform's defaults,
+                        // as all the configurations sharing a unity have the same platform.
+                        // The architecture is not omitted: when it varies in the project, x64 has to be
+                        // told apart from arm64.
+                        if (IsOmittedAsDefault(fragmentsInfos[i], unityFragments[i], unityTarget))
                             continue;
 
                         AppendFragmentUnityName(fragmentsInfos[i], unityFragments[i], ref fragmentString);
@@ -434,13 +446,68 @@ namespace Sharpmake.Generators.FastBuild
 
                     string fragmentString = string.Empty;
                     for (int i = 0; i < unityFragments.Length; ++i)
+                    {
+                        // Unset architecture/level mean "platform default": they must not alter the
+                        // hash, so that targets that don't use them keep the same unity names.
+                        if (unityFragments[i] == 0 && IsDefaultOmittedFragment(fragmentsInfos[i].FieldType))
+                            continue;
+
                         AppendFragmentUnityName(fragmentsInfos[i], unityFragments[i], ref fragmentString);
+                    }
 
                     int hashcode = fragmentString.ToLowerInvariant().GetDeterministicHashCode();
                     unity.UnityName = $"{project.Name}_unity_{hashcode:X8}";
                     unity.UnityOutputPattern = unity.UnityName.ToLower() + "*.cpp";
                 }
             }
+        }
+
+        private static bool IsDefaultOmittedFragment(Type fragmentType)
+        {
+            return fragmentType == typeof(ProcessorArchitecture) || fragmentType == typeof(InstructionSetLevel);
+        }
+
+        // True if the fragment is the Baseline level, which the target string leaves out
+        private static bool IsOmittedAsDefault(FieldInfo fragmentFieldInfo, int unityFragment, ITarget target)
+        {
+            return fragmentFieldInfo.FieldType == typeof(InstructionSetLevel) &&
+                Util.IsOmittedAsDefault(target, Enum.ToObject(fragmentFieldInfo.FieldType, unityFragment));
+        }
+
+        // Fragments are sorted by type name, which would put the level before the architecture ("APX_x64"):
+        // the level qualifies the architecture, so it is named right after it ("x64_APX")
+        // Example: [DevEnv, Level, Optimization, Platform, Arch] gives 0, 2, 3, 4, 1
+        private static IEnumerable<int> GetUnityNameFragmentOrder(IReadOnlyList<FieldInfo> fragmentsInfos)
+        {
+            int architecture = IndexOfFragment(fragmentsInfos, typeof(ProcessorArchitecture));
+            int level = IndexOfFragment(fragmentsInfos, typeof(InstructionSetLevel));
+
+            // Without both fragments there is nothing to reorder
+            bool levelFollowsArchitecture = architecture >= 0 && level >= 0;
+
+            for (int i = 0; i < fragmentsInfos.Count; ++i)
+            {
+                // The level is held back from its own slot...
+                if (levelFollowsArchitecture && i == level)
+                    continue;
+
+                yield return i;
+
+                // ...and released right after the architecture
+                if (levelFollowsArchitecture && i == architecture)
+                    yield return level;
+            }
+        }
+
+        // Returns -1 if the target has no fragment of this type
+        private static int IndexOfFragment(IReadOnlyList<FieldInfo> fragmentsInfos, Type fragmentType)
+        {
+            for (int i = 0; i < fragmentsInfos.Count; ++i)
+            {
+                if (fragmentsInfos[i].FieldType == fragmentType)
+                    return i;
+            }
+            return -1;
         }
 
         private static void AppendFragmentUnityName(FieldInfo fragmentFieldInfo, int unityFragment, ref string fragmentString)

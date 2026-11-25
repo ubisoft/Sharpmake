@@ -336,7 +336,6 @@ namespace Sharpmake.Generators.VisualStudio
                     SolutionProjectConfigMatch match = SolutionConfigMatcher.Match(solution, solutionConfiguration, solutionProject);
                     Solution.Configuration.IncludedProjectInfo includedProject = match.IncludedProject;
                     Project.Configuration projectConf = match.ProjectConf;
-                    Platform projectPlatform = match.ProjectTarget.GetPlatform();
 
                     SolutionConfigMatcher.TrackFastBuildConfig(solutionConfigurationFastBuildBuilt, solutionConfiguration, match);
 
@@ -352,7 +351,7 @@ namespace Sharpmake.Generators.VisualStudio
                     SolutionConfigMatcher.RecordFastBuildBuilt(solutionConfigurationFastBuildBuilt, solutionConfiguration, match);
 
                     string solutionConfigScope = configurationName + "|" + category;
-                    string projectPlatformString = Util.GetToolchainPlatformString(projectPlatform, solutionProject.Project, solutionConfiguration.Target, true);
+                    string projectPlatformString = SolutionConfigMatcher.GetProjectPlatform(solutionConfiguration, match, solutionProject);
                     string projectBuildType = projectConf.Name;
 
                     // Emit BuildType / Platform remap rules when the project's resolved config name

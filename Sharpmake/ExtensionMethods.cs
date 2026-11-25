@@ -494,24 +494,86 @@ namespace Sharpmake
 
         public static string GetVisualStudioBinPath(this DevEnv visualVersion, Platform platform)
         {
+            return visualVersion.GetVisualStudioBinPath(GetVisualStudioBinArchitecture(visualVersion, platform));
+        }
+
+        // Architecture of the compiler that the Platform overload of GetVisualStudioBinPath always gave
+        internal static ProcessorArchitecture GetVisualStudioBinArchitecture(DevEnv visualVersion, Platform platform)
+        {
             switch (visualVersion)
             {
                 case DevEnv.vs2015:
-                    {
-                        string targetPlatform = (platform == Platform.win64) ? "amd64" : "";
-                        return Path.Combine(visualVersion.GetVisualStudioVCRootPath(), "bin", targetPlatform);
-                    }
+                    return (platform == Platform.win64) ? ProcessorArchitecture.x64 : ProcessorArchitecture.x86;
                 case DevEnv.vs2017:
                 case DevEnv.vs2019:
                 case DevEnv.vs2022:
                 case DevEnv.vs2026:
-                    {
-                        string targetPlatform = (platform == Platform.win32) ? "x86" : "x64";
-                        string compilerHost = Environment.Is64BitOperatingSystem ? "HostX64" : "HostX86";
-                        return Path.Combine(visualVersion.GetVisualStudioVCRootPath(), "bin", compilerHost, targetPlatform);
-                    }
+                    return (platform == Platform.win32) ? ProcessorArchitecture.x86 : ProcessorArchitecture.x64;
             }
             throw new ArgumentOutOfRangeException("VS version not recognized " + visualVersion);
+        }
+
+        /// <summary>
+        /// Gets the folder of the compiler that builds for the given processor architecture.
+        /// </summary>
+        internal static string GetVisualStudioBinPath(this DevEnv visualVersion, ProcessorArchitecture architecture)
+        {
+            return Path.Combine(visualVersion.GetVisualStudioVCRootPath(), GetVisualStudioBinSubPath(visualVersion, architecture));
+        }
+
+        // Compiler folder relative to the VC root: vs2015 has no Host* folder
+        internal static string GetVisualStudioBinSubPath(DevEnv visualVersion, ProcessorArchitecture architecture)
+        {
+            string targetDirectory = GetVisualStudioToolsetDirectory(visualVersion, architecture);
+            if (visualVersion == DevEnv.vs2015)
+                return Path.Combine("bin", targetDirectory);
+
+            string compilerHost = Environment.Is64BitOperatingSystem ? "HostX64" : "HostX86";
+            return Path.Combine("bin", compilerHost, targetDirectory);
+        }
+
+        // Name of the per-architecture subfolder of the Visual Studio toolset (the last folder of bin\Host*\ and of lib\)
+        internal static string GetVisualStudioToolsetDirectory(DevEnv visualVersion, ProcessorArchitecture architecture)
+        {
+            if (visualVersion == DevEnv.vs2015)
+            {
+                switch (architecture)
+                {
+                    case ProcessorArchitecture.x86: return "";
+                    case ProcessorArchitecture.x64: return "amd64";
+                    case ProcessorArchitecture.arm64: throw new Error("Processor architecture arm64 requires Visual Studio 2017 or newer, not {0}.", visualVersion);
+                }
+            }
+            else
+            {
+                switch (architecture)
+                {
+                    case ProcessorArchitecture.x86: return "x86";
+                    case ProcessorArchitecture.x64: return "x64";
+                    case ProcessorArchitecture.arm64: return "arm64";
+                }
+            }
+            throw new Error("Unknown processor architecture {0} for {1}.", architecture, visualVersion);
+        }
+
+        // Name of the per-architecture subfolder of the Windows SDK libraries (Lib\<version>\um\<dir>)
+        internal static string GetWindowsSdkLibraryDirectory(ProcessorArchitecture architecture)
+        {
+            switch (architecture)
+            {
+                case ProcessorArchitecture.x86: return "x86";
+                case ProcessorArchitecture.x64: return "x64";
+                case ProcessorArchitecture.arm64: return "arm64";
+                default: throw new Error("Unknown processor architecture {0}.", architecture);
+            }
+        }
+
+        // Name of the per-architecture subfolder of the Windows SDK tools (bin\<version>\<dir>). The tools run
+        // on the build machine, so an arm64 target is built with the x64 ones.
+        // TODO: use the arm64 tools when building on an arm64 machine (like GetVisualStudioBinPath, only x86/x64 hosts are handled here)
+        internal static string GetWindowsSdkToolDirectory(ProcessorArchitecture architecture)
+        {
+            return architecture == ProcessorArchitecture.x86 ? "x86" : "x64";
         }
 
         public static bool OverridenWindowsPath(this DevEnv visualVersion)
@@ -521,12 +583,24 @@ namespace Sharpmake
 
         public static string GetWindowsExecutablePath(this DevEnv visualVersion, Platform platform)
         {
+            string targetPlatform = (platform == Platform.win64) ? "x64" : "x86";
+            return GetWindowsExecutablePath(visualVersion, visualVersion.GetVisualStudioBinPath(platform), targetPlatform);
+        }
+
+        /// <summary>
+        /// Like <see cref="GetWindowsExecutablePath(DevEnv, Platform)"/>, for a processor architecture.
+        /// </summary>
+        internal static string GetWindowsExecutablePath(this DevEnv visualVersion, ProcessorArchitecture architecture)
+        {
+            return GetWindowsExecutablePath(visualVersion, visualVersion.GetVisualStudioBinPath(architecture), GetWindowsSdkToolDirectory(architecture));
+        }
+
+        private static string GetWindowsExecutablePath(DevEnv visualVersion, string visualStudioBinPath, string targetPlatform)
+        {
             KitsRootEnum kitsRoot = KitsRootPaths.GetUseKitsRootForDevEnv(visualVersion);
 
-            string targetPlatform = (platform == Platform.win64) ? "x64" : "x86";
-
             var paths = new Strings();
-            paths.Add(visualVersion.GetVisualStudioBinPath(platform));
+            paths.Add(visualStudioBinPath);
 
             switch (kitsRoot)
             {
@@ -562,9 +636,21 @@ namespace Sharpmake
 
         public static string GetWindowsResourceCompiler(this DevEnv visualVersion, Platform platform)
         {
-            KitsRootEnum kitsRoot = KitsRootPaths.GetUseKitsRootForDevEnv(visualVersion);
-
             string targetPlatform = (platform == Platform.win64) ? "x64" : "x86";
+            return GetWindowsResourceCompiler(visualVersion, targetPlatform);
+        }
+
+        /// <summary>
+        /// Like <see cref="GetWindowsResourceCompiler(DevEnv, Platform)"/>, for a processor architecture.
+        /// </summary>
+        internal static string GetWindowsResourceCompiler(this DevEnv visualVersion, ProcessorArchitecture architecture)
+        {
+            return GetWindowsResourceCompiler(visualVersion, GetWindowsSdkToolDirectory(architecture));
+        }
+
+        private static string GetWindowsResourceCompiler(DevEnv visualVersion, string targetPlatform)
+        {
+            KitsRootEnum kitsRoot = KitsRootPaths.GetUseKitsRootForDevEnv(visualVersion);
 
             switch (kitsRoot)
             {
@@ -656,15 +742,30 @@ namespace Sharpmake
 
         public static string GetWindowsLibraryPath(this DevEnv visualVersion, Platform platform, DotNetFramework? dotNetFramework = null)
         {
-            string visualStudioVCDir = Util.EnsureTrailingSeparator(visualVersion.GetVisualStudioVCRootPath());
             string subDir = platform == Platform.win64 ? @"\amd64" : "";
             if (visualVersion.IsVisualStudio() && visualVersion >= DevEnv.vs2017)
                 subDir = platform == Platform.win64 ? @"\x64" : @"\x86";
 
+            string targetPlatform = platform == Platform.win64 ? "x64" : "x86";
+            return GetWindowsLibraryPath(visualVersion, subDir, targetPlatform, dotNetFramework);
+        }
+
+        /// <summary>
+        /// Like <see cref="GetWindowsLibraryPath(DevEnv, Platform, DotNetFramework?)"/>, for a processor architecture.
+        /// </summary>
+        internal static string GetWindowsLibraryPath(this DevEnv visualVersion, ProcessorArchitecture architecture, DotNetFramework? dotNetFramework = null)
+        {
+            string toolsetDirectory = GetVisualStudioToolsetDirectory(visualVersion, architecture);
+            string subDir = toolsetDirectory.Length == 0 ? "" : @"\" + toolsetDirectory;
+            return GetWindowsLibraryPath(visualVersion, subDir, GetWindowsSdkLibraryDirectory(architecture), dotNetFramework);
+        }
+
+        private static string GetWindowsLibraryPath(DevEnv visualVersion, string subDir, string targetPlatform, DotNetFramework? dotNetFramework)
+        {
+            string visualStudioVCDir = Util.EnsureTrailingSeparator(visualVersion.GetVisualStudioVCRootPath());
             string visualStudioLib = string.Format(@"{0}lib{1};{0}atlmfc\lib{1};", visualStudioVCDir, subDir);
 
             KitsRootEnum useKitsRoot = KitsRootPaths.GetUseKitsRootForDevEnv(visualVersion);
-            string targetPlatform = platform == Platform.win64 ? "x64" : "x86";
 
             switch (useKitsRoot)
             {

@@ -266,12 +266,14 @@ namespace Sharpmake
             return new Target(
                 Platform.anycpu,
                 DevEnv,
-                Optimization.Debug | Optimization.Release,
-                OutputType.Dll,
-                Blob.NoBlob,
-                BuildSystem.MSBuild,
-                Assembler.SharpmakeDotNetFramework
-            );
+                Optimization.Debug | Optimization.Release
+            )
+            {
+                OutputType = OutputType.Dll,
+                Blob = Blob.NoBlob,
+                BuildSystem = BuildSystem.MSBuild,
+                Framework = Assembler.SharpmakeDotNetFramework
+            };
         }
 
         /// <summary>

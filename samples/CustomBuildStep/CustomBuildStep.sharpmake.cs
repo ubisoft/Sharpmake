@@ -22,11 +22,10 @@ namespace FastBuild
                 new Target(
                     Platform.win64,
                     DevEnv.vs2022,
-                    Optimization.Debug | Optimization.Release,
-                    OutputType.Lib,
-                    Blob.NoBlob,
-                    BuildSystem.MSBuild | BuildSystem.FastBuild
-                )
+                    Optimization.Debug | Optimization.Release)
+                {
+                    BuildSystem = BuildSystem.MSBuild | BuildSystem.FastBuild
+                }
             );
         }
 
@@ -80,11 +79,10 @@ namespace FastBuild
                 new Target(
                     Platform.win64,
                     DevEnv.vs2022,
-                    Optimization.Debug | Optimization.Release,
-                    OutputType.Lib,
-                    Blob.NoBlob,
-                    BuildSystem.MSBuild | BuildSystem.FastBuild
-                )
+                    Optimization.Debug | Optimization.Release)
+                {
+                    BuildSystem = BuildSystem.MSBuild | BuildSystem.FastBuild
+                }
             );
         }
 

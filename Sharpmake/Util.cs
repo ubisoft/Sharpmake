@@ -1782,7 +1782,8 @@ namespace Sharpmake
                     case Platform.win32:
                         return "x86";
                     case Platform.win64:
-                        return "x64";
+                        return target != null && target.TryGetFragment(out Platform targetPlatform) && targetPlatform == Platform.win64
+                            && GetProcessorArchitecture(target) == ProcessorArchitecture.arm64 ? "ARM64" : "x64";
                     case Platform.anycpu:
                         return isForSolution ? "Any CPU" : "AnyCPU";
                     default:

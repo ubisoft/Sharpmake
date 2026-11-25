@@ -148,6 +148,7 @@ def launch_tests():
             Test("CSharpHelloWorld", "HelloWorld.sharpmake.cs"),
             Test("JumboBuild", "JumboBuild.sharpmake.cs"),
             Test("HelloWorld", "HelloWorld.sharpmake.cs"),
+            Test("HelloWindowsArchitectures", "HelloWindowsArchitectures.sharpmake.cs"),
             Test("HelloLinux", "HelloLinux.Main.sharpmake.cs"),
             Test("HelloAssembly", "HelloAssembly.sharpmake.cs"),
             Test("CSharpVsix", "CSharpVsix.sharpmake.cs"),

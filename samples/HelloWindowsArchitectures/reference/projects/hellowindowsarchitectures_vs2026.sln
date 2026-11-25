@@ -1,0 +1,31 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HelloWindowsArchitectures", "hellowindowsarchitectures_vs2026.vcxproj", "{2DC646CF-DED4-7709-A1FC-ABC186C73BC9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM64 = Debug|ARM64
+		Debug|x64 = Debug|x64
+		Debug|x64-APX = Debug|x64-APX
+		Release|ARM64 = Release|ARM64
+		Release|x64 = Release|x64
+		Release|x64-APX = Release|x64-APX
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2DC646CF-DED4-7709-A1FC-ABC186C73BC9}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{2DC646CF-DED4-7709-A1FC-ABC186C73BC9}.Debug|ARM64.Build.0 = Debug|ARM64
+		{2DC646CF-DED4-7709-A1FC-ABC186C73BC9}.Debug|x64.ActiveCfg = Debug|x64
+		{2DC646CF-DED4-7709-A1FC-ABC186C73BC9}.Debug|x64.Build.0 = Debug|x64
+		{2DC646CF-DED4-7709-A1FC-ABC186C73BC9}.Debug|x64-APX.ActiveCfg = Debug APX|x64
+		{2DC646CF-DED4-7709-A1FC-ABC186C73BC9}.Debug|x64-APX.Build.0 = Debug APX|x64
+		{2DC646CF-DED4-7709-A1FC-ABC186C73BC9}.Release|ARM64.ActiveCfg = Release|ARM64
+		{2DC646CF-DED4-7709-A1FC-ABC186C73BC9}.Release|ARM64.Build.0 = Release|ARM64
+		{2DC646CF-DED4-7709-A1FC-ABC186C73BC9}.Release|x64.ActiveCfg = Release|x64
+		{2DC646CF-DED4-7709-A1FC-ABC186C73BC9}.Release|x64.Build.0 = Release|x64
+		{2DC646CF-DED4-7709-A1FC-ABC186C73BC9}.Release|x64-APX.ActiveCfg = Release APX|x64
+		{2DC646CF-DED4-7709-A1FC-ABC186C73BC9}.Release|x64-APX.Build.0 = Release APX|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

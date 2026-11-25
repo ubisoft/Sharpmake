@@ -16,12 +16,10 @@ namespace PackageReference
                 new Target(
                     Platform.win64,
                     DevEnv.vs2022 | DevEnv.vs2019,
-                    Optimization.Debug | Optimization.Release,
-                    OutputType.Dll,
-                    Blob.NoBlob,
-                    BuildSystem.MSBuild,
-                    DotNetFramework.v4_7_2
-                )
+                    Optimization.Debug | Optimization.Release)
+                {
+                    OutputType = OutputType.Dll
+                }
             );
 
             RootPath = @"[project.SharpmakeCsPath]\projects\[project.Name]";
@@ -70,12 +68,10 @@ namespace PackageReference
                 new Target(
                     Platform.win64,
                     DevEnv.vs2022 | DevEnv.vs2019,
-                    Optimization.Debug | Optimization.Release,
-                    OutputType.Dll,
-                    Blob.NoBlob,
-                    BuildSystem.MSBuild,
-                    DotNetFramework.v4_7_2
-                )
+                    Optimization.Debug | Optimization.Release)
+                {
+                    OutputType = OutputType.Dll
+                }
             );
 
             RootPath = @"[project.SharpmakeCsPath]\projects\[project.Name]";
@@ -107,12 +103,10 @@ namespace PackageReference
                 new Target(
                     Platform.win64,
                     DevEnv.vs2022 | DevEnv.vs2019,
-                    Optimization.Debug | Optimization.Release,
-                    OutputType.Dll,
-                    Blob.NoBlob,
-                    BuildSystem.MSBuild,
-                    DotNetFramework.v4_7_2
-                )
+                    Optimization.Debug | Optimization.Release)
+                {
+                    OutputType = OutputType.Dll
+                }
             );
         }
 

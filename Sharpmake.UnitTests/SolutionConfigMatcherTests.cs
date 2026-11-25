@@ -118,6 +118,68 @@ namespace Sharpmake.UnitTests
             Assert.That(match.Build, Is.False);
         }
 
+        // The solution target leaves the architecture unset (x64): the fallback must pick the project's x64 target
+        // and not the arm64 one. Raw values only tie (unset never equals anything), so this relies on the effective values.
+        [Test]
+        public void MissingProjectFallsBackToConfigurationWithSameArchitecture()
+        {
+            Solution solution = GetSolution<ArchitectureSolution>();
+            Solution.Configuration apxConfiguration = solution.Configurations.Single(c => Util.GetInstructionSetLevel(c.Target) == InstructionSetLevel.APX);
+            Solution.ResolvedProject resolvedProject = solution.GetResolvedProjects(solution.Configurations, out _).Single(p => p.Project.GetType() == typeof(ArchitectureLib));
+
+            var match = SolutionConfigMatcher.Match(solution, apxConfiguration, resolvedProject);
+
+            Assert.That(match.PerfectMatch, Is.False);
+            Assert.That(Util.GetProcessorArchitecture(match.ProjectTarget), Is.EqualTo(ProcessorArchitecture.x64));
+        }
+
+        // The project platform written in the .sln is the one of the project's matched target, not of the solution's:
+        // an arm64 solution configuration mapped to a project without arm64 target must point to its x64 configuration
+        [Test]
+        public void ProjectPlatformFollowsTheMatchedProjectTarget()
+        {
+            Solution solution = GetSolution<ArchitectureSolution>();
+            Solution.Configuration arm64Configuration = solution.Configurations.Single(c => Util.GetProcessorArchitecture(c.Target) == ProcessorArchitecture.arm64);
+            var resolvedProjects = solution.GetResolvedProjects(solution.Configurations, out _);
+
+            var x64OnlyMatch = SolutionConfigMatcher.Match(solution, arm64Configuration, resolvedProjects.Single(p => p.Project.GetType() == typeof(X64OnlyLib)));
+            var bothMatch = SolutionConfigMatcher.Match(solution, arm64Configuration, resolvedProjects.Single(p => p.Project.GetType() == typeof(ArchitectureLib)));
+
+            Assert.That(SolutionConfigMatcher.GetProjectPlatform(arm64Configuration, x64OnlyMatch, resolvedProjects.Single(p => p.Project.GetType() == typeof(X64OnlyLib))), Is.EqualTo("x64"));
+            Assert.That(SolutionConfigMatcher.GetProjectPlatform(arm64Configuration, bothMatch, resolvedProjects.Single(p => p.Project.GetType() == typeof(ArchitectureLib))), Is.EqualTo("ARM64"));
+        }
+
+        // A custom platform name that ignores the architecture gives the same "name|platform" to the x64, APX and ARM64
+        // configurations: the duplicate error must say why and how to fix it
+        [Test]
+        public void DuplicateHint_ForConfigurationsDifferingByArchitecture()
+        {
+            Solution solution = GetSolution<CustomPlatformNameSolution>();
+
+            string hint = SolutionConfigMatcher.GetDuplicateNamesHint(solution.Configurations);
+
+            Assert.That(hint, Does.Contain("GetArchitectureDisplaySuffix"));
+        }
+
+        [Test]
+        public void DuplicateHint_IsEmptyWhenTheNamesAreDistinct()
+        {
+            Solution solution = GetSolution<ArchitectureSolution>();
+
+            Assert.That(SolutionConfigMatcher.GetDuplicateNamesHint(solution.Configurations), Is.Empty);
+        }
+
+        [Test]
+        public void CustomPlatformNameWithDisplaySuffix_GivesDistinctNames()
+        {
+            Solution solution = GetSolution<SuffixedPlatformNameSolution>();
+
+            var names = solution.Configurations.Select(c => c.Name + "|" + c.PlatformName).ToList();
+
+            Assert.That(names.Distinct().Count(), Is.EqualTo(3));
+            Assert.That(SolutionConfigMatcher.GetDuplicateNamesHint(solution.Configurations), Is.Empty);
+        }
+
         [Test]
         public void InactiveProjectIsNotBuilt()
         {
@@ -392,6 +454,93 @@ namespace Sharpmake.UnitTests
             public void ConfigureAll(Configuration conf, Target target)
             {
                 conf.AddProject<FullLib>(target);
+            }
+        }
+
+        [Generate]
+        public class ArchitectureLib : Project
+        {
+            public ArchitectureLib()
+            {
+                SourceRootPath = Directory.GetCurrentDirectory() + "/[project.Name]";
+                AddTargets(new Target(Platform.win64, DevEnv.vs2026, Optimization.Release));
+                AddTargets(new Target(Platform.win64, DevEnv.vs2026, Optimization.Release) { ProcessorArchitecture = ProcessorArchitecture.arm64 });
+            }
+
+            [Configure]
+            public void ConfigureAll(Configuration conf, Target target)
+            {
+                conf.Output = Configuration.OutputType.Lib;
+            }
+        }
+
+        [Generate]
+        public class X64OnlyLib : Project
+        {
+            public X64OnlyLib()
+            {
+                SourceRootPath = Directory.GetCurrentDirectory() + "/[project.Name]";
+                AddTargets(new Target(Platform.win64, DevEnv.vs2026, Optimization.Release));
+            }
+
+            [Configure]
+            public void ConfigureAll(Configuration conf, Target target)
+            {
+                conf.Output = Configuration.OutputType.Lib;
+            }
+        }
+
+        // ArchitectureLib is not in the APX configuration, X64OnlyLib only in the x64 baseline one
+        [Generate]
+        public class ArchitectureSolution : Solution
+        {
+            public ArchitectureSolution()
+            {
+                AddTargets(new Target(Platform.win64, DevEnv.vs2026, Optimization.Release) { InstructionSetLevel = InstructionSetLevel.Baseline | InstructionSetLevel.APX });
+                AddTargets(new Target(Platform.win64, DevEnv.vs2026, Optimization.Release) { ProcessorArchitecture = ProcessorArchitecture.arm64 });
+            }
+
+            [Configure]
+            public void ConfigureAll(Configuration conf, Target target)
+            {
+                if (target.InstructionSetLevel == InstructionSetLevel.APX)
+                    return;
+
+                conf.AddProject<ArchitectureLib>(target);
+
+                if (target.ProcessorArchitecture != ProcessorArchitecture.arm64)
+                    conf.AddProject<X64OnlyLib>(target);
+            }
+        }
+
+        public abstract class ArchitectureTargetsSolutionBase : Solution
+        {
+            protected ArchitectureTargetsSolutionBase()
+            {
+                AddTargets(new Target(Platform.win64, DevEnv.vs2026, Optimization.Release) { InstructionSetLevel = InstructionSetLevel.Baseline | InstructionSetLevel.APX });
+                AddTargets(new Target(Platform.win64, DevEnv.vs2026, Optimization.Release) { ProcessorArchitecture = ProcessorArchitecture.arm64 });
+            }
+        }
+
+        // like AP's "Blob-Compiler" names: they know nothing about the architecture
+        [Generate]
+        public class CustomPlatformNameSolution : ArchitectureTargetsSolutionBase
+        {
+            [Configure]
+            public void ConfigureAll(Configuration conf, Target target)
+            {
+                conf.PlatformName = "Custom";
+            }
+        }
+
+        [Generate]
+        public class SuffixedPlatformNameSolution : ArchitectureTargetsSolutionBase
+        {
+            [Configure]
+            public void ConfigureAll(Configuration conf, Target target)
+            {
+                string suffix = Util.GetArchitectureDisplaySuffix(target);
+                conf.PlatformName = suffix.Length == 0 ? "Custom" : "Custom-" + suffix;
             }
         }
 

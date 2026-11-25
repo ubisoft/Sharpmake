@@ -26,6 +26,8 @@ call :UpdateRef samples JumboBuild                  JumboBuild.sharpmake.cs     
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples HelloWorld                  HelloWorld.sharpmake.cs                    reference         HelloWorld
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
+call :UpdateRef samples HelloWindowsArchitectures HelloWindowsArchitectures.sharpmake.cs    reference         HelloWindowsArchitectures
+if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples HelloLinux                  HelloLinux.Main.sharpmake.cs               reference         HelloLinux
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples HelloAssembly               HelloAssembly.sharpmake.cs                 reference         HelloAssembly

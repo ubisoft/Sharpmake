@@ -216,6 +216,23 @@ namespace Sharpmake
 
             foreach (ITarget target in Targets.TargetObjects)
             {
+                try
+                {
+                    Util.VerifyProcessorArchitectureAndLevel(target);
+                    if (this is CSharpProject && Util.GetInstructionSetLevel(target) != InstructionSetLevel.Baseline)
+                    {
+                        throw new Error("Target \"{0}\" of C# project \"{1}\": instruction set level {2} only applies to native (C++) code; C# projects support Baseline only.",
+                            target, GetType().Name, Util.GetInstructionSetLevel(target));
+                    }
+                }
+                catch (Error e)
+                {
+                    string message = Targets.DescribeInvalidTarget(target, e.Message);
+                    if (message == null)
+                        throw;
+                    throw new Error("{0}", message);
+                }
+
                 string targetString = target.GetTargetString();
                 if (usedTargetNames.ContainsKey(targetString))
                 {

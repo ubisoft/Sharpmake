@@ -890,6 +890,11 @@ namespace Sharpmake.Generators.VisualStudio
                 }),
                 Options.Option(Options.Vc.Compiler.OptimizeGlobalData.Enable, () => { context.Configuration.AdditionalCompilerOptions.Add("/Gw"); })
                 );
+
+                // The APX instruction set level of the target adds /feature:APX (or the clang equivalent) in AdditionalOptions
+                string apxSwitch = InstructionSetLevelSwitches.GetCompilerSwitch(context.Configuration.Target, useClangCl ? CompilerDriver.ClangCl : CompilerDriver.Msvc);
+                if (apxSwitch != null)
+                    context.Configuration.AdditionalCompilerOptions.Add(apxSwitch);
             }
 
             //Options.Vc.Compiler.FunctionLevelLinking.

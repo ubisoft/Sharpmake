@@ -95,6 +95,15 @@ The problem with the previous example, is that the following would compile while
     }
 ```
 
+### Architecture and instruction set level in `[target.X]`
+
+When a target has a non-default `ProcessorArchitecture` or `InstructionSetLevel` (see [Platforms](Platforms.md)):
+
+- `[target.Platform]` includes a token for them (`Win64APX`, `Win64Armv8`), while `[target.Name]` does not (`Release`). Default values add nothing, so existing paths do not change.
+- A default `TargetPath` of an APX target uses `[target.Name]` after `[target.Platform]`, because the configuration name has a space (`Release APX`). Do the same in a hand-written `TargetPath`: a folder name should not contain a space.
+- A custom `Solution.Configuration.PlatformName` must append `Util.GetArchitectureDisplaySuffix(target)`, otherwise the x64, APX and ARM64 targets share one solution platform.
+- `[Configure(ProcessorArchitecture.x64)]` also matches the targets that leave the architecture to the platform default.
+
 
 ## Write things once
 

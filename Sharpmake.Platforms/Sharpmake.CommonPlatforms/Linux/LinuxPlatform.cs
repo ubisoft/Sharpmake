@@ -27,6 +27,8 @@ namespace Sharpmake
             public override string GetToolchainPlatformString(ITarget target) => "x64";
             public override bool IsMicrosoftPlatform => false; // No way!
             public override bool IsPcPlatform => true;
+            public override ProcessorArchitecture DefaultProcessorArchitecture => ProcessorArchitecture.x64;
+            public override ProcessorArchitecture SupportedProcessorArchitectures => ProcessorArchitecture.x64;
             public override bool IsUsingClang => true; // Maybe now? Traditionally GCC but only the GNU project is backing it now.
             public override bool IsLinkerInvokedViaCompiler { get; set; } = false;
             public override bool HasDotNetSupport => false; // Technically false with .NET Core and Mono.

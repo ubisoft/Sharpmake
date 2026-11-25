@@ -263,6 +263,19 @@
             ]
         },
         {
+            "Name": "HelloWindowsArchitectures",
+            "CIs": [ "gitlab" ],
+            "OSs": [ "windows-2025-vs2026" ],
+            "Frameworks": [ "net8.0" ],
+            "Configurations": [ "release" ],
+            "TestFolder": "samples/HelloWindowsArchitectures",
+            "Commands":
+            [
+                "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"HelloWindowsArchitectures.sharpmake.cs\" -framework {framework}",
+                "./Compile.ps1 -slnOrPrjFile \"hellowindowsarchitectures_vs2026.sln\" -configuration {configuration} -platform \"x64\" -WorkingDirectory \"{testFolder}/projects\" -VsVersion latest -compiler MsBuild"
+            ]
+        },
+        {
             "Name": "JumboBuild",
             "CIs": [ "github", "gitlab" ],
             "OSs": [ "windows-2019", "windows-2022" ],

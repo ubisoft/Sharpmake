@@ -105,6 +105,45 @@ namespace Sharpmake.UnitTests
             Assert.That(unityLogNames, Is.EqualTo(expectedLogNames));
         }
 
+        // x64 (unset fragments), x64+APX and arm64 targets: each must get its own unity, and x64 keeps its legacy name
+        [TestCase(typeof(Bff.FragmentUnityResolver))]
+        [TestCase(typeof(Bff.HashUnityResolver))]
+        [TestCase(typeof(Bff.FragmentHashUnityResolver))]
+        public void ArchitectureTargets_GetDistinctUnityNames(Type resolverType)
+        {
+            Bff.UnityResolver = new UnityResolverLogger((Bff.IUnityResolver)Activator.CreateInstance(resolverType));
+            GlobalSettings.DefaultDevEnvs = DevEnv.vs2017 | DevEnv.vs2019;
+            GenerateAndBuildProjects();
+
+            var project = GetProject<BffUnityResolverTestProjects.ArchitectureProject>();
+            Assert.That(project, Is.Not.Null);
+
+            var names = project.Configurations.OfType<CommonProjectConfiguration>().ToDictionary(x => x.Name, x => x.LogUnityName);
+            TestContext.Out.WriteLine(string.Join(Environment.NewLine, names.Select(x => x.Key + " : " + x.Value)));
+
+            Assert.That(names.Count, Is.EqualTo(3));
+            Assert.That(names.Values.Distinct().Count(), Is.EqualTo(3));
+        }
+
+        // The architecture is named when it varies in the project (even x64, to tell it from arm64), followed by the level
+        // when it is not Baseline: an explicit Baseline never shows up, like in the target string
+        [Test]
+        public void FragmentUnityResolver_NamesArchitectureAndNonBaselineLevel()
+        {
+            Bff.UnityResolver = new UnityResolverLogger(new Bff.FragmentUnityResolver());
+            GlobalSettings.DefaultDevEnvs = DevEnv.vs2017 | DevEnv.vs2019;
+            GenerateAndBuildProjects();
+
+            var project = GetProject<BffUnityResolverTestProjects.ArchitectureProject>();
+            var names = project.Configurations.OfType<CommonProjectConfiguration>().Select(x => x.Name + " : " + x.LogUnityName).OrderBy(x => x).ToList();
+
+            Assert.That(names, Is.EqualTo(new List<string> {
+                "ArchitectureProject_Win64 : ArchitectureProject_x64_unity",
+                "ArchitectureProject_Win64APX : ArchitectureProject_x64_APX_unity",
+                "ArchitectureProject_Win64Armv8 : ArchitectureProject_arm64_unity",
+            }));
+        }
+
         protected void GenerateAndBuildUsingResolver<T>(DevEnv devEnv) where T : Bff.IUnityResolver, new()
         {
             Bff.IUnityResolver unityResolver = new T();
@@ -185,6 +224,39 @@ namespace Sharpmake.UnitTests
     namespace BffUnityResolverTestProjects
     {
         [Generate]
+        public class ArchitectureProject : Project
+        {
+            public ArchitectureProject() : base(typeof(Target), typeof(CommonProjectConfiguration))
+            {
+                RootPath = Directory.GetCurrentDirectory();
+                SourceRootPath = Directory.GetCurrentDirectory() + "/[project.Name]";
+                AddTargets(new Target(Platform.win64, DevEnv.vs2026, Optimization.Release)
+                {
+                    Blob = Blob.FastBuildUnitys,
+                    BuildSystem = BuildSystem.FastBuild,
+                    Framework = DotNetFramework.net8_0,
+                    ProcessorArchitecture = ProcessorArchitecture.x64,
+                    InstructionSetLevel = InstructionSetLevel.Baseline | InstructionSetLevel.APX
+                });
+                AddTargets(new Target(Platform.win64, DevEnv.vs2026, Optimization.Release)
+                {
+                    Blob = Blob.FastBuildUnitys,
+                    BuildSystem = BuildSystem.FastBuild,
+                    Framework = DotNetFramework.net8_0,
+                    ProcessorArchitecture = ProcessorArchitecture.arm64
+                });
+            }
+
+            [Configure]
+            public void ConfigureAll(CommonProjectConfiguration conf, Target target)
+            {
+                conf.ProjectPath = @"[project.RootPath]\[project.Name]\[target.Platform]";
+                conf.Name = "[project.Name]_[target.Platform]";
+                conf.IsFastBuild = true;
+            }
+        }
+
+        [Generate]
         public class SimpleProject : Project
         {
             public SimpleProject() : base(typeof(Target), typeof(CommonProjectConfiguration))
@@ -193,11 +265,12 @@ namespace Sharpmake.UnitTests
                 SourceRootPath = Directory.GetCurrentDirectory() + "/[project.Name]";
                 AddTargets(new Target(Platform.win64,
                                       GlobalSettings.DefaultDevEnvs,
-                                      Optimization.Debug | Optimization.Release | Optimization.Retail,
-                                      OutputType.Lib,
-                                      Blob.FastBuildUnitys,
-                                      BuildSystem.FastBuild,
-                                      DotNetFramework.net8_0));
+                                      Optimization.Debug | Optimization.Release | Optimization.Retail)
+                {
+                    Blob = Blob.FastBuildUnitys,
+                    BuildSystem = BuildSystem.FastBuild,
+                    Framework = DotNetFramework.net8_0
+                });
             }
 
             [Configure]

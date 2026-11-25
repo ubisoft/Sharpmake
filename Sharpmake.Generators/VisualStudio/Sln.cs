@@ -465,8 +465,6 @@ namespace Sharpmake.Generators.VisualStudio
 
                     SolutionConfigMatcher.TrackFastBuildConfig(solutionConfigurationFastBuildBuilt, solutionConfiguration, match);
 
-                    Platform projectPlatform = match.ProjectTarget.GetPlatform();
-
                     SolutionConfigMatcher.GetNameAndCategory(solution, solutionConfiguration, out string configurationName, out string category);
 
                     if (containsMultiDotNetFramework && includedProject?.Project is CSharpProject)
@@ -483,7 +481,7 @@ namespace Sharpmake.Generators.VisualStudio
                     using (fileGenerator.Declare("solutionConf", solutionConfiguration))
                     using (fileGenerator.Declare("projectGuid", solutionProject.UserData["Guid"]))
                     using (fileGenerator.Declare("projectConf", projectConf))
-                    using (fileGenerator.Declare("projectPlatform", Util.GetToolchainPlatformString(projectPlatform, solutionProject.Project, solutionConfiguration.Target, true)))
+                    using (fileGenerator.Declare("projectPlatform", SolutionConfigMatcher.GetProjectPlatform(solutionConfiguration, match, solutionProject)))
                     using (fileGenerator.Declare("category", category))
                     using (fileGenerator.Declare("configurationName", configurationName))
                     {

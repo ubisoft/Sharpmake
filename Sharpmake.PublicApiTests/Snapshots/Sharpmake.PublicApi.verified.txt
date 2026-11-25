@@ -1,4 +1,5 @@
 ﻿[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Sharpmake.Application")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Sharpmake.CommonPlatforms")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Sharpmake.Generators")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Sharpmake.UnitTests")]
 [assembly: System.Runtime.Versioning.TargetFramework(".NETCoreApp,Version=v8.0", FrameworkDisplayName=".NET 8.0")]
@@ -1167,6 +1168,7 @@ namespace Sharpmake
     }
     public interface IPlatformDescriptor
     {
+        Sharpmake.ProcessorArchitecture DefaultProcessorArchitecture { get; }
         bool HasDotNetSupport { get; }
         bool HasPrecompiledHeaderSupport { get; }
         bool HasSharedLibrarySupport { get; }
@@ -1175,7 +1177,12 @@ namespace Sharpmake
         bool IsPcPlatform { get; }
         bool IsUsingClang { get; }
         string SimplePlatformString { get; }
+        Sharpmake.ProcessorArchitecture SupportedProcessorArchitectures { get; }
+        string GetConfigurationNameSuffix(Sharpmake.ITarget target);
+        string GetDisambiguatedPlatformString(Sharpmake.ITarget target);
         Sharpmake.EnvironmentVariableResolver GetPlatformEnvironmentResolver(params Sharpmake.VariableAssignment[] variables);
+        string GetSolutionPlatformName(Sharpmake.ITarget target);
+        Sharpmake.InstructionSetLevel GetSupportedInstructionSetLevels(Sharpmake.ProcessorArchitecture architecture);
         string GetToolchainPlatformString(Sharpmake.ITarget target);
     }
     public interface IProjectGenerator
@@ -1255,6 +1262,13 @@ namespace Sharpmake
         Relative = 0,
         FarthestMatchInParentPath = 1,
         NearestMatchInParentPath = 2,
+    }
+    [Sharpmake.Fragment]
+    [System.Flags]
+    public enum InstructionSetLevel
+    {
+        Baseline = 1,
+        APX = 2,
     }
     [System.Serializable]
     public class InternalError : System.Exception
@@ -4338,6 +4352,14 @@ namespace Sharpmake
         public void ParseLine(string line, System.IO.FileInfo sourceFilePath, int lineNumber, Sharpmake.IAssemblerContext context) { }
         public bool ShouldParseLine() { }
     }
+    [Sharpmake.Fragment]
+    [System.Flags]
+    public enum ProcessorArchitecture
+    {
+        x86 = 1,
+        x64 = 2,
+        arm64 = 4,
+    }
     public class Project : Sharpmake.Configurable<Sharpmake.Project.Configuration>
     {
         public Sharpmake.Strings AdditionalSourceRootPaths;
@@ -5354,13 +5376,19 @@ namespace Sharpmake
         public Sharpmake.BuildSystem BuildSystem;
         public Sharpmake.DevEnv DevEnv;
         public Sharpmake.DotNetFramework Framework;
+        public Sharpmake.InstructionSetLevel InstructionSetLevel;
         public Sharpmake.Optimization Optimization;
         public Sharpmake.OutputType OutputType;
         public Sharpmake.Platform Platform;
+        public Sharpmake.ProcessorArchitecture ProcessorArchitecture;
         public Target() { }
+        public Target(Sharpmake.Platform platform, Sharpmake.DevEnv devEnv, Sharpmake.Optimization optimization) { }
+        [System.Obsolete(("Use the Target(Platform, DevEnv, Optimization) constructor and set optional fragm" +
+            "ents in an object initializer instead."), false)]
         public Target(Sharpmake.Platform platform, Sharpmake.DevEnv devEnv, Sharpmake.Optimization optimization, Sharpmake.OutputType outputType = 1, Sharpmake.Blob blob = 2, Sharpmake.BuildSystem buildSystem = 1, Sharpmake.DotNetFramework framework = 256) { }
         public string FrameworkFolder { get; }
         public override string Name { get; }
+        public override string ProjectConfigurationName { get; }
         public string ToolchainPlatform { get; }
     }
     public class Targets
@@ -5535,6 +5563,7 @@ namespace Sharpmake
         public static string FormatCallerInfo(string sourceFilePath, int sourceLineNumber) { }
         public static string FrameworkDisplayName() { }
         public static string GetAppxManifestFileName(Sharpmake.Project.Configuration conf) { }
+        public static string GetArchitectureDisplaySuffix(Sharpmake.ITarget target) { }
         public static string GetCallerInfoFromStack() { }
         public static string GetCapitalizedPath(string path) { }
         public static string GetClangVersionFromLLVMInstallDir(string llvmInstallDir) { }
@@ -5544,6 +5573,7 @@ namespace Sharpmake
         public static System.IO.FileInfo GetCurrentSharpmakeFileInfo() { }
         public static string GetDefaultLLVMInstallDir() { }
         public static int GetDeterministicHashCode(this string str) { }
+        public static string GetDisambiguatedPlatformString(Sharpmake.ITarget target) { }
         public static string GetDotNetTargetString(Sharpmake.DotNetFramework framework) { }
         public static string GetEnvironmentVariable(string variableName, string fallbackValue, ref string outputValue, bool silent = false) { }
         public static Sharpmake.Platform GetExecutingPlatform() { }

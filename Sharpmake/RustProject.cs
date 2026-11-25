@@ -51,6 +51,13 @@ namespace Sharpmake
         /// <param name="target">Current target.</param>
         protected void AddRustBuildStep(Configuration conf, Target target)
         {
+            // cargo is not given a --target, so it builds for the machine's architecture
+            if (target.ProcessorArchitecture != 0 && !Util.IsOmittedAsDefault(target, target.ProcessorArchitecture))
+            {
+                throw new Error("Target \"{0}\" of Rust project \"{1}\": processor architecture {2} is not supported yet, Rust projects only build for the platform's default architecture.",
+                    target, Name, target.ProcessorArchitecture);
+            }
+
             conf.ProjectFileName = "[project.Name]";
 
             conf.Output = Configuration.OutputType.Lib;

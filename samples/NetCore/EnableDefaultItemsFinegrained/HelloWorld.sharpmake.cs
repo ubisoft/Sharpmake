@@ -18,11 +18,11 @@ namespace NetCore.EnableDefaultItemsFinegrained
             new Target(
                 Platform.anycpu,
                 DevEnv.vs2022,
-                Optimization.Debug | Optimization.Release,
-                OutputType.Dll,
-                Blob.NoBlob,
-                BuildSystem.MSBuild,
-                DotNetFramework.net8_0)
+                Optimization.Debug | Optimization.Release)
+            {
+                OutputType = OutputType.Dll,
+                Framework = DotNetFramework.net8_0
+            }
         };
 
         public HelloWorldDefaultItemsFinegrained()

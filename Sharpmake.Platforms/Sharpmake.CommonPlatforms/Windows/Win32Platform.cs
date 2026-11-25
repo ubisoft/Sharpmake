@@ -20,6 +20,8 @@ namespace Sharpmake
             #region IPlatformDescriptor implementation
             public override string SimplePlatformString => "Win32";
             public override string GetToolchainPlatformString(ITarget target) => "Win32";
+            public override ProcessorArchitecture DefaultProcessorArchitecture => ProcessorArchitecture.x86;
+            public override ProcessorArchitecture SupportedProcessorArchitectures => ProcessorArchitecture.x86;
             #endregion
 
             #region IPlatformVcxproj implementation

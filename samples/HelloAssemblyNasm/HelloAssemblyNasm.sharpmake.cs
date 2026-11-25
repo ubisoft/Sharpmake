@@ -35,13 +35,12 @@ namespace HelloAssemblyNasm
             // FastBuild
             StripFastBuildSourceFiles = false;
             AddTargets(new Target(
-                        Platform.win64,
-                        DevEnv.vs2022,
-                        Optimization.Debug | Optimization.Release,
-                        OutputType.Lib,
-                        Blob.NoBlob,
-                        BuildSystem.FastBuild | BuildSystem.MSBuild
-            ));
+                Platform.win64,
+                DevEnv.vs2022,
+                Optimization.Debug | Optimization.Release)
+            {
+                BuildSystem = BuildSystem.FastBuild | BuildSystem.MSBuild
+            });
         }
 
         [Configure]
@@ -81,13 +80,12 @@ namespace HelloAssemblyNasm
         {
             Name = "HelloAssemblyNasm";
             AddTargets(new Target(
-                        Platform.win64,
-                        DevEnv.vs2022,
-                        Optimization.Debug | Optimization.Release,
-                        OutputType.Lib,
-                        Blob.NoBlob,
-                        BuildSystem.FastBuild | BuildSystem.MSBuild
-            ));
+                Platform.win64,
+                DevEnv.vs2022,
+                Optimization.Debug | Optimization.Release)
+            {
+                BuildSystem = BuildSystem.FastBuild | BuildSystem.MSBuild
+            });
         }
 
         [Configure()]

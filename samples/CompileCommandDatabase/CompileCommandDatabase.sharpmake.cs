@@ -29,7 +29,7 @@ namespace CompileDataBaseCommand
         protected BaseLibProject(string name)
         {
             Name = name + "ProjectName";
-            AddTargets(new Target(Platform.win64, DevEnv.vs2022, Optimization.Debug, OutputType.Lib));
+            AddTargets(new Target(Platform.win64, DevEnv.vs2022, Optimization.Debug));
             SourceRootPath = "[project.SharpmakeCsPath]/" + name;
         }
 

@@ -17,19 +17,18 @@ namespace NetCore
                 new Target(
                     Platform.anycpu,
                     DevEnv.vs2019,
-                    Optimization.Debug | Optimization.Release,
-                    OutputType.Dll,
-                    Blob.NoBlob,
-                    BuildSystem.MSBuild,
-                    DotNetFramework.v4_7_2),
+                    Optimization.Debug | Optimization.Release)
+                {
+                    OutputType = OutputType.Dll
+                },
                 new Target(
                     Platform.anycpu,
                     DevEnv.vs2019,
-                    Optimization.Debug | Optimization.Release,
-                    OutputType.Dll,
-                    Blob.NoBlob,
-                    BuildSystem.MSBuild,
-                    DotNetFramework.v4_8)
+                    Optimization.Debug | Optimization.Release)
+                {
+                    OutputType = OutputType.Dll,
+                    Framework = DotNetFramework.v4_8
+                }
             };
 
             public HelloWorld()
@@ -83,11 +82,11 @@ namespace NetCore
                 new Target(
                     Platform.anycpu,
                     DevEnv.vs2019,
-                    Optimization.Debug | Optimization.Release,
-                    OutputType.Dll,
-                    Blob.NoBlob,
-                    BuildSystem.MSBuild,
-                    DotNetFramework.v4_7_2 | DotNetFramework.v4_8)
+                    Optimization.Debug | Optimization.Release)
+                {
+                    OutputType = OutputType.Dll,
+                    Framework = DotNetFramework.v4_7_2 | DotNetFramework.v4_8
+                }
             };
 
             public HelloWorldMultiFramework()

@@ -23,6 +23,19 @@ namespace Sharpmake
         public abstract bool HasSharedLibrarySupport { get; }
         public virtual bool HasPrecompiledHeaderSupport => true;
 
+        /// <inheritdoc/>
+        public virtual ProcessorArchitecture DefaultProcessorArchitecture => 0;
+
+        /// <inheritdoc/>
+        public virtual ProcessorArchitecture SupportedProcessorArchitectures => 0;
+
+        /// <inheritdoc/>
+        public virtual InstructionSetLevel GetSupportedInstructionSetLevels(ProcessorArchitecture architecture) => InstructionSetLevel.Baseline;
+
+        /// <inheritdoc/>
+        public virtual string GetSolutionPlatformName(ITarget target) => GetToolchainPlatformString(target);
+
+
         public virtual EnvironmentVariableResolver GetPlatformEnvironmentResolver(params VariableAssignment[] parameters)
         {
             //
