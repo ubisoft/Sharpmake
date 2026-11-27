@@ -7,7 +7,7 @@ include:
   # WARNING: When this include is modified, we also need to modifify the corresponding include in Get-SamplesPipeline.ps1.
   - project: 'ubi/runner/ci/templates'
     file: 'ubi_runner.yml'
-    ref: '1.0.9'
+    ref: '1.0.11'
 
 stages:
   - build
@@ -29,7 +29,7 @@ variables:
 
 .compilation:base:
   stage: build
-  
+
   parallel:
     matrix:
     - configuration: [debug, release]
@@ -48,9 +48,11 @@ compilation:mac:
     - .ubi_runner_mac_macos26_xcode26
 
 compilation:linux:
-  extends: .compilation:base
-  tags: [square-linux-k8s-compil]
-  image: mcr.microsoft.com/dotnet/sdk:8.0
+  extends:
+    - .compilation:base
+    - .ubi_runner_linux_large
+    - .ubi_runner_retry_on_system_failure
+  image: mcr-docker-mirror.artifactory.ubisoft.org/dotnet/sdk:8.0
 
 generate_samples_pipeline:
   stage: build
