@@ -17,7 +17,7 @@ $samplesDef = Get-Content -Raw -Path 'SamplesDef.json' | ConvertFrom-Json
 $samplesPipeline = @{
     include = @{
         project = "ubi/runner/ci/templates"
-        ref = "1.0.7"
+        ref = "1.0.11"
         file = "ubi_runner.yml"
     }
 }
@@ -41,12 +41,12 @@ foreach ($sample in $samplesDef.Samples)
                         'linux'
                         {
                             $osProperties = @{
-                                tags = @( 'square_linux_dind' )
-                                services = @( 'docker:20.10.10-dind' )
+                                extends = @( '.ubi_runner_linux_small', '.ubi_runner_linux_dind', '.ubi_runner_retry_on_system_failure' )
+                                # UbiRunners have no default docker image: provide the docker CLI image (Alpine based, apk available).
+                                image = 'docker.mirrors.ubisoft.org/docker:27.5.1'
                                 variables = @{
-                                    DOCKER_HOST = 'tcp://localhost:2376'
-                                    DOCKER_TLS_VERIFY = 1
-                                    DOCKER_CERT_PATH = '/certs/client'
+                                    # The docker build pulls several base images; the default DinD storage is too small.
+                                    UBI_RUNNER_SVC_DIND_TEMP_STORAGE = '8G'
                                 }
                             }
                             $osCompilationName = 'linux'
